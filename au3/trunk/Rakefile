@@ -1,0 +1,61 @@
+#Encoding: Windows-1252
+=begin
+This file is part of au3. 
+Copyright © 2009 Marvin Gülker
+
+au3 is published under the same terms as Ruby. 
+See http://www.ruby-lang.org/en/LICENSE.txt
+=end
+require "rake/rdoctask"
+require "rake/gempackagetask"
+
+Rake::RDocTask.new do |rd|
+  rd.title = "au3 RDocs"
+  rd.main = "README.rdoc"
+  rd.options << "--charset=Windows-1252"
+  rd.rdoc_files.include("README.rdoc", "INSTALL.rdoc", "**/*.c")
+end
+
+spec = Gem::Specification.new do |gemspec|
+  gemspec.name = "au3"
+  gemspec.summary = "A binding to the AutoItX3 Windows automation tool."
+  gemspec.description = <<EOF
+au3 is a gem that provides Ruby bindings to the AutoIt Windows automation tool by 
+using it's DLL interface AutoItX. 
+EOF
+  gemspec.requirements = ["Microsoft Windows"]
+  gemspec.version = "0.0.1"
+  gemspec.author = "Marvin Guelker"
+  gemspec.email = "sutniuq@gmx.net"
+  gemspec.platform = Gem::Platform::CURRENT
+  gemspec.required_ruby_version = ">=1.8"
+  os_deps = []
+  os_deps << "ext/au3.o" if File.file? "ext/au3.o"
+  os_deps << "ext/au3.so" if File.file? "ext/au3.so"
+  os_deps << "ext/au3.dll" if File.file? "ext/au3.dll"
+  gemspec.files = ["README.rdoc", os_deps, "ext/au3.c", "ext/extconf.rb", Dir["ext/parts/**"]].flatten
+  gemspec.has_rdoc = true
+  gemspec.rdoc_options << " -m README.rdoc" << "-t 'au3 RDocs'" << "-c Windows-1252"
+  gemspec.rubyforge_project = "Automations"
+  gemspec.require_paths << "ext"
+end
+Rake::GemPackageTask.new(spec).define
+
+desc "Delete old build results"
+task :del_build do
+  files = %w[ext/au3.o ext/au3.so ext/Makefile]
+  files.each{|file| rm(file) if File.file?(file)}
+end
+
+desc "Build the au3 C extension"
+task :build do
+  Dir.chdir("ext") do
+    ruby "extconf.rb"
+    sh "make"
+  end
+end
+
+desc "Remove old build and rebuild"
+task :rebuild => [:del_build, :build, :rerdoc] do
+  puts "Rebuilt au3."
+end

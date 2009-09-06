@@ -1,0 +1,73 @@
+=au3
+<tt>.au3</tt> is the usual file extension for {AutoIt version 3}[http://www.autoitscript.com/autoit3/index.shtml] 
+scripts. That this library uses it as its name, tells a lot about 
+its features. Basically, the +au3+ library can do everything 
+you can do with the <tt>.au3</tt> files: 
+* Automate the mouse
+* Automate the keyboard
+* Manipulate Windows
+* etc. 
+However, there a a few exceptions, since +au3+ doesn't use 
+the AutoIt v3 interpreter behind the scenes. Instead, +au3+ is wrapped 
+around the DLL interface of AutoIt3, known as AutoItX3. 
+Since au3 uses AutoItX3, you have to install that library. 
+Get AutoIt from http://www.autoitscript.com/autoit3/index.shtml 
+and search the "AutoItX" subdirectory for the file 
+"AutoItX3.dll" and copy it to the directory your script resides in. 
+==Usage
+The majority of +au3+'s methods is bundled the AutoItX3 module 
+and accessable via it's module methods. In order to get them, 
+just require +au3+: 
+  require "rubygems" #If you're running pre-1.9
+  require "au3"
+  
+  AutoItX3.move_mouse(100, 100)
+The window-related methods are put together in the 
+AutoItX3::Window class. That allows you to create 
+Rubyish Window objects rather than using the procedural 
+function interface of AutoItX3. You needn't have to require them 
+extra. 
+  require "rubygems" #If you're running pre-1.9
+  require "au3"
+  
+  window = AutoItX3::Window.new("README.rdoc")
+  window.close
+Version 3 of AutoIt is known for its capabilities of direct 
+interaction with a window's controls. You will find this methods 
+wrapped in the AutoItX3::Control class. 
+  require "rubygems" #If you're running pre-1.9
+  require "au3"
+  
+  window = AutoItX3::Window.new("Run")
+  edit = window.active_control
+  edit.click
+===A note about encodings
+This is important: If you're working with Ruby 1.9 (like me, for example), 
+you may have become used to encode your files in UTF-8. You'll 
+run into problems when referencing window and control texts which 
+contain non-ASCII characters. For instance, the German equivalent 
+for the "Run" window is called "Ausführen". Now, if you try 
+something like the follwowing you will get an error saying that 
+the window can't be found: 
+  window = AutoItX3::Window.new("Ausführen")
+Instead, you must encode the window titles in your local 
+encoding (what can be easily done by String's #encode method). 
+This works: 
+  #Windows-1252 is the German standard encoding in Windows
+  window = AutoItX3::Window.new("Ausführen".encode("Windows-1252"))
+==Don't know where to start?
+Have a look at the documentation of the AutoItX3 module. 
++au3+ is well documented and even if you don't find something 
+useful, you may just want to play around with it. ;-)
+==Copyright
+  Copyright © 2009 Marvin Gülker
+  Licensed under the same terms as Ruby (see http://www.ruby-lang.org/en/LICENSE.txt )
+    Initia in potestate nostra sunt, de eventu fortuna iudicat. 
+==License
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of Ruby's license. 
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See 
+    Ruby's license for more details. 
