@@ -116,6 +116,7 @@ VALUE method_run_and_wait(int argc, VALUE argv[], VALUE self)
   LPCWSTR dir = to_wchar_t("");
   int flag = 1;
   long int exitcode;
+  long int err;
   check_for_arg_error(argc, 1, 3);
   
   if (argc >= 2)
@@ -129,11 +130,11 @@ VALUE method_run_and_wait(int argc, VALUE argv[], VALUE self)
   }
   exitcode = AU3_RunWait(rstr_to_wstr(argv[0]), dir, flag);
   
-  //Gebe false bei Fehlschlag zurück
-  if (AU3_error())
-    return Qfalse;
+  //Gebe den korrekten Exitstatus zurück
+  if (err = AU3_error())
+    return LONG2NUM(err);
   else
-    return INT2NUM(exitcode);
+    return LONG2NUM(exitcode);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_shutdown(VALUE self, VALUE code)

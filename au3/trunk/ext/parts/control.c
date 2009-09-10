@@ -12,9 +12,9 @@
 
 void raise_unfound_ctl(VALUE title, VALUE c_id)
 {
-  rb_raise(Au3Error, "The control '%s' was not found in the window '%s' (or the window was not found)!", StringValuePtr(title), StringValuePtr(c_id));
+  rb_raise(Au3Error, "The control '%s' was not found in the window '%s' (or the window was not found)!", StringValuePtr(c_id), StringValuePtr(title));
 }
-
+//------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_init_control(VALUE self, VALUE title, VALUE text, VALUE c_id)
 {
   rb_ivar_set(self, rb_intern("@title"), title);
@@ -129,9 +129,6 @@ VALUE method_text_ctl(VALUE self)
   
   AU3_ControlGetText(rstr_to_wstr(title), rstr_to_wstr(text), rstr_to_wstr(c_id), buffer, 10000);
   
-  if (AU3_error() == 1)
-    raise_unfound_ctl(title, c_id);
-  
   return wstr_to_rstr(buffer);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -211,14 +208,14 @@ VALUE method_send_command_to_control(int argc, VALUE argv[], VALUE self)
 {
   VALUE title = rb_ivar_get(self, rb_intern("@title"));
   VALUE text = rb_ivar_get(self, rb_intern("@text"));
-  VALUE c_id = rb_ivar_get(self, rb_intern("@c_id"));
+  VALUE c_id = rb_funcall(rb_ivar_get(self, rb_intern("@c_id")), rb_intern("to_s"), 0);
   LPCWSTR option = to_wchar_t("");
   wchar_t buffer[10000];
   
   check_for_arg_error(argc, 1, 2);
   
   if (argc == 2)
-    option = rstr_to_wstr(argv[1]);
+    option = rstr_to_wstr(rb_funcall(argv[1], rb_intern("to_s"), 0));
   
   AU3_ControlCommand(rstr_to_wstr(title), rstr_to_wstr(text), rstr_to_wstr(c_id), rstr_to_wstr(argv[0]), option, buffer, 10000);
   

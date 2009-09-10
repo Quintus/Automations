@@ -7,13 +7,19 @@ au3 is published under the same terms as Ruby.
 See http://www.ruby-lang.org/en/LICENSE.txt
 =end
 require "rake/rdoctask"
+require "rake/testtask"
 require "rake/gempackagetask"
 
 Rake::RDocTask.new do |rd|
   rd.title = "au3 RDocs"
-  rd.main = "README.rdoc"
+  rd.main = "ext/README.rdoc"
   rd.options << "--charset=Windows-1252"
-  rd.rdoc_files.include("README.rdoc", "INSTALL.rdoc", "**/*.c")
+  rd.rdoc_files.include("ext/README.rdoc", "ext/INSTALL.rdoc", "**/*.c")
+end
+
+Rake::TestTask.new("test") do |t|
+  t.pattern = "test/**/test_*.rb"
+  t.warning = true
 end
 
 spec = Gem::Specification.new do |gemspec|
@@ -33,11 +39,12 @@ EOF
   os_deps << "ext/au3.o" if File.file? "ext/au3.o"
   os_deps << "ext/au3.so" if File.file? "ext/au3.so"
   os_deps << "ext/au3.dll" if File.file? "ext/au3.dll"
-  gemspec.files = ["README.rdoc", os_deps, "ext/au3.c", "ext/extconf.rb", Dir["ext/parts/**"]].flatten
+  gemspec.files = ["ext/README.rdoc", os_deps, "ext/au3.c", "ext/extconf.rb", Dir["ext/parts/**"], Dir["test/**"]].flatten
   gemspec.has_rdoc = true
-  gemspec.rdoc_options << " -m README.rdoc" << "-t 'au3 RDocs'" << "-c Windows-1252"
+  gemspec.rdoc_options << " -m ext/README.rdoc" << "-t 'au3 RDocs'" << "-c Windows-1252"
   gemspec.rubyforge_project = "Automations"
   gemspec.require_paths << "ext"
+  gemspec.test_files = Dir.glob("test/**/test_*.rb")
 end
 Rake::GemPackageTask.new(spec).define
 
@@ -59,3 +66,12 @@ desc "Remove old build and rebuild"
 task :rebuild => [:del_build, :build, :rerdoc] do
   puts "Rebuilt au3."
 end
+
+desc "Remove all generated files"
+task :clobber => [:del_build]
+
+task :copy_dll do
+  cp "test/AutoItX3.dll", "./AutoItX3.dll"
+end
+
+task :test => [:copy_dll]

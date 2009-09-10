@@ -1,6 +1,6 @@
 ==Build instructions
 1. Download and install AutoIt3 from http://www.autoitscript.com/autoit3/index.shtml
-2. Copy AutoItX3.dll from the AutoItX subdirectory to au3's ext directory
+2. Copy AutoItX3.dll from the AutoItX subdirectory to au3's ext and test directories
 ===MinGW
 3. Copy AutoIt3.h and libautoitx3.a from AutoItX/StandardDLL/DevC to au3's ext directory
 4. cd into the trunk directory of au3
@@ -10,7 +10,7 @@
 4. cd into the ext directory of au3
 5. Type "ruby extconf.rb"
 6. Type nmake
-7. Type mt .... #TODO! I hate this step since I cannot remember this long command!
+7. Type mt.exe -manifest au3.so.manifest -outputresource:au3.so;2
 8. Type nmake install
 ==How to use?
 Copy the AutoItX3.dll file to your script directory, require "au3" and start scripting. 

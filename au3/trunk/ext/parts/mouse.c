@@ -85,16 +85,16 @@ VALUE method_cursor_pos(VALUE self)
 {
   int x = AU3_MouseGetPosX();
   int y = AU3_MouseGetPosY();
-  return rb_ary_new3(2, INT2FIX(x), INT2FIX(y));
+  return rb_ary_new3(2, INT2NUM(x), INT2NUM(y));
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_move_mouse(int argc, VALUE argv[], VALUE self)
 {
-  int speed = 10;
+  int speed = -1;
   check_for_arg_error(argc, 2, 3);
   if (argc == 3)
     speed = INT2FIX(argv[2]);
-  AU3_MouseMove(FIX2INT(argv[0]), FIX2INT(argv[1]), speed);
+  AU3_MouseMove(NUM2INT(argv[0]), NUM2INT(argv[1]), speed);
   return Qnil;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------

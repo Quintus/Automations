@@ -10,15 +10,17 @@ you can do with the <tt>.au3</tt> files:
 However, there a a few exceptions, since +au3+ doesn't use 
 the AutoIt v3 interpreter behind the scenes. Instead, +au3+ is wrapped 
 around the DLL interface of AutoIt3, known as AutoItX3. 
-Since au3 uses AutoItX3, you have to install that library. 
-Get AutoIt from http://www.autoitscript.com/autoit3/index.shtml 
-and search the "AutoItX" subdirectory for the file 
-"AutoItX3.dll" and copy it to the directory your script resides in. 
+==DLL problems: So to use this
+As said, au3 is wrapped around AutoItX3. To get au3 working, you have 
+to have the file "AutoItX3.dll" somewhere in your PATH. The simplest way 
+to get this is just to download AutoIt from http://www.autoitscript.com 
+and copy the AutoItX3.dll file from the AutoItX subdirectory into the 
+directory your script resides in. Or, if you don't want to copy the file 
+over and over again, put it in your Ruby's bin directory. 
 ==Usage
 The majority of +au3+'s methods is bundled the AutoItX3 module 
 and accessable via it's module methods. In order to get them, 
 just require +au3+: 
-  require "rubygems" #If you're running pre-1.9
   require "au3"
   
   AutoItX3.move_mouse(100, 100)
@@ -27,27 +29,26 @@ AutoItX3::Window class. That allows you to create
 Rubyish Window objects rather than using the procedural 
 function interface of AutoItX3. You needn't have to require them 
 extra. 
-  require "rubygems" #If you're running pre-1.9
   require "au3"
   
-  window = AutoItX3::Window.new("README.rdoc")
+  window = AutoItX3::Window.new("au3") #The beginning of a window's title is enough
   window.close
 Version 3 of AutoIt is known for its capabilities of direct 
 interaction with a window's controls. You will find this methods 
 wrapped in the AutoItX3::Control class. 
-  require "rubygems" #If you're running pre-1.9
   require "au3"
   
-  window = AutoItX3::Window.new("Run")
-  edit = window.active_control
-  edit.click
+  window = AutoItX3::Window.new("Un") #Unnamed, Unbenannt, whatever, this should be a notepad window...
+  window.activate
+  edit = window.focused_control
+  edit.text = "ABCDEFG"
 ===A note about encodings
-This is important: If you're working with Ruby 1.9 (like me, for example), 
+This is important: During working with Ruby 1.9 (like me, for example), 
 you may have become used to encode your files in UTF-8. You'll 
 run into problems when referencing window and control texts which 
 contain non-ASCII characters. For instance, the German equivalent 
 for the "Run" window is called "Ausführen". Now, if you try 
-something like the follwowing you will get an error saying that 
+something like the following you will get an error saying that 
 the window can't be found: 
   window = AutoItX3::Window.new("Ausführen")
 Instead, you must encode the window titles in your local 
@@ -55,6 +56,16 @@ encoding (what can be easily done by String's #encode method).
 This works: 
   #Windows-1252 is the German standard encoding in Windows
   window = AutoItX3::Window.new("Ausführen".encode("Windows-1252"))
+Alternatively you can encode your whole sourcefile in your locale encoding. 
+===AutoIt problems in Vista
+I made the experience that the AutoItX3 API seems to have some problems in 
+Windows Vista. I tried to run this code: 
+  require "au3"
+  AutoItX3.move_mouse(100, 100)
+but nothing happened. As I found out, this does only happen when I 
+try running from my programming editor (SciTE); when I run the script 
+from the command line, everything worked fine. So, if your script does not 
+work as expected and seems to leave out parts, try running it from the console. 
 ==Don't know where to start?
 Have a look at the documentation of the AutoItX3 module. 
 +au3+ is well documented and even if you don't find something 

@@ -169,7 +169,7 @@ VALUE method_visible(VALUE self)
   if (AU3_error() == 1)
     raise_unfound(title, text);
   
-  return (state & 2 == 2) ? Qtrue : Qfalse;
+  return ((state & 2) == 2) ? Qtrue : Qfalse;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_enabled(VALUE self)
@@ -181,7 +181,7 @@ VALUE method_enabled(VALUE self)
   if (AU3_error() == 1)
     raise_unfound(title, text);
   
-  return (state & 4 == 4) ? Qtrue : Qfalse;
+  return ((state & 4) == 4) ? Qtrue : Qfalse;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_minimized(VALUE self)
@@ -193,7 +193,7 @@ VALUE method_minimized(VALUE self)
   if (AU3_error() == 1)
     raise_unfound(title, text);
   
-  return (state & 16 == 16) ? Qtrue : Qfalse;
+  return ((state & 16) == 16) ? Qtrue : Qfalse;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_maximized(VALUE self)
@@ -205,7 +205,7 @@ VALUE method_maximized(VALUE self)
   if (AU3_error() == 1)
     raise_unfound(title, text);
   
-  return (state & 32 == 32) ? Qtrue : Qfalse;
+  return ((state & 32) == 32) ? Qtrue : Qfalse;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_state(VALUE self)
@@ -255,7 +255,7 @@ VALUE method_kill(VALUE self)
   
   AU3_WinKill(rstr_to_wstr(title), rstr_to_wstr(text));
   
-  return rb_funcall(self, rb_intern("exists?"), 0);
+  return Qnil;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 //TODO: This function simply doesn't work. No item is found, but why?
@@ -297,7 +297,6 @@ VALUE method_move(int argc, VALUE argv[], VALUE self)
     width = NUM2LONG(argv[2]);
   if (argc >= 4)
     height = NUM2LONG(argv[3]);
-  
   
   AU3_WinMove(rstr_to_wstr(title), rstr_to_wstr(text), NUM2LONG(argv[0]), NUM2LONG(argv[1]), width, height);
   return Qnil;
@@ -410,13 +409,15 @@ VALUE method_focused_control(VALUE self)
   VALUE title = rb_ivar_get(self, rb_intern("@title"));
   VALUE text = rb_ivar_get(self, rb_intern("@text"));
   wchar_t buffer[10000];
+  char str[1000000];
   
   AU3_ControlGetFocus(rstr_to_wstr(title), rstr_to_wstr(text), buffer, 10000);
   
   if (AU3_error() == 1)
     raise_unfound(title, text);
   
-  return rb_funcall(Control, rb_intern("new"), title, text, wstr_to_rstr(buffer));
+  sprintf(str, "AutoItX3::Control.new('%s', '%s', '%s')", StringValuePtr(title), StringValuePtr(text), to_char(buffer));
+  return rb_eval_string(str);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 VALUE method_statusbar_text(int argc, VALUE argv[], VALUE self)

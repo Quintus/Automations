@@ -496,7 +496,7 @@
 *Document-method: AutoItX3.send_keys
 *
 *call-seq: 
-*  AutoItX3.send( keys [, flag = "" ] ) ==> nil
+*  AutoItX3.send_keys( keys [, flag = "" ] ) ==> nil
 *
 *Simulates the keystrokes given keystrokes. If you don't 
 *set +flag+ to 1, you may use some of the follwing escape 
@@ -801,24 +801,24 @@
 *Document-method: AutoItX3.run
 *
 *call-seq: 
-*  AutoItX3.run( name [, workingdir [, flag ] ] ) ==> einInteger or nil
+*  AutoItX3.run( name [, workingdir = "" [, flag = 1] ] ) ==> einInteger or nil
 *
 *Runs a program. The program flow continues, if you want to wait for the process to 
 *finish, use #run_and_wait. 
 *Returns the PID of the created process or nil if there was a failure starting the process. 
-*The +flag+ parameter can be one of the HIDE, MINIMZE or MAXIMIZE constants. 
+*The +flag+ parameter can be one of the SW_HIDE, SW_MINIMZE or SW_MAXIMIZE constants in the Window class 
 */
 
 /*
 *Document-method: AutoItX3.run_and_wait
 *
 *call-seq: 
-*  AutoItX3.run_and_wait( name [, workingdir [, flag ] ] ) ==> einInteger or nil
+*  AutoItX3.run_and_wait( name [, workingdir = "" [, flag = 1] ] ) ==> einInteger or nil
 *
 *Runs a program. This method waits until the process has finished and returns 
 *the exitcode of the process (or false if there was an error initializing it). If 
 *you don't want this behaviour, use #run. 
-*The +flag+ parameter can be one of the HIDE, MINIMZE or MAXIMIZE constants. 
+*The +flag+ parameter can be one of the SW_HIDE, SW_MINIMZE or SW_MAXIMIZE constants in the Window class. 
 */
 
 /*
@@ -964,7 +964,7 @@
 */
 
 /*
-*Document-method: AutoItX3::Window.close
+*Document-method: AutoItX3::Window#close
 *
 *call-seq: 
 *  AutoItX3::Window#close ==> nil
@@ -1115,7 +1115,7 @@
 *Document-method: AutoItX3::Window#kill
 *
 *call-seq: 
-*  AutoItX3::Window#kill ==> true or false
+*  AutoItX3::Window#kill ==> nil
 *
 *Kills +self+. This method forces a window to close if it doesn't close 
 *quickly enough (in contrary to #close which waits for user actions 
@@ -1229,6 +1229,8 @@
 *  AutoItX3::Window#focused_control ==> aControl
 *
 *Returns the actually focused control in +self+, a AutoItX3::Control object. 
+*Note that if the owning window doesn't have the input focus, you'll get an 
+*unusable Control object back. 
 */
 
 /*
@@ -1435,6 +1437,8 @@
 *  AutoItX3::ListBox#current_selection = num ==> num
 *
 *Sets the current selection of a combo box to item +num+. 
+*The index is zero-based. Raises an Au3Error if +num+ is out 
+*of range. 
 */
 
 /*
@@ -1444,6 +1448,7 @@
 *  AutoItX3::ListBox#select_string( str ) ==> str
 *
 *Sets +self+'s selection to the first occurence of +str+. 
+*Raises an Au3Error if +str+ cannot be found. 
 */
 
 /*
@@ -2081,6 +2086,7 @@ void Init_au3(void)
   rb_define_method(Window, "exists?", method_exists, 0);
   rb_define_method(Window, "class_list", method_class_list, 0);
   rb_define_method(Window, "client_size", method_client_size, 0);
+  rb_define_method(Window, "close", method_close, 0);
   rb_define_method(Window, "handle", method_handle, 0);
   rb_define_method(Window, "rect", method_rect, 0);
   rb_define_method(Window, "pid", method_pid, 0);
