@@ -8,7 +8,9 @@
 #===au3.rb
 #This is au3's main file. 
 require "win32/api"
+#(See the end of this file for more require statements)
 
+#Added some methods to the build-in String class. 
 class String
   
   #The AutoItX3 API requires wchar_t * (or LPCWSTR) typed strings instead of the usual char *. 
@@ -29,7 +31,7 @@ class String
   
   #The AutoItX3 API returns wchar_t * (or LPCSWSTR) typed strings instead of the usual char *. 
   #This method should only be used for strings that have been created by #wide or by the au3 API 
-  #(which uses #wide internally). Keep in mind that this methods removes unconvertable characters. 
+  #(which uses #wide internally). Keep in mind that this method removes unconvertable characters. 
   #
   #Returns an +encoding+ encoded string that has been a wchar_t * (LPCWSTR) type. 
   def normal(encoding = "UTF-8")
@@ -46,22 +48,15 @@ class String
   
 end
 
-#This subclass of Win32::API is only used internally to make it a bit easier 
-#to create bindings the functions of AutoItX3. 
-class AU3_Function < Win32::API
-  
-  #Creates a new AU3_Function object. Takes the +name+, the +arguments+ and the +returnvalue+ of 
-  #the function. +name+ will be prefixed by "AU3_" and the DLL is set to "AutoItX3.dll". 
-  def initialize(name, arguments, returnvalue = 'V')
-    super("AU3_#{name}", arguments, returnvalue, "AutoItX3.dll")
-  end
-  
-end
+
 
 module AutoItX3
   
   #The smallest value AutoIt can handle. Used for *some* parameter defaults. 
   INTDEFAULT = -2147483647
+  
+  #The version of this au3 library. 
+  VERSION = "0.1.0-dev"
   
   #This is used to store the Win32::API objects. 
   @functions = {}
@@ -86,7 +81,35 @@ module AutoItX3
     "WinWaitDelay" => 250
   }
   
+  def self.functions
+    @functions
+  end
+  
+  def self.functions=(val)
+    @functions = val
+  end
+  
+  class Au3Error < StandardError
+  end
+  
+  #This subclass of Win32::API is only used internally to make it a bit easier 
+  #to create bindings the functions of AutoItX3. 
+  class AU3_Function < Win32::API
+    
+    #Creates a new AU3_Function object. Takes the +name+, the +arguments+ and the +returnvalue+ of 
+    #the function. +name+ will be prefixed by "AU3_" and the DLL is set to "AutoItX3.dll". 
+    #If you ommit the returnvalue, it's assumed to be of void type ('V'). 
+    def initialize(name, arguments, returnvalue = 'V')
+      super("AU3_#{name}", arguments, returnvalue, "AutoItX3.dll")
+    end
+    
+  end
+  
   class << self
+    
+    #This hash is used for the #set_option method. 
+    #Use the #set_option method to configure it. 
+    attr_reader :options
     
     #Returns the error code of the last called AutoItX3 function, which is 0 if 
     #everything worked fine. 
@@ -226,4 +249,11 @@ module AutoItX3
   
 end #AutoItX3
 
-require_relative("./misc.rb")
+require_relative("AutoItX3/misc.rb")
+require_relative("AutoItX3/filedir.rb")
+require_relative("AutoItX3/graphic.rb")
+require_relative("AutoItX3/keyboard.rb")
+require_relative("AutoItX3/mouse.rb")
+require_relative("AutoItX3/process.rb")
+
+p AutoItX3.process_exists? $$

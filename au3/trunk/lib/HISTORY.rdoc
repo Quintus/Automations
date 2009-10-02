@@ -1,0 +1,9 @@
+=History of au3
+==0.1.0
+* Changed the API to use win32-api now instead of a C extension
+* Added wide, wide!, normal and normal! to Ruby's String class
+* Added the AutoItX3::AU3_Function class
+* Added a block form to set_opt and opt that resets the options after executing the code block
+* Added an optional third parameter to AutoItX3.get_pixel_color for returning hexadecimal strings
+* Changed the default value of the second parameter of send_keys from 0 to false, according to Ruby's style
+* Changed the return value of run_as_set to nil instead of true
