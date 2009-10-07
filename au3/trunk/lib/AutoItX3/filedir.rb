@@ -20,7 +20,7 @@ module AutoItX3
     #Maps a network drive and raises an Au3Error if the action is not successful. 
     def add_drive_map(device, remote_share, flags = 0, username = "", password = "")
       @functions[__method__] ||= AU3_Function.new("DriveMapAdd", 'SSLSSPI')
-      buffer = " " * 100_000
+      buffer = " " * BUFFER_SIZE
       buffer.wide!
       @functions[__method__].call(device, remote_share, flags, username, password, buffer, buffer.size - 1)
       
@@ -31,7 +31,7 @@ module AutoItX3
         when 4 then raise(Au3Error, "Invalid device name '#{device}'!")
         when 5 then raise(Au3Error, "Invalid remote share '#{remote_share}'!")
         when 6 then raise(Au3Error, "The password is incorrect!")
-        else return buffer.normal
+        else return buffer.normal.strip
       end
     end
     
@@ -52,14 +52,14 @@ module AutoItX3
     #<tt>"||Server|drive"</tt> (every | is ment to be a backslash).  
     def get_drive_map(device)
       @functions[__method__] ||= AU3_Function.new("DriveMapGet", 'SPI')
-      buffer = " " * 100_000
+      buffer = " " * BUFFER_SIZE
       buffer.wide!
       ret = @functions[__method__].call(device, buffer, buffer.size - 1)
       
       if last_error == 1
         raise(Au3Error, "Failed to retrieve information about device '#{device}'")
       end
-      buffer.normal
+      buffer.normal.strip
     end
     
     #Deletes a key-value pair in a standard <tt>.ini</tt> file. 
@@ -76,10 +76,10 @@ module AutoItX3
     #if it can't find the key. The returned string will have a maximum length of 99,999 characters. 
     def read_ini_entry(filename, section, key, default = nil)
       @functions[__method__] ||= AU3_Function.new("IniRead", 'SSSSPI')
-      buffer = " " * 100_000
+      buffer = " " * BUFFER_SIZE
       buffer.wide!
       @functions[__method__].call(filename.wide, section.wide, key.wide, default.to_s.wide, buffer, buffer.size - 1)
-      buffer.normal
+      buffer.normal.strip
     end
     
     #Writes the specified key-value pair in a <tt>.ini</tt> file. Existing key-value pairs are overwritten. 

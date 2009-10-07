@@ -2,7 +2,7 @@
 #This file is part of au3. 
 #Copyright (c) 2009 Marvin Gülker
 begin
-  require "../ext/au3" 
+  require_relative "../lib/au3"
 rescue LoadError
   #Aha, this is the gem, not the build environment
   require "au3"
@@ -47,7 +47,7 @@ class KeyboardTest < Test::Unit::TestCase
     delete_all
     AutoItX3.send_keys(TEXT2)
     copy_all
-    assert_equal(TEXT2.sub("\n", "\r\n"), AutoItX3.cliptext)
+    assert_equal(TEXT2, AutoItX3.cliptext)
     delete_all
     AutoItX3.send_keys(TEXT3)
     copy_all

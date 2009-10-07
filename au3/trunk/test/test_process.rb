@@ -2,7 +2,7 @@
 #This file is part of au3. 
 #Copyright (c) 2009 Marvin Gülker
 begin
-  require "../ext/au3" 
+  require_relative "../lib/au3"
 rescue LoadError
   #Aha, this is the gem, not the build environment
   require "au3"
@@ -44,7 +44,7 @@ EOF
   end
   
   def test_run_and_wait
-    assert_equal(1, AutoItX3.run_and_wait("dir gibtsnich"))
+    assert_raises(AutoItX3::Au3Error){AutoItX3.run_and_wait("dir gibtsnich")}
   end
   
 end

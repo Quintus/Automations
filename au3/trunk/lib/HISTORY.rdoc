@@ -1,9 +1,19 @@
 =History of au3
+Important changes are marked <b>bold</b>. 
 ==0.1.0
-* Changed the API to use win32-api now instead of a C extension
-* Added wide, wide!, normal and normal! to Ruby's String class
+* <b>Changed the API to use win32-api now instead of a C extension</b>
+* <b>Added wide, wide!, normal and normal! to Ruby's String class</b>
 * Added the AutoItX3::AU3_Function class
-* Added a block form to set_opt and opt that resets the options after executing the code block
-* Added an optional third parameter to AutoItX3.get_pixel_color for returning hexadecimal strings
+* <b>Added a block form to set_opt and opt that resets the options after executing the code block</b>
+* <b>Added an optional third parameter to AutoItX3.get_pixel_color for returning hexadecimal strings</b>
 * Changed the default value of the second parameter of send_keys from 0 to false, according to Ruby's style
 * Changed the return value of run_as_set to nil instead of true
+* Added Window.functions and Window.functions= to avoid multiple AU3_Function objects for different instances of Window
+* <b>Added Window#valid? as an alias for Window#exists?</b>
+* Changed the return value of Control#click to nil instead of true
+* Changed the return value of Control#disable to nil instead of true
+* Changed the return value of Control#enable to nil instead of true
+* Changed the return value of Control#focus to nil instead of true
+* Changed the return value of Control#hide to nil instead of true
+* Changed the return value of Control#move to nil instead of true
+* Added Control.from_control to allow Controls to be transformed into a subclass

@@ -33,12 +33,16 @@ module AutoItX3
   
   class << self
     
+    #call-seq: 
+    #  close_process(pid) ==> nil
+    #  kill_process(pid) ==> nil
     #Closes the given process. 
     def close_process(pid)
       @functions[__method__] ||= AU3_Function.new("ProcessClose", 'S', 'L')
       @functions[__method__].call(pid.to_s.wide)
       nil
     end
+    alias kill_process close_process
     
     #Checks wheather or not the given name or PID exists. If successful, 
     #this method returns the PID of the process. 

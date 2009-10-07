@@ -29,7 +29,7 @@ module AutoItX3
     def open_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
       raise(ArgumentError, "The drive name has to be of form 'X:'!") unless tray =~ /^\w:$/
-      if @functions[__method__].call(tray.to_wide_char, "open".wide) == 0
+      if @functions[__method__].call(tray.wide, "open".wide) == 0
         return false
       else
         return true
@@ -43,7 +43,7 @@ module AutoItX3
     def close_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
       raise(ArgumentError, "The drive name has to be of form 'X:'!") unless tray =~ /^\w:$/
-      if @functions[__method__].call(tray.to_wide_char, "closed".wide) == 0
+      if @functions[__method__].call(tray.wide, "closed".wide) == 0
         return false
       else
         return true
@@ -70,12 +70,16 @@ module AutoItX3
     #at a NUL char. 
     def cliptext
       @functions[__method__] ||= AU3_Function.new("ClipGet", 'PL')
-      cliptext = " " * 100_000
+      cliptext = " " * BUFFER_SIZE
       cliptext.wide!
       @functions[__method__].call(cliptext, cliptext.size - 1)
-      cliptext.normal
+      cliptext.normal.strip
     end
     
+    #call-seq: 
+    #  tool_tip( text [, x = INTDEFAULT [, y = INTDEFAULT ] ] ) ==> nil
+    #  tooltip( text [, x = INTDEFAULT [, y = INTDEFAULT ] ] ) ==> nil
+    #
     #Displays a tooltip at the given position. If +x+ and +y+ are ommited, 
     #the tooltip will be displayed at the current cursor position. Coordinates 
     #out of range are automatically corrected. 
@@ -85,6 +89,7 @@ module AutoItX3
       @functions[__method__] ||= AU3_Function.new("ToolTip", 'SLL')
       @functions[__method__].call(text.wide, x, y)
     end
+    alias tooltip tool_tip
     
     #Wait for the specified amount of milliseconds. In AutoIt, this function is named 
     #"Sleep", but to avoid compatibility issues with Ruby's own sleep I decided to 

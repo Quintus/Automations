@@ -87,8 +87,8 @@ module AutoItX3
     #
     #Returns the current cursor position in a two-element array of form <tt>[x, y]</tt>. 
     def cursor_pos
-      @functions[:cursor_pos_x] ||= AU3_Function.new("MouseGetPosX", '')
-      @functions[:cursor_pos_y] ||= AU3_Function.new("MouseGetPosY", '')
+      @functions[:cursor_pos_x] ||= AU3_Function.new("MouseGetPosX", 'V', 'L')
+      @functions[:cursor_pos_y] ||= AU3_Function.new("MouseGetPosY", 'V', 'L')
       [@functions[:cursor_pos_x].call, @functions[:cursor_pos_y].call]
     end
     
