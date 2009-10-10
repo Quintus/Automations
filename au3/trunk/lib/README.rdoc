@@ -14,9 +14,12 @@ around the DLL interface of AutoIt3, known as AutoItX3.
 As said, au3 is wrapped around AutoItX3. To get au3 working, you have 
 to have the file "AutoItX3.dll" somewhere in your PATH. The simplest way 
 to get this is just to download AutoIt from http://www.autoitscript.com 
-and copy the AutoItX3.dll file from the AutoItX subdirectory into the 
-directory your script resides in. Or, if you don't want to copy the file 
-over and over again, put it in your Ruby's bin directory. 
+and copy the AutoItX3.dll file (I don't guarantee for the 64-bit version) 
+from the AutoItX subdirectory into the directory your script resides in. 
+Or, if you don't want to copy the file over and over again, put it in your Ruby's 
+bin directory. If you want to deploy your program, the final recipient need not 
+to have AutoIt installed - it's enough if you just include the AutoItX3.dll in your 
+application (and make sure you've read the AutoItX3 license - it's quite short). 
 ==Usage
 The majority of +au3+'s methods is bundled the AutoItX3 module 
 and accessable via it's module methods. In order to get them, 
@@ -38,40 +41,24 @@ interaction with a window's controls. You will find this methods
 wrapped in the AutoItX3::Control class. 
   require "au3"
   
-  window = AutoItX3::Window.new("Un") #Unnamed, Unbenannt, whatever, this should be a notepad window...
+  #Run notepad
+  AutoItX3.run("notepad.exe")
+  #Wait for the window to exist
+  AutoItX3::Window.wait("Un") #The start of the title is enough to find it
+  #Get a reference to it
+  window = AutoItX3::Window.new("Un")
+  #Bring it to the front
   window.activate
+  #Get the text control
   edit = window.focused_control
+  #Set the text. You should also have a look on the AutoItX3.send_keys method.
   edit.text = "ABCDEFG"
-===A note about encodings
-This is important: During working with Ruby 1.9 (like me, for example), 
-you may have become used to encode your files in UTF-8. You'll 
-run into problems when referencing window and control texts which 
-contain non-ASCII characters. For instance, the German equivalent 
-for the "Run" window is called "Ausführen". Now, if you try 
-something like the following you will get an error saying that 
-the window can't be found: 
-  window = AutoItX3::Window.new("Ausführen")
-Instead, you must encode the window titles in your local 
-encoding (what can be easily done by String's #encode method). 
-This works: 
-  #Windows-1252 is the German standard encoding in Windows
-  window = AutoItX3::Window.new("Ausführen".encode("Windows-1252"))
-Alternatively you can encode your whole sourcefile in your locale encoding. 
-===AutoIt problems in Vista
-I made the experience that the AutoItX3 API seems to have some problems in 
-Windows Vista. I tried to run this code: 
-  require "au3"
-  AutoItX3.move_mouse(100, 100)
-but nothing happened. As I found out, this does only happen when I 
-try running from my programming editor (SciTE); when I run the script 
-from the command line, everything worked fine. So, if your script does not 
-work as expected and seems to leave out parts, try running it from the console. 
-==Don't know where to start?
+===Don't know where to start?
 Have a look at the documentation of the AutoItX3 module. 
 +au3+ is well documented and even if you don't find something 
 useful, you may just want to play around with it. ;-)
 ==Copyright
-  Copyright © 2009 Marvin Gülker
+  Copyright Â© 2009 Marvin GÃ¼lker
   Licensed under the same terms as Ruby (see http://www.ruby-lang.org/en/LICENSE.txt )
     Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 ==License

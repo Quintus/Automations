@@ -7,6 +7,11 @@
 
 module AutoItX3
   
+  #A Window object holds a (pseudo) reference to a 
+  #window that may be shown on the screen or not. 
+  #If you want to get a real handle to the window, 
+  #call #handle on your Window object (but you won't 
+  #need that unless you want to use it for Win32 API calls). 
   class Window
     
     #A window describing the desktop. 

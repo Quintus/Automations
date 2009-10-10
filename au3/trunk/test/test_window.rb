@@ -32,7 +32,6 @@ class WindowTest < Test::Unit::TestCase
   end
   
   def test_exists
-    p @win.title
     assert_true(AutoItX3::Window.exists?(@win.title))
   end
   

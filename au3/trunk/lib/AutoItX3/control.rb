@@ -2,6 +2,11 @@
 
 module AutoItX3
   
+  #This is the superclass for all controls. If you don't find 
+  #a subclass of Control that matches your specific control, 
+  #you can use the Control class itself (and if you call 
+  #Window#focused_control, you *will* have to use it, 
+  #since that method retuns a Control and not a subclass). 
   class Control
     
     @functions = {}
@@ -172,7 +177,7 @@ module AutoItX3
       buffer = " " * BUFFER_SIZE
       buffer.wide!
       Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, command.wide, arg.to_s.wide, buffer, BUFFER_SIZE - 1)
-      raise_unfound if AutoItX3.error == 1
+      raise_unfound if AutoItX3.last_error == 1
       buffer.normal.strip
     end
     
@@ -194,6 +199,9 @@ module AutoItX3
     
   end
   
+  #List boxes are controls in which you can select one 
+  #or multiple items by clicking on it. ListBox is also 
+  #the superclass of ComboBox. 
   class ListBox < Control
     
     #call-seq: 
@@ -245,6 +253,9 @@ module AutoItX3
     
   end
   
+  #A combo box is a control on which you click 
+  #and then select a single item from the droped 
+  #list box. 
   class ComboBox < ListBox
     
     #Drops down a combo box. 
@@ -264,6 +275,9 @@ module AutoItX3
     
   end
   
+  #A button is a control on which you can click and than something happens. 
+  #Even if that's quite correct, that isn't all: check and radio boxes 
+  #are handled by Windows as buttons, so they fall into the scope of this class. 
   class Button < Control
     
     #Returns wheather +self+ is checked or not. 
@@ -284,6 +298,8 @@ module AutoItX3
     
   end
   
+  #An edit control is a single- or multiline input control in which you can 
+  #type text. For example, notepad consists mainly of a big edit control. 
   class Edit < Control
     
     #Returns the current caret position in a 2-element array 
@@ -311,6 +327,9 @@ module AutoItX3
     
   end
   
+  #A tab book or tab bar is a control that shows up most often 
+  #at the top of a window and lets you choice between different 
+  #contents within the same window.  
   class TabBook < Control
     
     #Returns the currently shown tab. 
@@ -334,6 +353,8 @@ module AutoItX3
     
   end
   
+  #A list view is a list which can contain many different 
+  #columns of data. 
   class ListView < Control
     
     #Ordinary list view
@@ -446,6 +467,8 @@ module AutoItX3
     
   end
   
+  #A TreeView is a control that shows a kind of expandable 
+  #list, like the one displayed ont the left side in <tt>.chm</tt> files. 
   class TreeView < Control
     
     #Sends +cmd+ to +self+. This method is only used internally. 

@@ -48,15 +48,42 @@ class String
   
 end
 
-
-
+#This module encapsulates all methods to interact with 
+#AutoItX3. Every method is documented, so you should't have 
+#problems with using them. However, a few notes: 
+#==Mouse Functions
+#Many mouse functions take an argument called +button+. This can be one 
+#of the following strings: 
+#  String              | Normal result   | Swapped buttons
+#  ====================+=================+================
+#  "" (empty string)   | Left            | Left
+#  --------------------+-----------------+----------------
+#  Left                | Left            | Left
+#  --------------------+-----------------+----------------
+#  Right               | Right           | Right
+#  --------------------+-----------------+----------------
+#  Middle              | Middle          | Middle
+#  --------------------+-----------------+----------------
+#  Primary             | Left            | Right
+#  --------------------+-----------------+----------------
+#  Secondary           | Right           | Left
+#  --------------------+-----------------+----------------
+#  Main                | Left            | Right
+#  --------------------+-----------------+----------------
+#  Menu                | Right           | Left
+#==Process Functions
+#The +pid+ parameter of many process functions 
+#needn't to be a process identification number, you can 
+#also pass in the name of the process. Please note, that 
+#in that case the first process with +pid+ in its name is 
+#assumed to be the correct one. 
 module AutoItX3
   
   #The smallest value AutoIt can handle. Used for *some* parameter defaults. 
   INTDEFAULT = -2147483647
   
   #The version of this au3 library. 
-  VERSION = "0.1.0-dev"
+  VERSION = "0.1.0"
   
   #This is the buffer size used for AutoItX3's text "returning" functions. 
   #It will be subtracted by 1 due to the trailing 0 of wchar_t * type strings. 
@@ -93,6 +120,7 @@ module AutoItX3
     @functions = val
   end
   
+  #This class is used for errors in this library. 
   class Au3Error < StandardError
   end
   
