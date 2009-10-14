@@ -36,7 +36,7 @@ class XXX
     #If we would use system in the main program to open 
     #gedit, it would hang until gedit is closed. That's why 
     #we run it in a separate process. 
-    fork{system("gedit")}
+    spawn("gedit")
     #Now we wait until gedit has made up its GUI. 
     #wait_for_window returns the ID of the found window, so 
     #we catch it and...
@@ -104,7 +104,7 @@ class XXX
     #command and it sometimes works, but you mustn't rely on it. Therefore I use 
     #the HOME environment variable here to get the home directory, rather than ~. 
     XDo::Keyboard.simulate("#{ENV["HOME"]}/testXDo.txt")
-    sleep 1 #gedit terminates if send [ALT]+[A] immediatly after the path
+    sleep 1 #gedit terminates if send [ALT]+[S] immediatly after the path
     XDo::Keyboard.alt_s
     #Now, let's duplicate our table. We could send all the stuff again, 
     #but I want to introduce you in the use of the X clipboard. 
@@ -132,7 +132,7 @@ class XXX
     sleep 5
     #Than close gedit. There are three methods to close a window, 
     ##close, #close! and #kill!. #close is like sending an [ALT]+[F4] keypress which may result in 
-    #a dialog box asking you for confimation. #close! is a bit stronger. First it calls #close and waits 
+    #a dialog box asking you for confirmation. #close! is a bit stronger. First it calls #close and waits 
     #a few seconds (you can specify how long exactly) then shuts down the window process. What 
     #leads us to the third method: #kill!. Be sure to call #kill! only on windows you know - 
     #it kills the process of a window by sending SIGTERM first and then SIGKILL. I've not tried 

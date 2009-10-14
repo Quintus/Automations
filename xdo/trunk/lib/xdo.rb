@@ -21,6 +21,9 @@ module XDo
   #The command to start eject. 
   EJECT = "eject"
   
+  #The version of this library. 
+  VERSION = "0.0.2-dev (10-14-2009)"
+  
   #Class for errors in this library. 
   class XError < StandardError
   end

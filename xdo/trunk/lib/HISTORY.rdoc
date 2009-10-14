@@ -1,0 +1,8 @@
+=History of the xdo gem
+This file shows the history of the xdo gem 
+from it's very beginning. Important changes in the 
+API are marked <b>bold</b>. 
+==0.0.2
+* Replaced fork{system("gedit")} in full_demo.rb with spawn("gedit")
+* Removed "require 'pp'" from keyboard.rb
+* <b>Added the Simulatable mixin</b>

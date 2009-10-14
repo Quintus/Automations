@@ -3,7 +3,6 @@
 #Copyright © 2009 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 require_relative("../xdo")
-require "pp"
 
 module XDo
   
