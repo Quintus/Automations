@@ -4,6 +4,7 @@ require "test/unit"
 require "xdo/keyboard.rb"
 require "xdo/clipboard.rb"
 require "xdo/xwindow"
+require "xdo/simulatable"
 
 class TestKeyboard < Test::Unit::TestCase
   
@@ -46,6 +47,24 @@ class TestKeyboard < Test::Unit::TestCase
     XDo::Keyboard.ctrl_c
     sleep 0.2
     assert_equal(TESTTEXT_SPECIAL.gsub("{TAB}", "\t"), XDo::Clipboard.read_clipboard)
+  end
+  
+  def test_include
+    String.class_eval do
+      include XDo::Simulatable
+      
+      def to_xdo
+        to_s
+      end
+    end
+    
+    XDo::Keyboard.ctrl_a
+    XDo::Keyboard.delete
+    "Ein String".simulate
+    XDo::Keyboard.ctrl_a
+    sleep 0.2
+    clip = XDo::Keyboard.ctrl_c
+    assert_equal("Ein String", clip)
   end
   
   def self.shutdown
