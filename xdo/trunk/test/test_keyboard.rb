@@ -63,7 +63,9 @@ class TestKeyboard < Test::Unit::TestCase
     "Ein String".simulate
     XDo::Keyboard.ctrl_a
     sleep 0.2
-    clip = XDo::Keyboard.ctrl_c
+    XDo::Keyboard.ctrl_c
+    sleep 0.2
+    clip = XDo::Clipboard.read_clipboard
     assert_equal("Ein String", clip)
   end
   
