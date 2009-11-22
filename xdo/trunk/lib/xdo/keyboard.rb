@@ -149,7 +149,7 @@ module XDo
       #Types a character sequence, but without any special chars. 
       #This function is a bit faster then #simulate. 
       def type(str, w_id = nil)
-        out = `#{XDOTOOL} type #{w_id ? "--window #{w_id}" : ""}"#{str}"`
+        out = `#{XDOTOOL} type #{w_id ? "--window #{w_id} " : ""}"#{str}"`
         nil
       end
       
@@ -163,7 +163,7 @@ module XDo
         if raw
           commands = []
           str.each_char do |char|
-            commands << "#{XDOTOOL} key #{w_id ? "--window #{w_id}" : ""}#{check_for_special_key(char)}"
+            commands << "#{XDOTOOL} key #{w_id ? "--window #{w_id} " : ""}#{check_for_special_key(char)}"
           end
           
           commands.each do |cmd|
@@ -196,7 +196,7 @@ module XDo
             else
               #Ab hier ist der Token sicherlich normaler Text; entsprechend wird damit verfahren. 
               token.each_char do |char|
-                commands << "#{XDOTOOL} key #{w_id ? "--window #{w_id}" : ""}#{check_for_special_key(char)}"
+                commands << "#{XDOTOOL} key #{w_id ? "--window #{w_id} " : ""}#{check_for_special_key(char)}"
               end
               commands.flatten! #Zur Sicherheit
             end
@@ -211,18 +211,18 @@ module XDo
       #Simulate a single char directly via the +key+ function of +xdotool+. 
       #+c+ is a single char like "a" or a combination like "shift+a". 
       def char(c, w_id = nil)
-        `#{XDOTOOL} key #{w_id ? "--window #{w_id}" : ""}#{c}`
+        `#{XDOTOOL} key #{w_id ? "--window #{w_id} " : ""}#{c}`
       end
       alias key char
       
       #Holds a key down. Please call #key_up after a call to this method. 
       def  key_down(key, w_id = nil)
-        `#{XDOTOOL} keydown #{w_id ? "--window #{w_id}" : "" }#{check_for_special_key(key)}`
+        `#{XDOTOOL} keydown #{w_id ? "--window #{w_id} " : "" }#{check_for_special_key(key)}`
       end
       
       #Releases a key hold down by #key_down. 
       def key_up(key, w_id = nil)
-        `#{XDOTOOL} keyup #{w_id ? "--window #{w_id}" : "" }#{check_for_special_key(key)}`
+        `#{XDOTOOL} keyup #{w_id ? "--window #{w_id} " : "" }#{check_for_special_key(key)}`
       end
       
       #Deletes a char. If +right+ is true, +del_char+ uses 
