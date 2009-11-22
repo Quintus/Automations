@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 #Encoding: UTF-8
 require "test/unit"
+require "tempfile"
 require "xdo/keyboard.rb"
 require "xdo/clipboard.rb"
 require "xdo/xwindow"
@@ -10,39 +11,76 @@ class TestKeyboard < Test::Unit::TestCase
   
   #Command to start a simple text editor
   EDITOR_CMD = "gedit"
-  TESTFILENAME = "#{ENV["HOME"]}/abcdefghijklmnopqrstuvwxyzäöüß.txt"
+  
   TESTTEXT = "This is test\ntext."
-  APPEND = "XYZ"
+  TESTTEXT2 = "XYZ"
   TESTTEXT_RAW = "ä{TAB}?b"
   TESTTEXT_SPECIAL = "ab{TAB}c{TAB}{TAB}d"
   
-  def self.startup
-    File.open(TESTFILENAME, "w"){|file| file.write(TESTTEXT)}
-    fork{system(%Q|#{EDITOR_CMD} "#{TESTFILENAME}"|)}
-    sleep 5
+  def setup
+    @edit_pid = spawn(EDITOR_CMD)
+    sleep 0.5
   end
   
-  def test_all
-    XDo::Keyboard.simulate("{PGUP}")
+  def teardown
+    Process.kill("KILL", @edit_pid)
+  end
+  
+  def test_char
+    Process.kill("KILL", @edit_pid) #Special file need to be opened
+    tempfile = Tempfile.open("XDOTEST")
+    tempfile.write(TESTTEXT)
+    tempfile.flush
+    sleep 1 #Wait for the buffer to be written out
+    @edit_pid = spawn(EDITOR_CMD, tempfile.path) #So it's automatically killed by #teardown
+    sleep 1
+    tempfile.close
     20.times{XDo::Keyboard.char("Shift+Right")}
     XDo::Keyboard.ctrl_c
     sleep 0.2
     assert_equal(TESTTEXT, XDo::Clipboard.read_clipboard)
-    XDo::Keyboard.simulate("{RIGHT}#{APPEND}")
+  end
+  
+  def test_simulate
+    XDo::Keyboard.simulate("A{BS}#{TESTTEXT2}")
     XDo::Keyboard.ctrl_a
     XDo::Keyboard.ctrl_c
     sleep 0.2
-    assert_equal(TESTTEXT + APPEND, XDo::Clipboard.read_clipboard)
-    (TESTTEXT.length + APPEND.length + 2).times{XDo::Keyboard.simulate("\b")}
-    XDo::Keyboard.simulate(TESTTEXT_RAW, true)
+    assert_equal(TESTTEXT2, XDo::Clipboard.read_clipboard)
+    
+    XDo::Keyboard.ctrL_a
+    XDo::Keyboard.delete
+    XDo::Keyboard.simulate(TESTTEXT_SPECIAL)
+    XDo::Keyboard.ctrl_a
+    XDo::Keyboard.ctrl_c
     sleep 0.2
+    assert_equal(TESTTEXT_SPECIAL.gsub("{TAB}", "\t"), XDo::Clipboard.read_clipboard)
+    
+    XDo::Keyboard.ctrl_a
+    XDo::Keyboard.delete
+    XDo::Keyboard.simulate(TESTTEXT_RAW, true)
     XDo::Keyboard.ctrl_a
     XDo::Keyboard.ctrl_c
     sleep 0.2
     assert_equal(TESTTEXT_RAW, XDo::Clipboard.read_clipboard)
-    (TESTTEXT_RAW.length + 2).times{XDo::Keyboard.delete}
-    XDo::Keyboard.simulate(TESTTEXT_SPECIAL)
+  end
+  
+  def test_type
+    XDo::Keyboard.type(TESTTEXT2)
+    XDo::Keyboard.ctrl_a
+    XDo::Keyboard.ctrl_c
     sleep 0.2
+    assert_equal(TESTTEXT2, XDo::Clipboard.read_clipboard)
+  end
+  
+  def test_window_id
+    XDo::XWindow.focus_desktop #Ensure that the editor hasn't the input focus anymore
+    sleep 1
+    edit_id = XDo::XWindow.search(EDITOR_CMD).first
+    xwin = XDo::XWindow.new(edit_id)
+    XDo::Keyboard.simulate(TESTTEXT_SPECIAL, false, edit_id)
+    sleep 1
+    xwin.activate
     XDo::Keyboard.ctrl_a
     XDo::Keyboard.ctrl_c
     sleep 0.2
@@ -67,15 +105,6 @@ class TestKeyboard < Test::Unit::TestCase
     sleep 0.2
     clip = XDo::Clipboard.read_clipboard
     assert_equal("Ein String", clip)
-  end
-  
-  def self.shutdown
-    xwin = XDo::XWindow.from_name(EDITOR_CMD)
-    xwin.activate
-    XDo::Keyboard.ctrl_s
-    sleep 0.5
-    xwin.close
-    File.delete(TESTFILENAME)
   end
   
 end
