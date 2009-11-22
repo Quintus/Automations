@@ -1,5 +1,11 @@
-INSTALLATION INSTRUCTIONS
-type "rake gem" to create a ruby gem, then "sudo gem install pkg/xdo" to install the gem. 
-type "rake test" to run the unit tests (but while they're running, you cannot use your PC since they take control of it). 
-type "rake rdoc" to generate the documentation. 
-type "rake full_gem" to run the unit tests and build the gem. 
+=INSTALLATION INSTRUCTIONS=
+==Gem building==
+Type "rake gem" to create a Ruby gem. It will be saved to the pkg subdirectory.
+Type "sudo gem install pkg/xdo" to install the just built gem. 
+==Unit testing==
+To run the tests, type "rake test". While the tests are running, you won't 
+be able to use your computer, since they take control of it. 
+==2 in 1==
+Type "rake full_gem" to run the unit tests and build the gem only when they all
+==Docs==
+Type "rake rdoc" to generate the documentation. 
