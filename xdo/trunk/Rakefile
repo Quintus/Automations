@@ -13,15 +13,15 @@ spec = Gem::Specification.new do |s|
 XDo is a library to automate your mouse, fake keyboard input and 
 manipulate windows in a Linux X server environment. It's wrapped 
 around a lot of command line tools (see requirements) of which xdotool 
-is the main one, the others are usually installed. 
+is the main one, the others are usually installed. It's designed to work 
+only with Ruby 1.9. 
 DESCRIPTION
-  s.add_dependency("test-unit", ">= 2.0")
+  s.add_development_dependency("test-unit", ">= 2.0")
   s.requirements = ["The xdotool command-line tool.", "xwininfo (usually installed)", "The xsel command-line tool.", "eject (usually installed)", "xkill (usually installed)"]
-  s.requirements << "The unit-test gem (will be installed if you don't have it)"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.author = "Marvin Gülker"
   s.email = "sutniuq@gmx.net"
-  s.platform = Gem::Platform::CURRENT
+  s.platform = Gem::Platform::CURRENT #Because it's a Linux-only gem
   s.required_ruby_version = ">=1.9"
   s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "Rakefile", "lib/README.rdoc"].flatten
   s.executables = ["xinfo.rb"]
