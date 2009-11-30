@@ -6,4 +6,6 @@ API are marked <b>bold</b>.
 * Replaced fork{system("gedit")} in full_demo.rb with spawn("gedit")
 * Removed "require 'pp'" from keyboard.rb
 * <b>Added the Simulatable mixin</b>
-* <b>Corrected window id usage for the XDo::Keyboard module. </b>
+* <b>Corrected window id usage for the XDo::Keyboard module</b>
+* Added a test for the window id usage
+* Made the test-unit gem a development dependency
