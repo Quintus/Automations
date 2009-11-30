@@ -48,7 +48,7 @@ class TestKeyboard < Test::Unit::TestCase
     sleep 0.2
     assert_equal(TESTTEXT2, XDo::Clipboard.read_clipboard)
     
-    XDo::Keyboard.ctrL_a
+    XDo::Keyboard.ctrl_a
     XDo::Keyboard.delete
     XDo::Keyboard.simulate(TESTTEXT_SPECIAL)
     XDo::Keyboard.ctrl_a
