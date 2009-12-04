@@ -17,23 +17,24 @@ is the main one, the others are usually installed. It's designed to work
 only with Ruby 1.9. 
 DESCRIPTION
   s.add_development_dependency("test-unit", ">= 2.0")
-  s.requirements = ["The xdotool command-line tool.", "xwininfo (usually installed)", "The xsel command-line tool.", "eject (usually installed)", "xkill (usually installed)"]
+  s.requirements = ["The xdotool command-line tool.", "The xsel command-line tool.", "xwininfo (usually installed)", "eject (usually installed)", "xkill (usually installed)"]
   s.version = "0.0.2"
   s.author = "Marvin Gülker"
   s.email = "sutniuq@gmx.net"
   s.platform = Gem::Platform::CURRENT #Because it's a Linux-only gem
   s.required_ruby_version = ">=1.9"
-  s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "Rakefile", "lib/README.rdoc"].flatten
+  s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "Rakefile", "lib/README.rdoc", "lib/HISTORY.rdoc"].flatten
   s.executables = ["xinfo.rb"]
   s.has_rdoc = true
+  s.rdoc_options << "--title" << "XDo RDocs" <<  "--main" << "lib/README.rdoc"
   s.test_files = Dir["test/test_*.rb"]
   s.rubyforge_project = "Automations"
 end
 Rake::GemPackageTask.new(spec).define
 
 Rake::RDocTask.new do |rd|
-  rd.rdoc_files.include("lib/**/*.rb", "lib/README.rdoc")
-  rd.title = "xdo RDocs"
+  rd.rdoc_files.include("lib/**/*.rb", "lib/README.rdoc", "lib/HISTORY.rdoc")
+  rd.title = "XDo RDocs"
   rd.main = "lib/README.rdoc"
 end
 
