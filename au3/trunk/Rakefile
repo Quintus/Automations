@@ -29,10 +29,10 @@ EOF
   gemspec.required_ruby_version = ">=1.9"
   gemspec.files = [Dir["test/**"], "lib/HISTORY.rdoc", "lib/README.rdoc", "lib/au3.rb", Dir["lib/AutoItX3/*.rb"]].flatten
   gemspec.has_rdoc = true
-  gemspec.rdoc_options << " -m 'lib/README.rdoc'" << "-t 'au3 RDocs'"
+  gemspec.rdoc_options << "--title" << "au3 RDocs" << "--main" << "lib/README.rdoc"
   gemspec.rubyforge_project = "Automations"
   gemspec.test_files = Dir.glob("test/**/test_*.rb")
   gemspec.add_dependency("win32-api", ">=1.4")
-  gemspec.add_dependency("test-unit", ">=2.0")
+  gemspec.add_development_dependency("test-unit", ">=2.0")
 end
 Rake::GemPackageTask.new(spec).define
