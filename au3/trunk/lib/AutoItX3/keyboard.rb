@@ -161,6 +161,37 @@ module AutoItX3
       @functions[__method__].call(keys.wide, flag)
     end
     
+    #Allows you to do things like 
+    #  AutoItX3.ctrl_c
+    #.Every _ will be used to separate a key press from another, so 
+    #you can't send _ with this function. Possible shortcuts are: 
+    #* ctrl
+    #* shift
+    #* alt
+    #* win
+    #* enter (or return)
+    #* del
+    #This text sequences can't be sent, too. 
+    def method_missing(sym, *args, &block)
+      super if !args.empty? or block
+      cmds = sym.to_s.split("_")
+      callsequence = ""
+      cmds.each do |cmd|
+        callsequence << case cmd.downcase
+          when "ctrl" then "^"
+          when "shift" then "+"
+          when "alt" then "!"
+          when "win" then "#"
+          when "enter" then "{ENTER}"
+          when "return" then "{ENTER}"
+          when "del" then "{DEL}"
+          else
+            cmd
+        end
+      end
+      send_keys(callsequence)
+    end
+    
   end
   
 end

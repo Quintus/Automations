@@ -17,3 +17,6 @@ Important changes are marked <b>bold</b>.
 * Changed the return value of Control#hide to nil instead of true
 * Changed the return value of Control#move to nil instead of true
 * Added Control.from_control to allow Controls to be transformed into a subclass
+==0.1.1
+*  Corrected documentation main page set by the Rakefile
+* <b>Added ##method_missing to the AutoItX3 module to allow shortcuts like <tt>AutoItX3.ctrl_c</tt>. 

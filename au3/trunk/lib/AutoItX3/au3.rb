@@ -83,7 +83,7 @@ module AutoItX3
   INTDEFAULT = -2147483647
   
   #The version of this au3 library. 
-  VERSION = "0.1.0"
+  VERSION = "0.1.1-dev (12-6-2009)"
   
   #This is the buffer size used for AutoItX3's text "returning" functions. 
   #It will be subtracted by 1 due to the trailing 0 of wchar_t * type strings. 
@@ -112,10 +112,12 @@ module AutoItX3
     "WinWaitDelay" => 250
   }
   
+  #All yet assigned functions. 
   def self.functions
     @functions
   end
   
+  #Reset all functions to the given hash. 
   def self.functions=(val)
     @functions = val
   end
