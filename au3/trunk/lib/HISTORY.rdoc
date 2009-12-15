@@ -1,5 +1,11 @@
 =History of au3
 Important changes are marked <b>bold</b>. 
+==0.1.1
+*  Corrected documentation main page set by the Rakefile
+* <b>Added ##method_missing to the AutoItX3 module to allow shortcuts like <tt>AutoItX3.ctrl_c</tt>. </b>
+* Renamed test_tray.rb to test_misc.rb
+* Added sleep test
+
 ==0.1.0
 * <b>Changed the API to use win32-api now instead of a C extension</b>
 * <b>Added wide, wide!, normal and normal! to Ruby's String class</b>
@@ -17,6 +23,3 @@ Important changes are marked <b>bold</b>.
 * Changed the return value of Control#hide to nil instead of true
 * Changed the return value of Control#move to nil instead of true
 * Added Control.from_control to allow Controls to be transformed into a subclass
-==0.1.1
-*  Corrected documentation main page set by the Rakefile
-* <b>Added ##method_missing to the AutoItX3 module to allow shortcuts like <tt>AutoItX3.ctrl_c</tt>. 
