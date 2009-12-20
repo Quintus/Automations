@@ -21,7 +21,7 @@ bin directory. If you want to deploy your program, the final recipient need not
 to have AutoIt installed - it's enough if you just include the AutoItX3.dll in your 
 application (and make sure you've read the AutoItX3 license - it's quite short). 
 ==Usage
-The majority of +au3+'s methods is bundled the AutoItX3 module 
+The majority of +au3+'s methods is bundled in the AutoItX3 module 
 and accessable via it's module methods. In order to get them, 
 just require +au3+: 
   require "au3"
