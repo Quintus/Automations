@@ -1,5 +1,5 @@
 =History of au3
-Important changes are marked <b>bold</b>. Bugfixes are written <i>itailc</i>. 
+Important changes are marked <b>bold</b>. Bugfixes are written <i>italic</i>. 
 ==0.1.1
 *  Corrected documentation main page set by the Rakefile
 * <b>Added ##method_missing to the AutoItX3 module to allow shortcuts like <tt>AutoItX3.ctrl_c</tt>. </b>
@@ -7,6 +7,7 @@ Important changes are marked <b>bold</b>. Bugfixes are written <i>itailc</i>.
 * Added sleep test
 * <i>Control#enabled? and Control#visible? never returned true. This has been fixed. </i>
 * Added a control test
+* Added a test for the ::set_option method. 
 
 ==0.1.0
 * <b>Changed the API to use win32-api now instead of a C extension</b>

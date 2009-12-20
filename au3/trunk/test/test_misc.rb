@@ -33,4 +33,16 @@ class MiscTest < Test::Unit::TestCase
     assert_in_delta(1.0, now - than, 0.01)
   end
   
+  def test_opt
+    AutoItX3.run("mspaint.exe")
+    AutoItX3.opt("WinTitleMatchMode", 2) do
+      assert(AutoItX3::Window.wait("Paint", "", 3)) #Timeout means false
+    end
+    assert_equal(false, AutoItX3::Window.wait("Paint", "", 3))
+    AutoItX3.set_option("WinTitleMatchMode", 2)
+    assert(AutoItX3::Window.wait("Paint", "", 3))
+    AutoItX3.opt("WinTitleMatchMode", 1)
+    assert_equal(false, AutoItX3::Window.wait("Paint", "", 3))
+  end
+  
 end
