@@ -6,6 +6,7 @@ Important changes are marked <b>bold</b>. Bugfixes are written <i>itailc</i>.
 * Renamed test_tray.rb to test_misc.rb
 * Added sleep test
 * <i>Control#enabled? and Control#visible? never returned true. This has been fixed. </i>
+* Added a control test
 
 ==0.1.0
 * <b>Changed the API to use win32-api now instead of a C extension</b>
