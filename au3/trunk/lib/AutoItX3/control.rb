@@ -40,10 +40,12 @@ module AutoItX3
     #the window holding the control (or "" if you don't want to specify one of them) 
     #and the ID of the control. Instead of the ID you may use the name of the 
     #control in combination width the occurence number of it, like "Edit1" and "Edit2". 
+    #Raises an Au3Error if the control doesn't exist. 
     def initialize(title, text, control_id)
       @title = title
       @text = text
       @c_id = control_id.to_s
+      visible? #Raises an error if the control doesn't exist
     end
     
     #Clicks +self+ with the given mouse +button+ (<tt>"Primary"</tt> by default) 
@@ -183,12 +185,12 @@ module AutoItX3
     
     #Returns wheather or not a control is visible. 
     def visible?
-      send_command_to_control("IsVisible") == 1
+      send_command_to_control("IsVisible").to_i == 1
     end
     
     #Returns true if a control can interact with the user (i.e. it's not "grayed out"). 
     def enabled?
-      send_command_to_control("IsEnabled") == 1
+      send_command_to_control("IsEnabled").to_i == 1
     end
     
     private
