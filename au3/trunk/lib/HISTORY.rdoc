@@ -8,6 +8,7 @@ Important changes are marked <b>bold</b>. Bugfixes are written <i>italic</i>.
 * <i>Control#enabled? and Control#visible? never returned true. This has been fixed. </i>
 * Added a control test
 * Added a test for the ::set_option method. 
+* Added a test for the ::method_missing shortcut trick
 
 ==0.1.0
 * <b>Changed the API to use win32-api now instead of a C extension</b>
