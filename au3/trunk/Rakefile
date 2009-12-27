@@ -25,6 +25,7 @@ EOF
   gemspec.version = "0.1.1"
   gemspec.author = "Marvin Guelker"
   gemspec.email = "sutniuq@gmx.net"
+  gemspec.homepage = "http://wiki.github.com/Quintus/Automations"
   gemspec.platform = Gem::Platform::RUBY
   gemspec.required_ruby_version = ">=1.9"
   gemspec.files = [Dir["test/**"], "lib/HISTORY.rdoc", "lib/README.rdoc", "lib/au3.rb", Dir["lib/AutoItX3/*.rb"]].flatten
