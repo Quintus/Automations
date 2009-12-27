@@ -58,4 +58,13 @@ class KeyboardTest < Test::Unit::TestCase
     assert_equal(TEXT3, AutoItX3.cliptext)
   end
   
+  def test_shortcuts
+    AutoItX3.send_keys(TEXT1)
+    AutoItX3.ctrl_a
+    AutoItX3.msleep(200)
+    AutoItX3.ctrl_c
+    AutoItX3.msleep(200)
+    assert_equal(TEXT1, AutoItX3.cliptext)
+  end
+  
 end
