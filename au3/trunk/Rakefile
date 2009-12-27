@@ -22,7 +22,7 @@ spec = Gem::Specification.new do |gemspec|
 using it's DLL interface AutoItX. 
 EOF
   gemspec.requirements = ["Microsoft Windows", "AutoItX3.dll from AutoIt3"]
-  gemspec.version = "0.1.0"
+  gemspec.version = "0.1.1"
   gemspec.author = "Marvin Guelker"
   gemspec.email = "sutniuq@gmx.net"
   gemspec.platform = Gem::Platform::RUBY

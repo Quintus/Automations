@@ -83,7 +83,7 @@ module AutoItX3
   INTDEFAULT = -2147483647
   
   #The version of this au3 library. 
-  VERSION = "0.1.1-dev (12-6-2009)"
+  VERSION = "0.1.1"
   
   #This is the buffer size used for AutoItX3's text "returning" functions. 
   #It will be subtracted by 1 due to the trailing 0 of wchar_t * type strings. 
