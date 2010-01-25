@@ -2,6 +2,7 @@
 #Encoding: UTF-8
 require "test/unit"
 require "xdo/xwindow.rb"
+require "xdo/keyboard"
 
 class WindowTest < Test::Unit::TestCase
   
