@@ -1,7 +1,7 @@
 =History of the xdo gem
 This file shows the history of the xdo gem 
 from it's very beginning. Important changes in the 
-API are marked <b>bold</b>. 
+API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
 ==0.0.2
 * Replaced fork{system("gedit")} in full_demo.rb with spawn("gedit")
 * Removed "require 'pp'" from keyboard.rb
@@ -9,3 +9,5 @@ API are marked <b>bold</b>.
 * <b>Corrected window id usage for the XDo::Keyboard module</b>
 * Added a test for the window id usage
 * Made the test-unit gem a development dependency
+==0.0.3
+* <i>Some XWindow instance methods (like #close!) showed wrong error messages due to the redundance of Kernel#raise with XWindow#raise. This has been fixed. </i>

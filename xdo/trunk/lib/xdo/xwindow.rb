@@ -272,7 +272,7 @@ module XDo
     def raise
       err = ""
       popen3("#{XDo::XDOTOOL} windowraise #{@id}"){|stdin, stdout, stderr| err << stderr.read}
-      raise(XDo::XError, err) unless err.empty?
+      Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
     #Activate a window. That is, bring it to top and give it the input focus. 
@@ -368,7 +368,7 @@ module XDo
     #Use #kill! to kill the process running the window. 
     #Available after requireing "xdo/keyboard"
     def close
-      raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
+      Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       activate
       sleep 0.5
       XDo::Keyboard.char("Alt+F4")
@@ -382,7 +382,7 @@ module XDo
     #does not succeed (within +timeout+ seconds), it will call #kill!. 
     #Available after requireing "xdo/keyboard". 
     def close!(timeout = 2)
-      raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
+      Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       #Try to close normally
       close
       #Check if it's deleted
