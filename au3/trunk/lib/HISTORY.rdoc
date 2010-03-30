@@ -1,5 +1,9 @@
 =History of au3
 Important changes are marked <b>bold</b>. Bugfixes are written <i>italic</i>. 
+
+==0.1.2
+*  <i>Fixed a typo and a bug in window.rb which made Window.select_menu_item raising errors. Also enhanced documentation of this method. Thanks to sdavis26 for reporting. </i>
+
 ==0.1.1
 *  Corrected documentation main page set by the Rakefile
 * <b>Added ##method_missing to the AutoItX3 module to allow shortcuts like <tt>AutoItX3.ctrl_c</tt>. </b>

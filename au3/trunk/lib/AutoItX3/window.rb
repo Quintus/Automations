@@ -296,10 +296,13 @@ module AutoItX3
     end
     
     #Clicks the specified item in the specified menu. You may specify up to seven 
-    #submenus. 
+    #submenus (1 Menu + 7 submenus). Note: You can't open a menu with this method, 
+    #the last submenu has to be associated with an action like opening a dialog window. 
     def select_menu_item(menu, *items)
-      Window.functons[__method__] ||= AU3_Function.new("WinMenuSelectItem", 'SSSSSSSSSS', 'L')
+      Window.functions[__method__] ||= AU3_Function.new("WinMenuSelectItem", 'SSSSSSSSSS', 'L')
       raise(ArgumentError, "Wrong number of arguments, maximum is seven items!") if items.size > 7 #(menu is the 8th)
+      items[6] = nil if items.size < 7
+      items.map!{|item| item.nil? ? "" : item}
       result = Window.functions[__method__].call(@title.wide, @text.wide, menu.wide, *items.map{|item| item.wide})
       raise_unfound if result == 0
       nil
