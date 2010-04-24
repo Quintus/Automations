@@ -74,6 +74,14 @@ module AutoItX3
     end
     
     #Deletes a key-value pair in a standard <tt>.ini</tt> file. 
+    #===Parameters
+    #[+filename+] The filename of the file. 
+    #[+section+] The section the key resides in. 
+    #[+key+] The key to delete. 
+    #===Return value
+    #true on success, otherwise false. 
+    #===Example
+    #  AutoItX3.delete_ini_entry("myini.ini", "mysection", "mykey")
     def delete_ini_entry(filename, section, key)
       @functions[__method__] ||= AU3_Function.new("IniDelete", 'SSS', 'L')
       if @functions[__method__].call(filename.wide, section.wide, key.wide) == 0
@@ -83,9 +91,23 @@ module AutoItX3
       end
     end
     
-    #Reads a value from a standard <tt>.ini</tt> file or returns the string given by +default+ 
-    #if it can't find the key. The returned string will have a maximum length of 99,999 characters. 
-    def read_ini_entry(filename, section, key, default = nil)
+    #Reads a value from a standard <tt>.ini</tt> file. 
+    #===Parameters
+    #[+filename+] The filename of the file. 
+    #[+section+] The section the key resides in. 
+    #[+key+] The key to read. 
+    #[+default+] ("")A string to return on failure. 
+    #===Return value
+    #The value of the +default+ parameter. 
+    #===Example
+    #  puts AutoItX3.read_ini_entry("myini.ini", "mysection", "mykey") #=> myvalue
+    #  #Nonexistant key: 
+    #  puts AutoItX3.read_ini_entry("myini.ini", "mysection", "mynonexsistingkey") #=> 
+    #  #With default value
+    #  puts AutoItX3.read_ini_entry("myini,ini", "mysection", "mynonexsistingkey", "NOTHING") #=> NOTHING
+    #===Remarks
+    #The returned string has a maximum length of <tt>AutoItX3::BUFFER_SIZE - 1 </tt> characters. 
+    def read_ini_entry(filename, section, key, default = "")
       @functions[__method__] ||= AU3_Function.new("IniRead", 'SSSSPI')
       buffer = " " * BUFFER_SIZE
       buffer.wide!
@@ -93,8 +115,22 @@ module AutoItX3
       buffer.normal.strip
     end
     
-    #Writes the specified key-value pair in a <tt>.ini</tt> file. Existing key-value pairs are overwritten. 
-    #A non-existing file will be created. Raises an Au3Error if +filename+ is read-only. 
+    #Writes the specified key-value pair in a <tt>.ini</tt> file. 
+    #===Parameters
+    #[+filename+] The file's filename. 
+    #[+section+] The section you want to write in. 
+    #[+key+] The key whose value you want to write. 
+    #[+value+] The value to write. 
+    #===Return value
+    #The +value+ argument. 
+    #===Raises
+    #[Au3Error] +filename+ is read-only. 
+    #===Example
+    #  AutoItX3.write_ini_entry("minini.ini", "mysection", "mykey", "myvalue")
+    #===Remarks
+    #Both the +section+ and the +key+ will be created if they aren't there already. Likewise is the file if nonexistant. 
+    #
+    #If the specified key-value pair already exists, it will be overwritten. 
     def write_ini_entry(filename, section, key_value, value)
       @functions[__method__] ||= AU3_Function.new("IniWrite", 'SSSS', 'L')
       

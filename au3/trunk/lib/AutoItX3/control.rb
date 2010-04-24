@@ -13,15 +13,20 @@ module AutoItX3
     
     class << self
       
-      def functions
+      def functions # :nodoc:
         @functions
       end
       
-      def functions=(hsh)
+      def functions=(hsh) # :nodoc:
         @functions = hsh
       end
       
       #Generates a control by using another control. 
+      #===Parameters
+      #[+ctrl+] The control to transform. 
+      #===Return value
+      #A new instance of a subclass of Control. 
+      #===Remarks & Example
       #This function is meant to be used with subclasses of Control, so you can do 
       #things like this: 
       #  #...
@@ -36,11 +41,19 @@ module AutoItX3
       
     end
     
-    #Creates a new Control object. Pass in the title and text of 
-    #the window holding the control (or "" if you don't want to specify one of them) 
-    #and the ID of the control. Instead of the ID you may use the name of the 
-    #control in combination width the occurence number of it, like "Edit1" and "Edit2". 
-    #Raises an Au3Error if the control doesn't exist. 
+    #Creates a new Control object. 
+    #===Parameters
+    #[+title+] The title of the window containing the control. 
+    #[+text+] The text of the window containing the control Set to "" (empty string) if you don't care about it. 
+    #[+control_id+] The ID of the control. You can also use the name of the control in combination 
+    #  with the occurence number of it, like "Edit1" and "Edit2". 
+    #===Return value
+    #A brand new Control instance. 
+    #===Raises
+    #[Au3Error] The control or the window doesn't exist. 
+    #===Example
+    #  #Get the edit control of the "Run" dialog: 
+    #  ctrl = AutoItX3::Control.new("Run", "", "Edit1")
     def initialize(title, text, control_id)
       @title = title
       @text = text
@@ -48,8 +61,23 @@ module AutoItX3
       visible? #Raises an error if the control doesn't exist
     end
     
-    #Clicks +self+ with the given mouse +button+ (<tt>"Primary"</tt> by default) 
-    #+click+ times (1 by default) at the given position (middle by default). 
+    #Clicks +self+ with the given mouse +button+. 
+    #===Parameters
+    #[+button+] (<tt>"Primary"</tt>)The button to click with. 
+    #[+clicks+] (1) The number of clicks. 
+    #[+x+] (+INTDEFAULT+) The X-coordinate to click at. Middle if left out. 
+    #[+y+] (+INTDEFAULT+) The Y-coordinate to click at. Middle if left out. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Couldn't click the control. 
+    #===Example
+    #  #Click with the left (or if left-handed mouse, right) button
+    #  ctrl.click
+    #  #Click with the secondary button
+    #  ctrl.click("Secondary")
+    #  #Double click
+    #  ctrl.click("Primary", 2)
     def click(button = "Primary", clicks = 1, x = INTDEFAULT, y = INTDEFAULT)
       Control.functions[__method__] ||= AU3_Function.new("ControlClick", 'SSSSLLL', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, button.wide, clicks, x, y)
@@ -60,6 +88,12 @@ module AutoItX3
     end
     
     #Disables ("grays out") +self+. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Failed to disable the control. 
+    #===Example
+    #  ctrl.disable
     def disable
       Control.functions[__method__] ||= AU3_Function.new("ControlDisable", 'SSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide)
@@ -70,6 +104,12 @@ module AutoItX3
     end
     
     #Enables +self+ (i.e. make it accept user actions). 
+    #===Return value
+    #nil.
+    #===Raises
+    #[Au3Error] Couldn't enable the control. 
+    #===Example
+    #  ctrl.enable
     def enable
       Control.functions[__method__] ||= AU3_Function.new("ControlEnable", 'SSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide)
@@ -80,6 +120,12 @@ module AutoItX3
     end
     
     #Gives the input focus to +self+. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Couldn't get the input focus. 
+    #===Example
+    #  ctrl.focus
     def focus
       Control.functions[__method__] ||= AU3_Functino.new("ControlFocus", 'SSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide)
@@ -89,9 +135,15 @@ module AutoItX3
       nil
     end
     
-    #Returns the internal window handle of +self+. It can be used in 
+    #Returns the internal window handle of +self+. 
+    #===Return value
+    #The handle of +self+ as a hexadecimal string. 
+    #===Example
+    #  hwnd = ctrl.handle.to_i(16)
+    #===Remarks
+    #The handle can be used in 
     #advanced window mode or directly in Win32 API calls (but you have 
-    #to call #to_i on the string than). 
+    #to call #to_i(16) on the string then). 
     def handle
       Control.functions[__method__] ||= AU3_Function.new("ControlGetHandle", 'SSSPI')
       buffer = " " * BUFFER_SIZE
@@ -101,8 +153,13 @@ module AutoItX3
       buffer.normal.strip
     end
     
-    #Returns a 4-element array containing the control's position and size. 
-    #Form is: <tt>[ x , y , width , height ]</tt>. 
+    #Gets the control's bounding rectangle. 
+    #===Return value
+    #A 4-element array of form <tt>[ x , y , width , height ]</tt>. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.rect #=> [66, 72, 297, 17]
     def rect
       Control.functions[:c_x] ||= AU3_Function.new("ControlGetPosX", 'SSS', 'L')
       Control.functions[:c_y] ||= AU3_Function.new("ControlGetPosY", 'SSS', 'L')
@@ -121,6 +178,12 @@ module AutoItX3
     end
     
     #Returns the +self+'s text. 
+    #===Return value
+    #The text value of +self+. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  puts ctrl.text #=> regedit
     def text
       Control.functions[__method__] ||= AU3_Function.new("ControlGetText", 'SSSPI')
       buffer = " " * BUFFER_SIZE
@@ -131,6 +194,13 @@ module AutoItX3
     end
     
     #Hides +self+. 
+    #===Return value
+    #nil. 
+    #===Example
+    #  ctrl.hide
+    #===Remarks
+    #"Hidings" means to make a control completely invisible. If you just want it to 
+    #refuse user input, use #disable. 
     def hide
       Control.functions[__method__] ||= AU3_Function.new("ControlHide", 'SSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide)
@@ -139,6 +209,22 @@ module AutoItX3
     end
     
     #Moves a control and optionally resizes it. 
+    #===Parameters
+    #[+x+] The goal X coordinate. 
+    #[+y+] The goal Y coordinate. 
+    #[+width+] (-1) The goal width. 
+    #[+height+] (-1) The goal height. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.move(100, 100)
+    #  #Move to (100|100) and resize
+    #  ctrl.move(100, 100, 500, 500)
+    #===Remarks
+    #If you move or resize a control, the visually shown control may not change, but if you try to 
+    #click on it after moving it away, you will get to know that it isn't there anymore. 
     def move(x, y, width = -1, height = -1)
       Control.functions[__method__] ||= AU3_Function.new("ControlMove", 'SSSLLLL', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, x, y, width, height)
@@ -146,9 +232,21 @@ module AutoItX3
       nil
     end
     
-    #Simulates user input to a control. This works normally even on 
-    #hidden and inactive windows. Please note that this method cannot 
-    #send every keystroke AutoItX3.send_keys can, notably [ALT] combinations. 
+    #Simulates user input to a control. 
+    #===Parameters
+    #[+str+] The input string to simulate. 
+    #[+flag+] (0) If set to 1, escape sequences in braces { and } are ignored. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  #Send some keystrokes
+    #  ctrl.send_keys("Abc")
+    #  #Send some keys with escape sequences
+    #  ctrl.send_keys("Ab{ESC}c")
+    #  #Ignore the escape sequences
+    #  ctrl.send_keys("Ab{ESC}c", 1)
     def send_keys(str, flag = 0)
       Control.functions[__method__] ||= AU3_Function.new("ControlSend", 'SSSSI', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, str.wide, flag)
@@ -157,6 +255,18 @@ module AutoItX3
     end
     
     #Sets the text of a control directly. 
+    #===Parameters
+    #[+text+] The text to set. 
+    #===Return value
+    #The +text+ argument. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.text = "My awesome text"
+    #===Remarks
+    #The difference to #send_keys is that some controls doesn't allow 
+    #the user to type text into (labels for example). These control's text 
+    #can be set by using this method, but note that escape sequences aren't supported here. 
     def text=(text)
       Control.functions[__method__] ||= AU3_Function.new("ControlSetText", 'SSSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, text.wide)
@@ -165,6 +275,12 @@ module AutoItX3
     end
     
     #Shows a hidden control. 
+    #===Return value
+    #nil. 
+    #===Example
+    #  ctrl.show
+    #===Remarks
+    #This doesn't enable user input, use #enable for that purpose. 
     def show
       Control.functions[__method__] ||= AU3_Function.new("ControlShow", 'SSS', 'L')
       res = Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide)
