@@ -9,15 +9,18 @@ module AutoItX3
   
   class << self
     
-    #====Arguments
+    #Maps a network drive.  
+    #===Parameters
     #Every | is ment to be a backslash. 
-    #- device: The device letter to map the drive to, in the form <tt>"X:"</tt>. If this is an asterisk *, the next available letter will be used. 
-    #- remote_share: The address of the network drive, in the form <tt>"||Server|Drive"</tt> or <tt>"||Server|Share"</tt>. 
-    #- flags (0): A combination (via +) of 1 (PersistantMapping) and 8 (Show authentification dialog if neccessary). 
-    #- username (""): The username, of the form <tt>"username"</tt> or <tt>"Domain|username"</tt>. 
-    #- password (""): The login password. 
-    #====Description
-    #Maps a network drive and raises an Au3Error if the action is not successful. 
+    #[+device+] The device letter to map the drive to, in the form <tt>"X:"</tt>. If this is an asterisk *, the next available letter will be used. 
+    #[+remote_share+] The address of the network drive, in the form <tt>"||Server|Drive"</tt> or <tt>"||Server|Share"</tt>. 
+    #[+flags+] (0) A combination (via +) of 1 (PersistantMapping) and 8 (Show authentification dialog if neccessary). 
+    #[+username+] ("") The username, of the form <tt>"username"</tt> or <tt>"Domain|username"</tt>. 
+    #[+password+] (""): The login password. 
+    #===Return value
+    #The assigned drive letter. 
+    #===Raises
+    #[Au3Error] Failed to connect the network drive. 
     def add_drive_map(device, remote_share, flags = 0, username = "", password = "")
       @functions[__method__] ||= AU3_Function.new("DriveMapAdd", 'SSLSSPI')
       buffer = " " * BUFFER_SIZE
@@ -35,21 +38,29 @@ module AutoItX3
       end
     end
     
-    #Disconnects a network drive. +device+ can be either of form <tt>"X:"</tt> or 
-    #<tt>"||Server|share"</tt> (imagine every | to be a backslash). 
-    #Raises an Au3Error if the disconnection was unsucsessful. 
+    #Disconnects a network drive. 
+    #===Parameters
+    #[+device+] The device to disconnect. Can be either of form <tt>"X:"</tt> or <tt>"||Server|share</tt> (| is a backslash). 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Couldn't disconnect the network drive. 
     def delete_drive_map(device)
       @functions[__method__] ||= AU3_Function.new("DriveMapDel", 'S', 'L')
       result = @functions[__method__].call(device)
       if result == 0
         raise(Au3Error, "Failed to remove remote device '#{device}'!")
       end
-      true
+      nil
     end
     
-    #Gets the server of the network drive named by +device+ or raises an Au3Error if it 
-    #can't access the device for some reason. The returned string will be of form 
-    #<tt>"||Server|drive"</tt> (every | is ment to be a backslash).  
+    #Gets the server of a network drive. 
+    #===Parameters
+    #[+device+] The device to check. 
+    #===Return value
+    #A string of form <tt>"||Server|drive"</tt>, where every | is meant to be a backslash. 
+    #===Raises
+    #[Au3Error] Couldn't retrieve the requested information. 
     def get_drive_map(device)
       @functions[__method__] ||= AU3_Function.new("DriveMapGet", 'SPI')
       buffer = " " * BUFFER_SIZE
