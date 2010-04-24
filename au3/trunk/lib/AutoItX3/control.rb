@@ -300,17 +300,38 @@ module AutoItX3
     end
     
     #Returns wheather or not a control is visible. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.visible? #=> true
+    #  ctrl.hide
+    #  p ctrl.visible? #=> false
+    #  ctrl.show
+    #  p ctrl.visible #=> true
     def visible?
       send_command_to_control("IsVisible").to_i == 1
     end
     
     #Returns true if a control can interact with the user (i.e. it's not "grayed out"). 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.enabled? #=> true
+    #  ctrl.disable
+    #  p ctrl.enabled? #=> false
+    #  ctrl.enable
+    #  p ctrl.enabled? #=> true
     def enabled?
       send_command_to_control("IsEnabled").to_i == 1
     end
     
     private
     
+    #Raises an error message saying that the window or the control wasn't found. 
     def raise_unfound
       raise(Au3Error, "The control '#{@c_id}' was not found in the window '#{@title}' (or the window was not found)!", caller)
     end
