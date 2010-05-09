@@ -11,7 +11,7 @@ end
 Rake::RDocTask.new do |rd|
   rd.title = "au3 RDocs"
   rd.main = "lib/README.rdoc"
-  rd.rdoc_files.include("lib/README.rdoc", "lib/HISTORY.rdoc", "**/*.rb")
+  rd.rdoc_files.include("lib/README.rdoc", "lib/HISTORY.rdoc", "lib/**/*.rb")
 end
 
 spec = Gem::Specification.new do |gemspec|
@@ -22,10 +22,10 @@ spec = Gem::Specification.new do |gemspec|
 using it's DLL interface AutoItX. 
 EOF
   gemspec.requirements = ["Microsoft Windows", "AutoItX3.dll from AutoIt3"]
-  gemspec.version = "0.1.1"
-  gemspec.author = "Marvin Guelker"
+  gemspec.version = "0.1.2.dev"
+  gemspec.author = "Marvin Gülker"
   gemspec.email = "sutniuq@gmx.net"
-  gemspec.homepage = "http://wiki.github.com/Quintus/Automations"
+  gemspec.homepage = "http://auto.rubyforge.org/"
   gemspec.platform = Gem::Platform::RUBY
   gemspec.required_ruby_version = ">=1.9"
   gemspec.files = [Dir["test/**"], "lib/HISTORY.rdoc", "lib/README.rdoc", "lib/au3.rb", Dir["lib/AutoItX3/*.rb"]].flatten
