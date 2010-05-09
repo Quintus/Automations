@@ -373,7 +373,7 @@ module AutoItX3
     #===Parameters
     #[+item_number+] The 0-based index of the item to delete. 
     #===Return value
-    #nil. 
+    #Unknown. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
@@ -382,27 +382,54 @@ module AutoItX3
       send_command_to_control("DelString", item.to_s).to_i
     end
     
-    #Finds the item number of +item+ in +self+. 
+    #Finds the item number (= 0-based index) of +item+ in +self+. 
+    #===Parameters
+    #[+item+] The item to look for. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.find("my_item") #=> 3
     def find(item)
       send_command_to_control("FindString", item).to_i
     end
     
     #Sets the current selection of a combo box to item +num+. 
-    #The index is zero-based. Raises an Au3Error if +num+ is out 
-    #of range. 
+    #===Parameters
+    #[+num+] The index of the item to set the selection to. 
+    #===Return value
+    #+num+. 
+    #===Raises
+    #[Au3Error] Index is out of range or the control or the window wasn't fond. 
+    #===Example
+    #  ctrl.current_selection = 3
     def current_selection=(num)
       send_command_to_control("SetCurrentSelection", num.to_i)
       num
     end
     
     #Sets +self+'s selection to the first occurence of +str+. 
-    #Raises an Au3Error if +str+ cannot be found. 
+    #===Parameters
+    #[+str+] The string to select. 
+    #===Return value
+    #+str+. 
+    #===Raises
+    #[Au3Error] Couldn't find the string, the control or the window. 
+    #===Example
+    #  ctrl.select_string("my_string")
     def select_string(str)
       send_command_to_control("SelectString", str)
       string
     end
     
     #Returns the currently selected string. 
+    #===Return value
+    #The currently selected string. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.current_selection #=> "my_string"
     def current_selection
       send_command_to_control("GetCurrentSelection")
     end
@@ -415,6 +442,12 @@ module AutoItX3
   class ComboBox < ListBox
     
     #Drops down a combo box. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  box.drop
     def drop
       send_command_to_control("ShowDropDown")
     end
@@ -424,6 +457,10 @@ module AutoItX3
     #  close
     #
     #Undrops or closes a combo box. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
     def undrop
       send_command_to_control("HideDropDown")
     end
@@ -433,21 +470,45 @@ module AutoItX3
   
   #A button is a control on which you can click and than something happens. 
   #Even if that's quite correct, that isn't all: check and radio boxes 
-  #are handled by Windows as buttons, so they fall into the scope of this class. 
+  #are handled by Windows as buttons as well, so they fall into the scope of this class. 
   class Button < Control
     
     #Returns wheather +self+ is checked or not. 
-    #Only useful for radio and check buttons. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.checked? #=> false
+    #  ctrl.check
+    #  p ctrl.checked? #=> true
+    #===Remarks
+    #This method is only useful for radio and check buttons. 
     def checked?
       send_command_to_control("IsChecked") == 1
     end
     
     #Checks +self+ if it's a radio or check button. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.check
+    #===Rmarks
+    #Only useful for radio and check buttons. If you try to do this on a regular button, 
+    #it's like you clicked it. 
     def check
       send_command_to_control("Check")
     end
     
     #Unchecks +self+ if it's a radio or check button. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.uncheck
     def uncheck
       send_command_to_control("UnCheck")
     end
