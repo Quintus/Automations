@@ -485,7 +485,7 @@ module AutoItX3
     #===Remarks
     #This method is only useful for radio and check buttons. 
     def checked?
-      send_command_to_control("IsChecked") == 1
+      send_command_to_control("IsChecked") == "1"
     end
     
     #Checks +self+ if it's a radio or check button. 
