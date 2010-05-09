@@ -350,6 +350,15 @@ module AutoItX3
     #Adds an entry to an existing combo or list box. 
     #If you use the << form, you can do a chain call like: 
     #  ctrl << "a" << "b" << "c"
+    #===Parameters
+    #[+string+] The string to append. 
+    #===Return value
+    #The appended string or +self+, in the case of the operator form. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  list.add_item("my_item")
+    #  list << "my_item" << "my_second_item"
     def add_item(string)
       send_command_to_control("AddString", string)
       string
@@ -360,7 +369,15 @@ module AutoItX3
       self
     end
     
-    #Delete item +no+. 
+    #Deletes an item. 
+    #===Parameters
+    #[+item_number+] The 0-based index of the item to delete. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  list.delete(0)
     def delete(item_number)
       send_command_to_control("DelString", item.to_s).to_i
     end
