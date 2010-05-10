@@ -849,27 +849,70 @@ module AutoItX3
       buffer.normal.strip
     end
     
-    #Checks +item+ if it supports that operation. 
+    #Checks +item+, if it supports that operation. 
+    #===Parameters
+    #[+item+] The name of the item to check. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.check("my item")
     def check(item)
       send_command_to_tree_view("Check", item)
     end
     
     #Collapses +item+ to hide its children. 
+    #===Parameters
+    #[+item+] The name of the item to collapse. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.collapse("AutoItX3")
     def collapse(item)
       send_command_to_tree_view("Collapse", item)
     end
     
     #Return wheather or not +item+ exists. 
+    #===Parameters
+    #[+item+] The name of the item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.exists?("AutoItX") #=> true
+    #  p ctrl.exists?("nonexistant") #=> false
     def exists?(item)
       send_command_to_tree_view("Exists", item).to_i == 1
     end
     
     #Expands +item+ to show its children. 
+    #===Parameters
+    #[+item+] The name of the item to expand. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.expand("AutoItX")
     def expand(item)
       send_command_to_tree_view("Expand", item)
     end
     
     #Returns the number of children of +item+. 
+    #===Parameters
+    #[+item+] The name of the item to check. 
+    #===Return value
+    #The number of subitems of that node. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_subitems("AutoItX") #=> 8
+    #===Remarks
+    #This method returns 0 if the item doesn't exist. 
     def num_subitems(item)
       send_command_to_tree_view("GetItemCount", item).to_i
     end
