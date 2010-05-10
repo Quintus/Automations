@@ -519,8 +519,13 @@ module AutoItX3
   #type text. For example, notepad consists mainly of a big edit control. 
   class Edit < Control
     
-    #Returns the current caret position in a 2-element array 
-    #of form <tt>[line, column]</tt>. 
+    #Returns the current caret position.
+    #===Return value
+    #A 2-element array of form <tt>[line, column]</tt>. Numbering starts with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p edit.caret_pos #=> [1, 1]
     def caret_pos
       x = send_command_to_control("GetCurrentLine").to_i
       y = send_command_to_control("GetCurrentCol").to_i
@@ -528,16 +533,39 @@ module AutoItX3
     end
     
     #Returns the number of lines in +self+. 
+    #===Return value
+    #The number of lines. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p edit.lines #=> 3
     def lines
       send_command_to_control("GetLineCount").to_i
     end
     
     #Returns the currently selected text. 
+    #===Return value
+    #The currently selected text selection. 
+    #===Example
+    #  p edit.selected_text #=> "I love Ruby!"
+    #===Remarks
+    #Be careful with the encoding of the returned text. It's likely that 
+    #you have to do a force_encoding on it, since there isn't any guarantee in 
+    #which encoding a window returns it's contents. 
     def selected_text
       send_command_to_control("GetSelected")
     end
     
     #"Pastes" +str+ at +self+'s current caret position. 
+    #===Parameters
+    #[+str+] The text to paste. 
+    #===Return value
+    #Unknown. 
+    #===Example
+    #  edit.paste("My text")
+    #===Remarks
+    #In contrast to #selected_text, the window should receive the 
+    #text correctly, since AutoItX3 only accepts UTF-16LE-encoded strings. 
     def paste(str)
       send_command_to_control("EditPaste", str)
     end
@@ -550,19 +578,35 @@ module AutoItX3
   class TabBook < Control
     
     #Returns the currently shown tab. 
+    #===Return value
+    #The number of the currently shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p tab.current #=> 2
     def current
       send_command_to_control("CurrentTab").to_i
     end
     
-    #Shows the tab right to the current one and returns the number 
-    #of the now shown tab. 
+    #Shows the tab right to the current one. 
+    #===Return value
+    #Returns the number of the now shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  tab.right #| 3
     def right
       send_command_to_control("TabRight")
       current
     end
     
-    #Shows the tab left to the current one and returns the number 
-    #of the now shown tab. 
+    #Shows the tab left to the current one.
+    #===Return value
+    #Returns the number of the now shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  tab.left #| 1
     def left
       send_command_to_control("TabLeft")
       current
