@@ -49,12 +49,7 @@ module AutoItX3
     def process_exists?(pid)
       @functions[__method__] ||= AU3_Function.new("ProcessExists", 'S', 'L')
       pid = @functions[__method__].call(pid.to_s.wide)
-      if pid == 0
-        false
-      else
-        pid
-      end
-      
+      pid > 0 && pid
     end
     
     #Sets a process's priority. Use one of the *_PRIORITY constants. 
@@ -77,11 +72,7 @@ module AutoItX3
     #Return false if +timeout+ was reached. 
     def wait_for_process(procname, timeout = 0)
       @functions[__method__] ||= AU3_Function.new("ProcessWait", 'SL', 'L')
-      if @functions[__method__].call(procname.to_s.wide, timeout) == 0
-        false
-      else
-        true
-      end
+      @functions[__method__].call(procname.to_s.wide, timeout) == 1
     end
     
     #Waits for the given process name or PID to disappear. 
@@ -89,11 +80,7 @@ module AutoItX3
     #Returns false if +timeout+ was reached. 
     def wait_for_process_close(pid, timeout = 0)
       @functions[__method__] ||= AU3_Function.new("ProcessWaitClose", 'SL', 'L')
-      if @functions[__method__].call(pid.to_s.wide, timeout) == 0
-        false
-      else
-        true
-      end
+      @functions[__method__].call(pid.to_s.wide, timeout) == 1
     end
     
     #Runs a program. The program flow continues, if you want to wait for the process to 
@@ -140,11 +127,7 @@ module AutoItX3
     #- POWER_DOWN
     def shutdown(code)
       @functions[__method__] ||= AU3_Function.new("Shutdown", 'L', 'L')
-      if @functions[__method__].call(code) == 0
-        false
-      else
-        true
-      end
+      @functions[__method__].call(code) == 1
     end
     
   end
