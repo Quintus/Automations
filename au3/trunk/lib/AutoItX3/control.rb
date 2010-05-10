@@ -615,7 +615,8 @@ module AutoItX3
   end
   
   #A list view is a list which can contain many different 
-  #columns of data. 
+  #columns of data. For example, the Windows Explorer's "details view" 
+  #uses this control. 
   class ListView < Control
     
     #Ordinary list view
@@ -638,12 +639,29 @@ module AutoItX3
     end
     
     #Deselects the given item(s). 
+    #===Parameters
+    #[+from+] Either the index of the item to deselect or the start of the item list to deselect. 0-based. 
+    #[+to+] (<tt>""</tt>) The end of the item list to deselect. 0-based. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
     def deselect(from, to = "")
       send_command_to_list_view("DeSelect", from, to)
     end
     
-    #Searches for +string+ and +sub_item+ in +self+ and returns the index 
-    #of the found list item or false if it isn't found. 
+    #Searches for +string+ and +sub_item+ in +self+. 
+    #===Parameters
+    #[+string+] The string to look for. 
+    #[+sub_item+] (<tt>""</tt>) The "colum" to look in. A 0-based integer index. 
+    #===Return value
+    #Returns the index of the found list item or false if it isn't found. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.find("file1.rb") #=> 3
+    #  p ctrl.find("15 KB", 3) #=> 2
+    #  p ctrl.find("nonexistant") #=> false
     def find(string, sub_item = "")
       res = send_command_to_list_view("FindItem", string, sub_item).to_i
       if res == -1
