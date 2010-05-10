@@ -837,6 +837,10 @@ module AutoItX3
   
   #A TreeView is a control that shows a kind of expandable 
   #list, like the one displayed ont the left side in <tt>.chm</tt> files. 
+  #
+  #The +item+ parameter of many methods in this class is a string of form 
+  #  "#index_0|#index_1|#index_2..."
+  #that describes where to find the item. See the #selected method for an example. 
   class TreeView < Control
     
     #Sends +cmd+ to +self+. This method is only used internally. 
@@ -844,81 +848,96 @@ module AutoItX3
       Control.functions[__method__] ||= AU3_Function.new("ControlTreeView", 'SSSSSSPI')
       buffer = " " * BUFFER_SIZE
       buffer.wide!
-      Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, command.wide, arg1.wide, arg2.wide, buffer, BUFFER_SIZE - 1)
+      Control.functions[__method__].call(@title.wide, @text.wide, @c_id.to_s.wide, command.to_s.wide, arg1.to_s.wide, arg2.to_s.wide, buffer, BUFFER_SIZE - 1)
       raise(Au3Error, "Unknown error occured when sending '#{command}' to '#{@c_id}' in '#{@title}'! Maybe an invalid window?") if AutoItX3.last_error == 1
       buffer.normal.strip
     end
     
     #Checks +item+, if it supports that operation. 
     #===Parameters
-    #[+item+] The name of the item to check. 
+    #[+item+] The path of the item to check. 
     #===Return value
     #Unknown. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
-    #  ctrl.check("my item")
+    #  ctrl.check("#0|#3|#7")
     def check(item)
       send_command_to_tree_view("Check", item)
     end
     
     #Collapses +item+ to hide its children. 
     #===Parameters
-    #[+item+] The name of the item to collapse. 
+    #[+item+] The path of the item to collapse. 
     #===Return value
     #Unknown. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
-    #  ctrl.collapse("AutoItX3")
+    #  ctrl.collapse("#0")
     def collapse(item)
       send_command_to_tree_view("Collapse", item)
     end
     
     #Return wheather or not +item+ exists. 
     #===Parameters
-    #[+item+] The name of the item to check. 
+    #[+item+] The path of the item to check. 
     #===Return value
     #true or false. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
-    #  p ctrl.exists?("AutoItX") #=> true
-    #  p ctrl.exists?("nonexistant") #=> false
+    #  p ctrl.exists?("#0|#3") #=> true
+    #  p ctrl.exists?("#1|#4") #=> false
     def exists?(item)
       send_command_to_tree_view("Exists", item).to_i == 1
     end
     
     #Expands +item+ to show its children. 
     #===Parameters
-    #[+item+] The name of the item to expand. 
+    #[+item+] The path of the item to expand. 
     #===Return value
     #Unknown. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
-    #  ctrl.expand("AutoItX")
+    #  ctrl.expand("#0|#3")
     def expand(item)
       send_command_to_tree_view("Expand", item)
     end
     
     #Returns the number of children of +item+. 
     #===Parameters
-    #[+item+] The name of the item to check. 
+    #[+item+] The path of the item to check. 
     #===Return value
     #The number of subitems of that node. 
     #===Raises
     #[Au3Error] Control or window not found. 
     #===Example
-    #  p ctrl.num_subitems("AutoItX") #=> 8
+    #  p ctrl.num_subitems("#0") #=> 8
     #===Remarks
     #This method returns 0 if the item doesn't exist. 
     def num_subitems(item)
       send_command_to_tree_view("GetItemCount", item).to_i
     end
     
-    #Returns the text reference or the index reference (if +use_index+ is true) of 
-    #the selected item. 
+    #Returns where to find the selected item. 
+    #===Parameters
+    #[+use_index+] (+false+) If this is true, you only get the last index. 
+    #===Return value
+    #If +use_index+ is false, which is the default, you get a string back that describes 
+    #where you find the currently selected item. The string is of form
+    #  "#index_0|#index_1|#index_3..."
+    #for example 
+    #  "#0|#3|#0|#10|#1|#0"
+    #for the "ControlClick" item in the AutoItX help. 
+    #Otherwise, if +use_index+ is false, you only get the last index of that chain, as an integer. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #See <i>Return value</i>. 
+    #===Remarks
+    #You can pass the result of this method directly to many methods of this class. 
     def selected(use_index = false)
       result = send_command_to_tree_view("GetSelected", use_index ? 1 : 0)
       return result.to_i if use_index
@@ -930,23 +949,58 @@ module AutoItX3
     #  [ item ] ==> aString
     #
     #Returns the text of +item+. 
+    #===Parameters
+    #[+item+] The item to retrieve the text from. 
+    #===Return value
+    #The text at the specified position. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.text_at("#0|#3|#0|#10|#1|#0") #=> "ControlClick"
+    #===Remarks
+    #See #selected for an easy way of how to get the text of the currently selected item. 
     def text_at(item)
       send_command_to_tree_view("GetText", item)
     end
     alias [] text_at
     
-    #Returns wheather or not +item+ is checked. Raises an Au3Error 
-    #if +item+ is not a checkbox. 
+    #Returns wheather or not +item+ is checked. 
+    #===Parameters
+    #[+item+] The item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.checked?("#1|#2|#3") #=> true
+    #===Remarks
+    #This method always returns false for non-checkable items. 
     def checked?(item)
       send_command_to_tree_view("IsChecked", item).to_i == 1
     end
     
     #Selects +item+. 
+    #===Parameters
+    #[+item+] The item to select. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select("#1|#2")
     def select(item)
       send_command_to_tree_view("Select", item)
     end
     
     #Unchecks +item+ if it suports that operation (i.e. it's a checkbox). 
+    #===Parameters
+    #[+item+] The item to uncheck. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or Window not found. 
+    #===Example
+    #  ctrl.uncheck("#0|#3")
     def uncheck(item)
       send_command_to_tree_view("Uncheck", item)
     end
