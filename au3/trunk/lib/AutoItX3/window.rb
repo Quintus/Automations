@@ -50,11 +50,7 @@ module AutoItX3
       #Checks if a window with the given properties exists. 
       def exists?(title, text = "")
         @functions[__method__] ||= AU3_Function.new("WinExists", 'SS', 'L')
-        if @functions[__method__].call(title.wide, text.wide) == 0
-          return false;
-        else
-          return true;
-        end
+        @functions[__method__].call(title.wide, text.wide) == 1
       end
       
       #Returns a two-element array of form <tt>[x , y]</tt> reflecting the 
@@ -130,11 +126,7 @@ module AutoItX3
     #Checks wheather or not the window is active. 
     def active?
       Window.functions[__method__] ||= AU3_Function.new("WinActive", 'SS', 'L')
-      if Window.functions[__method__].call(@title.wide, @text.wide) == 0
-        return false
-      else
-        return true
-      end
+      Window.functions[__method__].call(@title.wide, @text.wide) == 1
     end
     
     #Sends WM_CLOSE to +self+. WM_CLOSE may be processed by the window, 

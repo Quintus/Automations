@@ -29,11 +29,7 @@ module AutoItX3
     def open_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
       raise(ArgumentError, "The drive name has to be of form 'X:'!") unless tray =~ /^\w:$/
-      if @functions[__method__].call(tray.wide, "open".wide) == 0
-        return false
-      else
-        return true
-      end
+      @functions[__method__].call(tray.wide, "open".wide) == 1
     end
     
     #Closes a cd tray. +drive+ should be of form <tt>"X:"</tt>. The cd tray must 
@@ -43,18 +39,13 @@ module AutoItX3
     def close_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
       raise(ArgumentError, "The drive name has to be of form 'X:'!") unless tray =~ /^\w:$/
-      if @functions[__method__].call(tray.wide, "closed".wide) == 0
-        return false
-      else
-        return true
-      end
+      @functions[__method__].call(tray.wide, "closed".wide) == 1
     end
     
     #Determines wheather the current user has administrator privileges. 
     def is_admin?
       @functions[__method__] ||= AU3_Function.new("IsAdmin", 'V', 'L')
-      return false if @functions[__method__].call == 0
-      true
+      @functions[__method__].call == 1
     end
     
     #Writes +text+ to the Windows clipboard. 
