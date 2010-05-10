@@ -45,8 +45,7 @@ module AutoItX3
     #===Parameters
     #[+title+] The title of the window containing the control. 
     #[+text+] The text of the window containing the control Set to "" (empty string) if you don't care about it. 
-    #[+control_id+] The ID of the control. You can also use the name of the control in combination 
-    #  with the occurence number of it, like "Edit1" and "Edit2". 
+    #[+control_id+] The ID of the control. You can also use the name of the control in combination with the occurence number of it, like "Edit1" and "Edit2". 
     #===Return value
     #A brand new Control instance. 
     #===Raises
