@@ -45,8 +45,7 @@ module AutoItX3
     #===Parameters
     #[+title+] The title of the window containing the control. 
     #[+text+] The text of the window containing the control Set to "" (empty string) if you don't care about it. 
-    #[+control_id+] The ID of the control. You can also use the name of the control in combination 
-    #  with the occurence number of it, like "Edit1" and "Edit2". 
+    #[+control_id+] The ID of the control. You can also use the name of the control in combination with the occurence number of it, like "Edit1" and "Edit2". 
     #===Return value
     #A brand new Control instance. 
     #===Raises
@@ -519,8 +518,13 @@ module AutoItX3
   #type text. For example, notepad consists mainly of a big edit control. 
   class Edit < Control
     
-    #Returns the current caret position in a 2-element array 
-    #of form <tt>[line, column]</tt>. 
+    #Returns the current caret position.
+    #===Return value
+    #A 2-element array of form <tt>[line, column]</tt>. Numbering starts with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p edit.caret_pos #=> [1, 1]
     def caret_pos
       x = send_command_to_control("GetCurrentLine").to_i
       y = send_command_to_control("GetCurrentCol").to_i
@@ -528,16 +532,39 @@ module AutoItX3
     end
     
     #Returns the number of lines in +self+. 
+    #===Return value
+    #The number of lines. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p edit.lines #=> 3
     def lines
       send_command_to_control("GetLineCount").to_i
     end
     
     #Returns the currently selected text. 
+    #===Return value
+    #The currently selected text selection. 
+    #===Example
+    #  p edit.selected_text #=> "I love Ruby!"
+    #===Remarks
+    #Be careful with the encoding of the returned text. It's likely that 
+    #you have to do a force_encoding on it, since there isn't any guarantee in 
+    #which encoding a window returns it's contents. 
     def selected_text
       send_command_to_control("GetSelected")
     end
     
     #"Pastes" +str+ at +self+'s current caret position. 
+    #===Parameters
+    #[+str+] The text to paste. 
+    #===Return value
+    #Unknown. 
+    #===Example
+    #  edit.paste("My text")
+    #===Remarks
+    #In contrast to #selected_text, the window should receive the 
+    #text correctly, since AutoItX3 only accepts UTF-16LE-encoded strings. 
     def paste(str)
       send_command_to_control("EditPaste", str)
     end
@@ -550,19 +577,35 @@ module AutoItX3
   class TabBook < Control
     
     #Returns the currently shown tab. 
+    #===Return value
+    #The number of the currently shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p tab.current #=> 2
     def current
       send_command_to_control("CurrentTab").to_i
     end
     
-    #Shows the tab right to the current one and returns the number 
-    #of the now shown tab. 
+    #Shows the tab right to the current one. 
+    #===Return value
+    #Returns the number of the now shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  tab.right #| 3
     def right
       send_command_to_control("TabRight")
       current
     end
     
-    #Shows the tab left to the current one and returns the number 
-    #of the now shown tab. 
+    #Shows the tab left to the current one.
+    #===Return value
+    #Returns the number of the now shown tab, starting with 1. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  tab.left #| 1
     def left
       send_command_to_control("TabLeft")
       current
@@ -571,7 +614,8 @@ module AutoItX3
   end
   
   #A list view is a list which can contain many different 
-  #columns of data. 
+  #columns of data. For example, the Windows Explorer 
+  #uses this control. 
   class ListView < Control
     
     #Ordinary list view
@@ -594,12 +638,29 @@ module AutoItX3
     end
     
     #Deselects the given item(s). 
+    #===Parameters
+    #[+from+] Either the index of the item to deselect or the start of the item list to deselect. 0-based. 
+    #[+to+] (<tt>""</tt>) The end of the item list to deselect. 0-based. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
     def deselect(from, to = "")
       send_command_to_list_view("DeSelect", from, to)
     end
     
-    #Searches for +string+ and +sub_item+ in +self+ and returns the index 
-    #of the found list item or false if it isn't found. 
+    #Searches for +string+ and +sub_item+ in +self+. 
+    #===Parameters
+    #[+string+] The string to look for. 
+    #[+sub_item+] (<tt>""</tt>) The "colum" to look in. A 0-based integer index. 
+    #===Return value
+    #Returns the index of the found list item or false if it isn't found. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.find("file1.rb") #=> 3
+    #  p ctrl.find("15 KB", 3) #=> 2
+    #  p ctrl.find("nonexistant") #=> false
     def find(string, sub_item = "")
       res = send_command_to_list_view("FindItem", string, sub_item).to_i
       if res == -1
@@ -615,24 +676,47 @@ module AutoItX3
     #  length ==> anInteger
     #
     #Returns the number of items in +self+. 
+    #===Return value
+    #The number of items in +self+. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.item_count #=> 9
     def item_count
       send_command_to_list_view("GetItemCount").to_i
     end
     alias size item_count
     alias length item_count
     
-    #Returns the inices of the selected items in an array which is empty if 
-    #none is selected. 
+    #Returns the inices of the selected items. 
+    #===Return value
+    #An array containg the indices of the selected items which is empty if none is selected. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.selected #=> [3, 4, 5]
     def selected
-      send_command_to_list_view("GetSelected", 1).split("|")
+      send_command_to_list_view("GetSelected", 1).split("|").map(&:to_i)
     end
     
     #Returns the number of selected items. 
+    #===Return value
+    #The number of items selected. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_selected #=> 3
     def num_selected
       send_command_to_list_view("GetSelectedCount").to_i
     end
     
     #Returns the number of subitems in +self+. 
+    #===Return value
+    #An integer that indicates how many "columns" the list view has. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_subitems #=> 4
     def num_subitems
       send_command_to_list_view("GetSubItemCount").to_i
     end
@@ -642,22 +726,67 @@ module AutoItX3
     #  AutoItX3::ListView#[ item [, subitem ] ] ==> aString
     #
     #Returns the text at the given position. 
+    #===Parameters
+    #[+item+] The "row" to look in. 0-based integer. 
+    #[+subitem+] (<tt>""</tt>) The "colum" to look in. 0-based integer. 
+    #===Return value
+    #The text at the given position. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.text_at(2, 3) #=> "6 KB"
+    #===Remarks
+    #Don't make any assumptions about the encoding or event the content 
+    #of a list box item. For example, a date field of the Windows Explorer 
+    #comes out like this: 
+    #  p ctrl.text_at(2, 1) #=> "ÔÇÄ10.ÔÇÄ05.ÔÇÄ2010 ÔÇÅÔÇÄ16:53"
+    #which is probably not what you thought, since in the Explorer Window it's 
+    #presented as: 
+    #  10.05.2010 16:52
     def text_at(item, subitem = "")
       send_command_to_list_view("GetText", item, subitem)
     end
     alias [] text_at
     
     #Returns wheather or not +item+ is selected. 
+    #===Parameters
+    #[+item+] The 0-based index of the item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.selected?(3) #=> false
+    #  p ctrl.selected?(7) #=> true
     def selected?(item)
       send_command_to_list_view("IsSelected", item).to_i == 1
     end
     
     #Selects the given item(s). 
+    #===Parameters
+    #[+from+] The index where to start or the item to select. 0-based integer. 
+    #[+to+] The index where to stop. 0-based integer. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select(3)
+    #  ctrl.select(3, 5)
+    #===Remarks
+    #This method doesn't deselect anything. If you want an entire new selection, 
+    #call #clear_selection before calling this method. 
     def select(from, to = "")
       send_command_to_list_view("Select", from, to)
     end
     
     #Selects all items in +self+. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select_all
     def select_all
       send_command_to_list_view("SelectAll")
     end
@@ -666,18 +795,39 @@ module AutoItX3
     #  AutoItX3::ListView#select_none ==> nil
     #
     #Clears the selection. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.clear_selection
     def clear_selection
       send_command_to_list_view("SelectClear")
     end
     alias select_none clear_selection
     
     #Inverts the selection. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.invert_selection
+    #===Remarks
+    #This works even if nothing or everything is selected. 
     def invert_selection
       send_command_to_list_view("SelectInvert")
     end
     
-    #Changes the view of +self+. Possible values of +view+ are 
-    #all constants of the ListView class. 
+    #Changes the view of +self+. 
+    #===Parameters
+    #[+view+] The view to change to. Possible values are the constants of the ListView class. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.change_view(AutoItX3::ListView::LIST)
     def change_view(view)
       send_command_to_list_view("ViewChange", view)
     end
@@ -686,6 +836,10 @@ module AutoItX3
   
   #A TreeView is a control that shows a kind of expandable 
   #list, like the one displayed ont the left side in <tt>.chm</tt> files. 
+  #
+  #The +item+ parameter of many methods in this class is a string of form 
+  #  "#index_0|#index_1|#index_2..."
+  #that describes where to find the item. See the #selected method for an example. 
   class TreeView < Control
     
     #Sends +cmd+ to +self+. This method is only used internally. 
@@ -693,38 +847,96 @@ module AutoItX3
       Control.functions[__method__] ||= AU3_Function.new("ControlTreeView", 'SSSSSSPI')
       buffer = " " * BUFFER_SIZE
       buffer.wide!
-      Control.functions[__method__].call(@title.wide, @text.wide, @c_id.wide, command.wide, arg1.wide, arg2.wide, buffer, BUFFER_SIZE - 1)
+      Control.functions[__method__].call(@title.wide, @text.wide, @c_id.to_s.wide, command.to_s.wide, arg1.to_s.wide, arg2.to_s.wide, buffer, BUFFER_SIZE - 1)
       raise(Au3Error, "Unknown error occured when sending '#{command}' to '#{@c_id}' in '#{@title}'! Maybe an invalid window?") if AutoItX3.last_error == 1
       buffer.normal.strip
     end
     
-    #Checks +item+ if it supports that operation. 
+    #Checks +item+, if it supports that operation. 
+    #===Parameters
+    #[+item+] The path of the item to check. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.check("#0|#3|#7")
     def check(item)
       send_command_to_tree_view("Check", item)
     end
     
     #Collapses +item+ to hide its children. 
+    #===Parameters
+    #[+item+] The path of the item to collapse. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.collapse("#0")
     def collapse(item)
       send_command_to_tree_view("Collapse", item)
     end
     
     #Return wheather or not +item+ exists. 
+    #===Parameters
+    #[+item+] The path of the item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.exists?("#0|#3") #=> true
+    #  p ctrl.exists?("#1|#4") #=> false
     def exists?(item)
       send_command_to_tree_view("Exists", item).to_i == 1
     end
     
     #Expands +item+ to show its children. 
+    #===Parameters
+    #[+item+] The path of the item to expand. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.expand("#0|#3")
     def expand(item)
       send_command_to_tree_view("Expand", item)
     end
     
     #Returns the number of children of +item+. 
+    #===Parameters
+    #[+item+] The path of the item to check. 
+    #===Return value
+    #The number of subitems of that node. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_subitems("#0") #=> 8
+    #===Remarks
+    #This method returns 0 if the item doesn't exist. 
     def num_subitems(item)
       send_command_to_tree_view("GetItemCount", item).to_i
     end
     
-    #Returns the text reference or the index reference (if +use_index+ is true) of 
-    #the selected item. 
+    #Returns where to find the selected item. 
+    #===Parameters
+    #[+use_index+] (+false+) If this is true, you only get the last index. 
+    #===Return value
+    #If +use_index+ is false, which is the default, you get a string back that describes 
+    #where you find the currently selected item. The string is of form
+    #  "#index_0|#index_1|#index_3..."
+    #for example 
+    #  "#0|#3|#0|#10|#1|#0"
+    #for the "ControlClick" item in the AutoItX help. 
+    #Otherwise, if +use_index+ is false, you only get the last index of that chain, as an integer. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #See <i>Return value</i>. 
+    #===Remarks
+    #You can pass the result of this method directly to many methods of this class. 
     def selected(use_index = false)
       result = send_command_to_tree_view("GetSelected", use_index ? 1 : 0)
       return result.to_i if use_index
@@ -736,23 +948,58 @@ module AutoItX3
     #  [ item ] ==> aString
     #
     #Returns the text of +item+. 
+    #===Parameters
+    #[+item+] The item to retrieve the text from. 
+    #===Return value
+    #The text at the specified position. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.text_at("#0|#3|#0|#10|#1|#0") #=> "ControlClick"
+    #===Remarks
+    #See #selected for an easy way of how to get the text of the currently selected item. 
     def text_at(item)
       send_command_to_tree_view("GetText", item)
     end
     alias [] text_at
     
-    #Returns wheather or not +item+ is checked. Raises an Au3Error 
-    #if +item+ is not a checkbox. 
+    #Returns wheather or not +item+ is checked. 
+    #===Parameters
+    #[+item+] The item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.checked?("#1|#2|#3") #=> true
+    #===Remarks
+    #This method always returns false for non-checkable items. 
     def checked?(item)
       send_command_to_tree_view("IsChecked", item).to_i == 1
     end
     
     #Selects +item+. 
+    #===Parameters
+    #[+item+] The item to select. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select("#1|#2")
     def select(item)
       send_command_to_tree_view("Select", item)
     end
     
     #Unchecks +item+ if it suports that operation (i.e. it's a checkbox). 
+    #===Parameters
+    #[+item+] The item to uncheck. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or Window not found. 
+    #===Example
+    #  ctrl.uncheck("#0|#3")
     def uncheck(item)
       send_command_to_tree_view("Uncheck", item)
     end
