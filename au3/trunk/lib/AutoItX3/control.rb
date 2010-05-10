@@ -686,7 +686,7 @@ module AutoItX3
     #Returns the inices of the selected items in an array which is empty if 
     #none is selected. 
     def selected
-      send_command_to_list_view("GetSelected", 1).split("|")
+      send_command_to_list_view("GetSelected", 1).split("|").map(&:to_i)
     end
     
     #Returns the number of selected items. 
