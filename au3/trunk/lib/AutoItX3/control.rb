@@ -615,7 +615,7 @@ module AutoItX3
   end
   
   #A list view is a list which can contain many different 
-  #columns of data. For example, the Windows Explorer's "details view" 
+  #columns of data. For example, the Windows Explorer 
   #uses this control. 
   class ListView < Control
     
@@ -677,24 +677,47 @@ module AutoItX3
     #  length ==> anInteger
     #
     #Returns the number of items in +self+. 
+    #===Return value
+    #The number of items in +self+. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.item_count #=> 9
     def item_count
       send_command_to_list_view("GetItemCount").to_i
     end
     alias size item_count
     alias length item_count
     
-    #Returns the inices of the selected items in an array which is empty if 
-    #none is selected. 
+    #Returns the inices of the selected items. 
+    #===Return value
+    #An array containg the indices of the selected items which is empty if none is selected. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.selected #=> [3, 4, 5]
     def selected
       send_command_to_list_view("GetSelected", 1).split("|").map(&:to_i)
     end
     
     #Returns the number of selected items. 
+    #===Return value
+    #The number of items selected. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_selected #=> 3
     def num_selected
       send_command_to_list_view("GetSelectedCount").to_i
     end
     
     #Returns the number of subitems in +self+. 
+    #===Return value
+    #An integer that indicates how many "columns" the list view has. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.num_subitems #=> 4
     def num_subitems
       send_command_to_list_view("GetSubItemCount").to_i
     end
@@ -704,22 +727,67 @@ module AutoItX3
     #  AutoItX3::ListView#[ item [, subitem ] ] ==> aString
     #
     #Returns the text at the given position. 
+    #===Parameters
+    #[+item+] The "row" to look in. 0-based integer. 
+    #[+subitem+] (<tt>""</tt>) The "colum" to look in. 0-based integer. 
+    #===Return value
+    #The text at the given position. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.text_at(2, 3) #=> "6 KB"
+    #===Remarks
+    #Don't make any assumptions about the encoding or event the content 
+    #of a list box item. For example, a date field of the Windows Explorer 
+    #comes out like this: 
+    #  p ctrl.text_at(2, 1) #=> "ÔÇÄ10.ÔÇÄ05.ÔÇÄ2010 ÔÇÅÔÇÄ16:53"
+    #which is probably not what you thought, since in the Explorer Window it's 
+    #presented as: 
+    #  10.05.2010 16:52
     def text_at(item, subitem = "")
       send_command_to_list_view("GetText", item, subitem)
     end
     alias [] text_at
     
     #Returns wheather or not +item+ is selected. 
+    #===Parameters
+    #[+item+] The 0-based index of the item to check. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  p ctrl.selected?(3) #=> false
+    #  p ctrl.selected?(7) #=> true
     def selected?(item)
       send_command_to_list_view("IsSelected", item).to_i == 1
     end
     
     #Selects the given item(s). 
+    #===Parameters
+    #[+from+] The index where to start or the item to select. 0-based integer. 
+    #[+to+] The index where to stop. 0-based integer. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select(3)
+    #  ctrl.select(3, 5)
+    #===Remarks
+    #This method doesn't deselect anything. If you want an entire new selection, 
+    #call #clear_selection before calling this method. 
     def select(from, to = "")
       send_command_to_list_view("Select", from, to)
     end
     
     #Selects all items in +self+. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.select_all
     def select_all
       send_command_to_list_view("SelectAll")
     end
@@ -728,18 +796,39 @@ module AutoItX3
     #  AutoItX3::ListView#select_none ==> nil
     #
     #Clears the selection. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.clear_selection
     def clear_selection
       send_command_to_list_view("SelectClear")
     end
     alias select_none clear_selection
     
     #Inverts the selection. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.invert_selection
+    #===Remarks
+    #This works even if nothing or everything is selected. 
     def invert_selection
       send_command_to_list_view("SelectInvert")
     end
     
-    #Changes the view of +self+. Possible values of +view+ are 
-    #all constants of the ListView class. 
+    #Changes the view of +self+. 
+    #===Parameters
+    #[+view+] The view to change to. Possible values are the constants of the ListView class. 
+    #===Return value
+    #Unknown. 
+    #===Raises
+    #[Au3Error] Control or window not found. 
+    #===Example
+    #  ctrl.change_view(AutoItX3::ListView::LIST)
     def change_view(view)
       send_command_to_list_view("ViewChange", view)
     end
