@@ -9,9 +9,20 @@ module AutoItX3
   
   class << self
     
-    #Blocks user input or enables it (but the user can gain back control by 
-    #pressing [CTRL] + [ALT] + [DEL]). In older versions of Windows, 
-    #AutoIt may also be blocked. Does not work with Windows Vista. 
+    #Blocks user input. 
+    #===Parameters
+    #[+val+] Wheather the user input should be blocked or not. 
+    #===Return value
+    #The passed argument, double-negated to ensure a boolean value. 
+    #===Example
+    #  p AutoItX3.input_blocked? #=> false
+    #  AutoItX3.block_input = true
+    #  p AutoItX3.input_blocked? #=> true
+    #  AutoItX3.block_input = false
+    #  p AutoItX3.input_blocked? #=> false
+    #===Remarks
+    #The user can gain back control by pressing [CTRL] + [ALT] + [DEL]. 
+    #In older versions of Windows AutoIt itself may also be blocked. 
     def block_input=(val)
       @functions[__method__] ||= AU3_Function.new("BlockInput", 'L')
       @functions[__method__].call(!!val)
@@ -19,6 +30,13 @@ module AutoItX3
     end
     
     #Returns wheather or not input is blocked by AutoItX3. 
+    #===Return value
+    #true or false. 
+    #===Example
+    #  #See #block_input. 
+    #===Remarks
+    #This method fails to report that input has been enabled again if the 
+    #user has pressed [CTRL] + [ALT] + [DEL] after a call to #block_input=. 
     def input_blocked?
       @input_blocked ||= false
     end
