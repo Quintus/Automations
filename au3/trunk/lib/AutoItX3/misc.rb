@@ -41,8 +41,16 @@ module AutoItX3
       @input_blocked ||= false
     end
     
-    #Opens the cd drive named in +drive+. +drive+ should be of form 
-    #<tt>"X:"</tt>. The cd tray must be local at this computer, remote drives 
+    #Opens a CD/DVD drive. 
+    #===Parameters
+    #[+tray+] The drive to eject, a string of form <tt>"X:"</tt>. 
+    #===Return value
+    #true on success, false otherwise. 
+    #===Example
+    #  AutoItX3.open_cd_tray("E:") #| true
+    #  AutoItX3.open_cd_tray("Y:") #| false
+    #===Remarks
+    #The cd tray must be local at this computer, remote drives 
     #cannot be accessed. 
     def open_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
@@ -50,9 +58,18 @@ module AutoItX3
       @functions[__method__].call(tray.wide, "open".wide) == 1
     end
     
-    #Closes a cd tray. +drive+ should be of form <tt>"X:"</tt>. The cd tray must 
-    #be local at this computer, remote drives cannot be accessed. 
-    #The method may return true if +drive+ is a laptop drive which can only be 
+    #Closes a CD/DVD drive. 
+    #===Parameters
+    #[+tray+] The drive to close. 
+    #===Return value
+    #true on success, false otherwise. 
+    #===Example
+    #  AutoItX3.open_cd_tray("E:")
+    #  AutoItX3.close_cd_tray("E:")
+    #===Remarks
+    #The cd tray must be local at this computer, remote drives 
+    #cannot be accessed. 
+    #This method may return true if +drive+ is a laptop drive which can only be 
     #closed manually. 
     def close_cd_tray(tray)
       @functions[__method__] ||= AU3_Function.new("CDTray", 'SS', 'L')
@@ -61,12 +78,24 @@ module AutoItX3
     end
     
     #Determines wheather the current user has administrator privileges. 
+    #===Return value
+    #true or false, 
+    #===Example
+    #  p AutoItX3.is_admin? #=> false
     def is_admin?
       @functions[__method__] ||= AU3_Function.new("IsAdmin", 'V', 'L')
       @functions[__method__].call == 1
     end
     
     #Writes +text+ to the Windows clipboard. 
+    #===Parameters
+    #[+text+] The text to write. 
+    #===Return value
+    #The argument passed. 
+    #===Example
+    #  AutoItX3.cliptext = "I love Ruby!"
+    #  puts AutoItX3.cliptext #=> I love Ruby!
+    #===Remarks
     #You can't write NUL characters to the clipboard, the text will 
     #be terminated. 
     def cliptext=(text)
@@ -75,8 +104,16 @@ module AutoItX3
       text
     end
     
-    #Returns the text saved in the clipboard. It will be truncated at the 99,999th character or 
-    #at a NUL char. 
+    #Reads the Windows clipboard. 
+    #===Return value
+    #The text saved in the clipboard, encoded in UTF-8. 
+    #===Example
+    #  puts AutoItX3.cliptext #=> I love Ruby!
+    #===Remarks
+    #Returns the text saved in the clipboard. It will be truncated at the 
+    #<tt>AutoItX3::BUFFER_SIZE - 1</tt>th character or at a NUL character. 
+    #
+    #If the clipboard doesn't contain text, this method returns an empty string. 
     def cliptext
       @functions[__method__] ||= AU3_Function.new("ClipGet", 'PL')
       cliptext = " " * BUFFER_SIZE
@@ -89,9 +126,16 @@ module AutoItX3
     #  tool_tip( text [, x = INTDEFAULT [, y = INTDEFAULT ] ] ) ==> nil
     #  tooltip( text [, x = INTDEFAULT [, y = INTDEFAULT ] ] ) ==> nil
     #
-    #Displays a tooltip at the given position. If +x+ and +y+ are ommited, 
-    #the tooltip will be displayed at the current cursor position. Coordinates 
-    #out of range are automatically corrected. 
+    #Displays a tooltip at the given position. 
+    #===Parameters
+    #[+text+] The text to display. 
+    #[+x+] (+INTDEFAULT+) The X coordinate where to display the tooltip. Defaults to the cursor's X coordinate if ommited. 
+    #[+y+] (+INTDEFAULT+) The Y coordinate where to display the tooltip. Defaults to the cursor's Y coordinate if ommited. 
+    #===Return value
+    #nil. 
+    #===Remarks
+    #Coordinates out of range are automatically corrected. 
+    #
     #The tooltip will be deleted when the program ends, or after a system-dependent 
     #timeout. 
     def tool_tip(text, x = INTDEFAULT, y = INTDEFAULT)
@@ -100,8 +144,12 @@ module AutoItX3
     end
     alias tooltip tool_tip
     
-    #Wait for the specified amount of milliseconds. In AutoIt, this function is named 
-    #"Sleep", but to avoid compatibility issues with Ruby's own sleep I decided to 
+    #Wait for the specified amount of milliseconds. 
+    #===Return value
+    #nil. 
+    #===Remarks
+    #In AutoIt, this function is named "Sleep", but to avoid compatibility 
+    #issues with Ruby's own sleep I decided to 
     #name the function "msleep" (the "m" indicates "milli"). If you wish to name it 
     #"sleep", simply define an alias. 
     def msleep(msecs)
