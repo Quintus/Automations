@@ -9,9 +9,23 @@ module AutoItX3
   
   class << self
     
-    #Simulates the given keystrokes. If you don't 
-    #set +flag+ to true (which disables escape sequences), you may 
-    #use some of the follwing escape sequences in braces { and } 
+    #Simulates keyboard input. 
+    #===Parameters
+    #[+keys+] The keystrokes to simulate. See _Remarks_. 
+    #[+flag+] (+false+) If set to +true+, escape sequences in braces { and } are ignored. 
+    #===Return value
+    #nil. 
+    #===Example
+    #  #Simulate [SHIFT] + [A], [B] and [C]. 
+    #  AutoItX3.send_keys("Abc")
+    #  #Simulate [A], [ESC] and b. 
+    #  AutoItX3.send_keys("a{ESC}b")
+    #  #Ignore the escape sequence and send it as regular keystrokes. 
+    #  AutoItX3.send_keys("a{ESC}b", true)
+    #  #Sends [ALT] + [F]
+    #  AutoItX3.send_keys("!F")
+    #===Remarks
+    #You may use some of the follwing escape sequences in braces { and } 
     #(copied from the AutoItX3 help): 
     #  Escape sequence     | Resulting keypress
     #  ====================+============================================================
