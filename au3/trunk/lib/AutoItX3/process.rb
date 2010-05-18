@@ -189,7 +189,6 @@ module AutoItX3
     #===Example
     #  AutoItX3.run_as_set("Rubyist", "WORKGROUP", "MyFamousUncrackablePassword")
     #  AutoItX3.run("hack_them_all.exe")
-    Raises a NotImplementedError if your system is Win2000 or older. 
     def run_as_set(username, domain, password, options = 1)
       @functions[__method__] ||= AU3_Function.new("RunAsSet", 'SSSI', 'L')
       if @functions[__method__].call(username.wide, domain.wide, password.wide, options) == 0
