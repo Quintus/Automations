@@ -12,6 +12,19 @@ module AutoItX3
   #If you want to get a real handle to the window, 
   #call #handle on your Window object (but you won't 
   #need that unless you want to use it for Win32 API calls). 
+  #
+  #Every window is clearly defined by two properties: The window't title 
+  #(or at least a part of it, see AutoItX3.opts) and it's text. 
+  #In most cases you can ignore the text, since a window's title is usually 
+  #enough to identify a window, but if you're only using parts of titles, you may have 
+  #to check texts as well, but be prepared that the "text" a window holds 
+  #doesn't have to correspond with the text you actually see on the window. 
+  #If you set a method's +text+ parameter to an empty string (which is the default), 
+  #a window will only be searched for by title. 
+  #
+  #Please also note that the handle a Window object holds gets invalid if the window it 
+  #refers to is closed. This class doesn't automatically notify you if that occures, so 
+  #don't wonder about "window not found" errors after a window was closed. 
   class Window
     
     #A window describing the desktop. 
@@ -48,14 +61,28 @@ module AutoItX3
       end
       
       #Checks if a window with the given properties exists. 
+      #===Parameters
+      #[+title+] The window's title. 
+      #[+text+] (<tt>""</tt>) The window's text. 
+      #===Return value
+      #true or false. 
+      #===Example
+      #  p AutoItX3::Window.exists?("Untitled - notepad") #=> true
+      #  p AutoItX3::Window.exists?("Nonexistant") #=> false
       def exists?(title, text = "")
         @functions[__method__] ||= AU3_Function.new("WinExists", 'SS', 'L')
         @functions[__method__].call(title.wide, text.wide) == 1
       end
       
-      #Returns a two-element array of form <tt>[x , y]</tt> reflecting the 
-      #position of the caret in the active window. This doesn't work with 
-      #every window. 
+      #Returns the position of the caret in the active window. 
+      #===Return value
+      #A two-element array of form <tt>[x , y]</tt>, which are meant to be row and column, not pixel values. 
+      #===Example
+      #  p AutoItX3::Window.caret_pos #=> [8, 28]
+      #===Remarks
+      #This doesn't work with every window. Many MDI windows, for example, use absolute coordinates and yet other always report static coordinates. 
+      #
+      #The caret is the blinking pipe cursor that is displayed when editing lines of text (it has nothing to do with the mouse cursor). 
       def caret_pos
         @functions[:caret_pos_x] ||= AU3_Function.new("WinGetCaretPosX", '', 'L')
         @functions[:caret_pos_y] ||= AU3_Function.new("WinGetCaretPosY", '', 'L')
@@ -65,6 +92,10 @@ module AutoItX3
       end
       
       #Minimizes all available windows. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  AutoItX3::Window.minimize_all
       def minimize_all
         @functions[__method__] ||= AU3_Function.new("WinMinimizeAll", '')
         @functions[__method__].call
@@ -72,15 +103,28 @@ module AutoItX3
       end
       
       #Undoes a previous call to Window.minimize_all. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  AutoItX3::Window.minimize_all
+      #  sleep 3
+      #  AutoItX3::Window.undo_minimize_all
       def undo_minimize_all
         @functions[__method__] ||= AU3_Function.new("WinMinimizeAllUndo", '')
         @functions[__method__].call
         nil
       end
       
-      #Waits for a window with the given properties to exist. You may 
-      #specify a +timeout+ in seconds. +wait+ normally returns true, but if 
-      #the timeout is expired, it returns false. 
+      #Waits for a window with the given properties to exist. 
+      #===Parameters
+      #[+title+] The title of the window to wait for. 
+      #[+text+] (<tt>""</tt> The text of the window to wait for. 
+      #[+timeout+] (+0+) The time to wait for, in seconds. Zero means to wait infinitely. 
+      #===Return value
+      #true if the window has been found, false if +timeout+ was reached. 
+      #===Example
+      #  AutoItX3::Window.wait("Untitled - Notepad") #| true
+      #  AutoItX3::Window.wait("Nonexistant", 3) #| false
       def wait(title, text = "", timeout = 0)
         @functions[__method__] ||= AU3_Function.new("WinWait", 'SSL', 'L')
         @functions[__method__].call(title.wide, text.wide, timeout) != 0
@@ -88,11 +132,16 @@ module AutoItX3
       
     end
     
-    #Creates a new Window object. This method checks if a window 
-    #with the given properties exists (via Window.exists?) and raises 
-    #an Au3Error if it does not. Use Window::DESKTOP_WINDOW as 
-    #the +title+ to get a window describing the desktop. Use Window::ACTIVE_WINDOW 
-    #as the +title+ to get a window describing the active (foreground) window. 
+    #Creates a new Window object. 
+    #===Parameters
+    #[+title+] The title of the window you want a reference to. Use DESKTOP_WINDOW for a handle to the desktop and ACTIVE_WINDOW for a handle to the currently selected window. 
+    #[+text+] The text of the window you want a reference to. 
+    #===Return value
+    #The newly created Window object. 
+    #===Raises
+    #[Au3Error] No window with the given properties was found. 
+    #===Example
+    #  win = AutoItX3::Window.new("Untitled - Notepad")
     def initialize(title, text = "")
       @title = title
       @text = text
@@ -101,22 +150,35 @@ module AutoItX3
     
     #Human-readable output of form <tt>"<Window: WINDOW_TITLE (WINDOW_HANDLE)>"</tt>. 
     #The title is determined by calling #title. 
-    def inspect
+    def inspect # :nodoc:
       "<Window: #{title} (#{handle})>"
     end
     
-    #Returns +self+'s title by returning the value of @title. 
+    #Returns the window's title. 
+    #===Return value
+    #+self+'s title by (the value of <tt>@title</tt>). 
+    #===Example
+    #  puts win.to_s #=> Untitled - Notepad
     def to_s
       @title
     end
     
-    #Returns the handle of the window as an integer by calling 
-    #<tt>.to_i(16)</tt> on the result of #handle. 
+    #Returns the actual handle of the window. 
+    #===Return value
+    #The window's handle as an integer. 
+    #===Example
+    #  p win.handle #=> 721996
+    #===Remarks
+    #See also #handle. 
     def to_i
       handle.to_i(16)
     end
     
     #Activates the window and returns true if it was successfully activated (using #active? to check). 
+    #===Return value
+    #true if the window is activated now, otherwise false. 
+    #===Example
+    #  win.activate
     def activate
       Window.functions[__method__] ||= AU3_Function.new("WinActivate", 'SS')
       Window.functions[__method__].call(@title.wide, @text.wide)
@@ -124,12 +186,24 @@ module AutoItX3
     end
     
     #Checks wheather or not the window is active. 
+    #===Return value
+    #true if the window is active, otherwise false. 
+    #===Example
+    #  p win.active? #=> false
+    #  win.activate #| true
+    #  p win.active? #=> true
     def active?
       Window.functions[__method__] ||= AU3_Function.new("WinActive", 'SS', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide) == 1
     end
     
-    #Sends WM_CLOSE to +self+. WM_CLOSE may be processed by the window, 
+    #Sends WM_CLOSE to +self+. This is like clicking on the [X] button on top of the window. 
+    #===Return value
+    #nil. 
+    #===Example
+    #  win.close
+    #===Remarks
+    #WM_CLOSE may be processed by the window, 
     #it could, for example, ask to save or the like. If you want to kill a window 
     #without giving the ability to process your message, use the #kill method. 
     def close
@@ -143,12 +217,23 @@ module AutoItX3
     #  valid? ==> true or false
     #
     #Calls the Window.exists? class method with the values given in Window.new. 
+    #===Return value
+    #true if this object refers to an existing window, false otherwise. 
+    #===Example
+    #  p win.exists? #=> true
+    #  win.close
+    #  p win.exists? #=> false
     def exists?
       Window.exists?(@title, @text)
     end
     alias valid? exists?
     
-    #*Returns an array of all used window classes of +self+. 
+    #Returns an array of all used window classes of +self+. 
+    #===Return value
+    #An array containg all the window classes as strings. 
+    #===Example
+    #  p win.class_list 
+    #  #=> ["SciTEWindowContent", "Scintilla", "Scintilla", "ToolbarWindow32", "SciTeTabCtrl", "msctls_statusbar32"]
     def class_list
       Window.functions[__method__] ||= AU3_Function.new("WinGetClassList", 'SSPI')
       buffer = " " * AutoItX3::BUFFER_SIZE
