@@ -40,7 +40,7 @@ in the INSTALL file.
 ==What's planned for the future?
 * An equivalent API. <tt>XDo::Mouse</tt> should have an equivalent <tt>AutoItX3::Mouse</tt>. 
 * Getting rid of AutoIt. Currently I try to conquer the Windows API for that purpose. 
-* Getting rid of xdotool. I never found a reference of the X server, so this is far, far future. 
+* Getting rid of xdotool. I'm currently working on this in a separate repo, look at http://www.github.com/Quintus/imitator. 
 * Combining +au3+ and +xdo+ into a single gem. 
 ==Contact
 If you want to contact me, for whatever reason, bugs, contributing, just email me at 
