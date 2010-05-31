@@ -516,16 +516,54 @@ module AutoItX3
       val
     end
     
-    #Sets +self+'s window state to one of the SW_* constants. 
+    #Sets +self+ to a specific state like "maximized". 
+    #===Parameters
+    #[+val+] The state the window should be set to. One of the SW_* constants of this class. 
+    #===Return value
+    #The argument passed. 
+    #===Example
+    #  #Mimize a window
+    #  win.state = AutoItX3::Window::SW_MINIMIZE
+    #  #Make it fullscreen
+    #  win.state = AutoItX3::Window::SW_MAXIMIZE
     def state=(val)
       Window.functions[__method__] ||= AU3_Function.new("WinSetState", 'SSL', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide, val)
       val
     end
     
-    #Renames +self+. This does not change the internal @title 
-    #instance variable, so you can use this with the 
-    #advanced window mode. 
+    #Renames +self+. 
+    #===Parameters
+    #[+val+] The new title. 
+    #===Return value
+    #The argument passed. 
+    #===Example
+    #  win.title = "Use Ruby whenever you can"
+    #===Remarks
+    #This does not change the internal @title instance variable, so you can use this with the 
+    #advanced window mode; this has another issue, though. If you aren't working in advanced 
+    #window mode, you (pseudo) Ruby handle gets invalid, since it only references the window by title: 
+    #  irb(main):042:0> win.title = "xxx"
+    #  => "xxx"
+    #  irb(main):043:0> win
+    #  AutoItX3::Au3Error: Unable to find a window with title 'lib' and text ''!
+    #          from C:/Users/marvin_g/Desktop/Automations/au3/trunk/lib/AutoItX3/window
+    #  .rb:265:in `handle'
+    #          from C:/Users/marvin_g/Desktop/Automations/au3/trunk/lib/AutoItX3/window
+    #  .rb:154:in `inspect'
+    #  irb(main):044:0> win2 = AutoItX3::Window.new("xxx")
+    #  => <Window: xxx (00070388)>
+    #  irb(main):045:0> win2.title = "lib"
+    #  => "lib"
+    #  irb(main):046:0> win2
+    #  AutoItX3::Au3Error: Unable to find a window with title 'xxx' and text ''!
+    #          from C:/Users/marvin_g/Desktop/Automations/au3/trunk/lib/AutoItX3/window
+    #  .rb:265:in `handle'
+    #          from C:/Users/marvin_g/Desktop/Automations/au3/trunk/lib/AutoItX3/window
+    #  .rb:154:in `inspect'
+    #  irb(main):047:0> win
+    #  => <Window: lib (00070388)>
+    #  irb(main):048:0>
     def title=(val)
       Window.functions[__method__] ||= AU3_Function.new("WinSetTitle", 'SSS', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide, val.wide)
@@ -536,8 +574,17 @@ module AutoItX3
     #  AutoItX3::Window#trans = val ==> val
     #  AutoItX3::Window#transparency = val ==> val
     #
-    #Sets the transparency of +self+ or raises a NotImplementedError 
-    #if the OS is Windows Millenium or older. 
+    #Sets a window's transparency. 
+    #===Parameters
+    #[+val+] The opacity you want the window set to; a numeric value between 0 (compelety transparent) and 255 (opaque). 
+    #===Return value
+    #The argument passed. 
+    #===Raises
+    #[NotImplementedError] You are using Windows Millenium or older which don't support transparent windows. 
+    #===Example
+    #  win.trans = 100
+    #===Remarks
+    #Note that a window whose transparency is set to 0 doesn't cause #visible? to return false. 
     def trans=(val)
       Window.functions[__method__] ||= AU3_Function.new("WinSetTrans", 'SSL', 'L')
       if Window.functions[__method__].call(@title.wide, @text.wide, val) == 0
@@ -547,31 +594,66 @@ module AutoItX3
     end
     alias transparency= trans=
     
-    #Waits for +self+ to exist. This method calls Window's class 
-    #method wait, so see Window.wait for more information. 
+    #Waits for +self+ to exist. 
+    #===Parameters
+    #[+timeout+] (+0+) The time to wait for the window to appear, in seconds. If set to 0 (which is the default), waits infinitely. 
+    #===Return value
+    #true if the window was found, false if +timeout+ was reached. 
+    #===Example
+    #  win.wait
+    #  #Only for 10 seconds
+    #  puts "Window doesn't exist" unless win.wait(10)
     def wait(timeout = 0)
       Window.wait(@title, @text, timeout)
     end
     
     #Waits for +self+ to be the active (that is, get the input focus). 
+    #===Parameters
+    #[+timeout+] (+0+) The time to wait, in seconds. 0 means waiting infinitely. 
+    #===Return value
+    #true if the window has been activated, false if +timeout+ was reached. 
+    #===Example
+    #  win.wait_active
+    #  #Only for 10 seconds
+    #  puts "YOU HAVE TO CLICK THE WINDOW!!!!!" unless win.wait_active(10)
     def wait_active(timeout = 0)
       Window.functions[__method__] ||= AU3_Function.new("WinWaitActive", 'SSL', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide, timeout) != 0
     end
     
     #Waits for +self+ to be closed. 
+    #===Parameters
+    #[+timeout+] (+0+) The time to wait, in seconds. 0 means to wait till doomsday. 
+    #===Return value
+    #true if the window was closed, false if +timeout+ was reached. 
+    #===Example
+    #  win.wait_close(10) #Wait for 10 seconds
     def wait_close(timeout = 0)
       Window.functions[__method__] ||= AU3_Function.new("WinWaitClose", 'SSL', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide, timeout) != 0
     end
     
     #Waits for +self+ to lose the input focus. 
+    #===Parameters
+    #[+timeout+] (+0+) The time to wait, in seconds. 0 means waiting infinitely. 
+    #===Return value
+    #true if the window has lost the input focus, false if +timeout+ was reached. 
+    #===Example
+    #  win.wait_not_active(10) #Wait for 10 seconds
     def wait_not_active(timeout = 0)
       Window.functions[__method__] ||= AU3_Function.new("WinWaitNotActive", 'SSL', 'L')
       Window.functions[__method__].call(@title.wide, @text.wide, timeout) != 0
     end
     
-    #Returns the actually focused control in +self+, a AutoItX3::Control object. 
+    #Gets the actually focused control in +self+. 
+    #===Return value
+    #A AutoItX3::Control object. 
+    #===Example
+    #  #For any control
+    #  c = win.focused_control
+    #  #If you're sure it's a textbox
+    #  t = AutoItX3::Edit.from_control(win.focused_control)
+    #===Remarks
     #Note that if the owning window doesn't have the input focus, you'll get an 
     #unusable Control object back. 
     def focused_control
@@ -582,9 +664,17 @@ module AutoItX3
       AutoItX3::Control.new(@title, @text, buffer.normal.strip)
     end
     
-    #Reads the text of the statusbar at position +part+. This method 
-    #raises an Au3Error if there's no statusbar, it's not a mscommon 
-    #statusbar or if you try to read a position out of range. 
+    #Reads the statusbar's text(s). 
+    #===Parameters
+    #[+part+] (+1+) The part of the statusbar to read, a 1-based index. 
+    #===Return value
+    #The text read. 
+    #===Raises
+    #[Au3Error] Couldn't read the statusbar's text. The window may doesn't have a statusbar, it's not a mscommon statusbar or you tried to read an index out of range. 
+    #===Example
+    #  p win.statusbar_text #=> "Loading..."
+    #===Remarks
+    #I couldn't get this method to work with whatever window I tried. Suggestions?
     def statusbar_text(part = 1)
       Window.functions[__method__] ||= AU3_Function.new("StatusbarGetText", 'SSLPI')
       buffer = " " * AutoItX3::BUFFER_SIZE
