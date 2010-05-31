@@ -1,3 +1,4 @@
+-- Encoding: UTF-8 ++
 =au3
 <tt>.au3</tt> is the usual file extension for {AutoIt version 3}[http://www.autoitscript.com/autoit3/index.shtml] 
 scripts. That this library uses it as its name, tells a lot about 
@@ -65,7 +66,12 @@ Have a look at the documentation of the AutoItX3 module.
 +au3+ is well documented and even if you don't find something 
 useful, you may just want to play around with it. ;-)
 ==Copyright
-  Copyright © 2009 Marvin Gülker
+  Copyright © 2009, 2010 Marvin Gülker, Steven Heidel
+  
+  Contact: 
+  Marvin Gülker (Quintus): sutniuq@@gmx@net
+  Steven Heidel (stevenheidel): steven@@livingskyweb@ca
+  
   Licensed under the same terms as Ruby (see http://www.ruby-lang.org/en/LICENSE.txt )
     Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 ==License
