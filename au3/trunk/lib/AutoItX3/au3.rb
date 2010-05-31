@@ -4,9 +4,7 @@
 #
 #au3 is published under the same terms as Ruby. 
 #See http://www.ruby-lang.org/en/LICENSE.txt
-#
-#===au3.rb
-#This is au3's main file. 
+
 require "win32/api"
 #(See the end of this file for more require statements)
 
