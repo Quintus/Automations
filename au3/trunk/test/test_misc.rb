@@ -34,7 +34,7 @@ class MiscTest < Test::Unit::TestCase
   end
   
   def test_opt
-    AutoItX3.run("mspaint.exe")
+    pid = AutoItX3.run("mspaint.exe")
     AutoItX3.opt("WinTitleMatchMode", 2) do
       assert(AutoItX3::Window.wait("Paint", "", 3)) #Timeout means false
     end
@@ -43,6 +43,7 @@ class MiscTest < Test::Unit::TestCase
     assert(AutoItX3::Window.wait("Paint", "", 3))
     AutoItX3.opt("WinTitleMatchMode", 1)
     assert_equal(false, AutoItX3::Window.wait("Paint", "", 3))
+    AutoItX3.kill_process(pid)
   end
   
 end
