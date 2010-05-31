@@ -249,7 +249,7 @@ module AutoItX3
     def client_size
       Window.functions[:client_size_width] ||= AU3_Function.new("WinGetClientSizeWidth", 'SS', 'L')
       Window.functions[:client_size_height] ||= AU3_Function.new("WinGetClientSizeHeight", 'SS', 'L')
-      size = [Window.functions[:client_size_width].call, Window.functions[:client_size_height].call]
+      size = [Window.functions[:client_size_width].call(@title.wide, @text.wide), Window.functions[:client_size_height].call(@title.wide, @text.wide)]
       raise_unfound if AutoItX3.last_error == 1
       size
     end
