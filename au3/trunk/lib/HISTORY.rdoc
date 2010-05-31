@@ -2,7 +2,12 @@
 Important changes are marked <b>bold</b>. Bugfixes are written <i>italic</i>. 
 
 ==0.1.2
+*  Improved the documentation significantly.
 *  <i>Fixed a typo and a bug in window.rb which made Window.select_menu_item raising errors. Also enhanced documentation of this method. Thanks to sdavis26 for reporting. </i>
+*  <i>TreeView#send_command_to_tree_view raised an error when passed integer values. This has been fixed.</i>
+*  <i>The method AutoItX3::ListView#selected returned strings although thedocs said that it returned indices which are generally expectedto be numbers. This has been corrected; the method returns now an array of integers.</i>
+*  <i>Button#checked? always returned false. This has been fixed. </i>
+*  <i>Window#client_size always raised an ArgumentError. This has been fixed. </i>
 
 ==0.1.1
 *  Corrected documentation main page set by the Rakefile
