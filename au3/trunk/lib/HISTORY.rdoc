@@ -8,6 +8,7 @@ Important changes are marked <b>bold</b>. Bugfixes are written <i>italic</i>.
 *  <i>The method AutoItX3::ListView#selected returned strings although thedocs said that it returned indices which are generally expectedto be numbers. This has been corrected; the method returns now an array of integers.</i>
 *  <i>Button#checked? always returned false. This has been fixed. </i>
 *  <i>Window#client_size always raised an ArgumentError. This has been fixed. </i>
+*  <b>Added the Window#send_message and Window#post_message methods. Since they belong rather to automation in general than to AutoIt in special, they reside in an extra file 'AutoItX3/window/send_message.rb' which you have to require first in order to get them.</b>
 
 ==0.1.1
 *  Corrected documentation main page set by the Rakefile
