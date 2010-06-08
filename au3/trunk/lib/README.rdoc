@@ -23,11 +23,13 @@ to have AutoIt installed - it's enough if you just include the AutoItX3.dll in y
 application (and make sure you've read the AutoItX3 license - it's quite short). 
 ==Win32API problems:
 You may get an error message similar to this after requiring 'au3':
-  C:/Ruby19/lib/ruby/gems/1.9.1/gems/win32-api-1.4.6-x86-mingw32/lib/win32/api.so: [BUG] Segmentation fault
-This is a bug in the newest version of Win32API. To fix this, simply install an
-older version of the Win32API gem:
-  gem install win32-api -v 1.4.5
-  gem install au3 # The au3 gem will need to be reinstalled
+  The specified module was not found. 
+This message also appears if you just require "win32/api", it's therefore not a problem with au3. 
+The simplest solution is to gem uninstall win32-api followed by 
+  gem install win32-api --platform=ruby
+which forces RubyGems to compile win32-api from source. Of course, in order to 
+do this you need to have a C compiler, for example from the RubyInstaller devkit or 
+MinGW/MSYS directly. 
 ==Usage
 The majority of +au3+'s methods is bundled in the AutoItX3 module 
 and accessable via it's module methods. In order to get them, 
@@ -61,6 +63,16 @@ wrapped in the AutoItX3::Control class.
   edit = window.focused_control
   #Set the text. You should also have a look on the AutoItX3.send_keys method.
   edit.text = "ABCDEFG"
+
+If you like to play with window messages directly, require 'AutoItX3/window/send_message' which 
+leaves the scope of AutoIt behind and directly wraps some Win32API functions. You get two new instance 
+methods for the AutoItX3::Window class, #post_message and #send_message, and now you can enjoy 
+doing things like 
+  require "au3"
+  require "AutoItX3/window/send_message"
+  #...
+  win.post_message(:close)
+. See the method's documentations for more information on this. 
 ===Don't know where to start?
 Have a look at the documentation of the AutoItX3 module. 
 +au3+ is well documented and even if you don't find something 
