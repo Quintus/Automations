@@ -7,11 +7,11 @@
 
 begin
   require_relative "../lib/au3"
-  require_relative "../lib/AutoItX3/window/send_command"
+  require_relative "../lib/AutoItX3/window/send_message"
 rescue LoadError
   #Aha, this is the gem, not the build environment
   require "au3"
-  require "AutoItX3/window/send_command"
+  require "AutoItX3/window/send_message"
 end
 require "test/unit"
 
