@@ -28,7 +28,7 @@ EOF
   gemspec.homepage = "http://auto.rubyforge.org/"
   gemspec.platform = Gem::Platform::RUBY
   gemspec.required_ruby_version = ">=1.9"
-  gemspec.files = [Dir["test/**"], "lib/HISTORY.rdoc", "lib/README.rdoc", "lib/au3.rb", Dir["lib/AutoItX3/*.rb"]].flatten
+  gemspec.files = [Dir["test/**"], "lib/HISTORY.rdoc", "lib/README.rdoc", "lib/au3.rb", Dir["lib/AutoItX3/*.rb"], "lib/AutoItX3/window/send_message.rb"].flatten
   gemspec.has_rdoc = true
   gemspec.rdoc_options << "--title" << "au3 RDocs" << "--main" << "lib/README.rdoc"
   gemspec.rubyforge_project = "Automations"
