@@ -3,8 +3,12 @@
 #Copyright © 2009 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 require "rake/gempackagetask"
-require "rake/rdoctask"
 require "rake/testtask"
+begin
+  require "hanna/rdoctask"
+rescue LoadError
+  require "rake/rdoctask"
+end
 
 spec = Gem::Specification.new do |s|
   s.name = "xdo"
@@ -18,10 +22,10 @@ only with Ruby 1.9.
 DESCRIPTION
   s.add_development_dependency("test-unit", ">= 2.0")
   s.requirements = ["The xdotool command-line tool.", "The xsel command-line tool.", "xwininfo (usually installed)", "eject (usually installed)", "xkill (usually installed)"]
-  s.version = "0.0.3"
+  s.version = "0.1.0.dev"
   s.author = "Marvin Gülker"
   s.email = "sutniuq@gmx.net"
-  s.platform = Gem::Platform::CURRENT #Because it's a Linux-only gem
+  s.platform = Gem::Platform::RUBY
   s.required_ruby_version = ">=1.9"
   s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "Rakefile", "lib/README.rdoc", "lib/HISTORY.rdoc"].flatten
   s.executables = ["xinfo.rb"]
