@@ -1,6 +1,6 @@
 #Encoding: UTF-8
 #This file is part of Xdo. 
-#Copyright © 2009 Marvin Gülker
+#Copyright © 2009, 2010 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 require "open3"
 require_relative("../xdo")
