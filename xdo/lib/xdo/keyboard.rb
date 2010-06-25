@@ -8,10 +8,11 @@ require_relative("../small_scanner")
 module XDo
   
   #A namespace encabsulating methods to simulate keyboard input. You can 
-  #send input to special windows, use the +w_id+ parameter of many methods 
-  #for that purpose. 
+  #send input to special windows, just pass in the window's ID or a XWindow 
+  #object via the +w_id+ parameter. 
   module Keyboard
     
+    #Aliases for key names in escape sequences. 
     ALIASES = {
       "BS" => "BackSpace", 
       "BACKSPACE" => "BackSpace", 
@@ -38,8 +39,20 @@ module XDo
       "NUM_COMMA" => "KP_Separator", 
       "NUM_INS" => "KP_Insert", 
       "NUM0" => "KP_0", 
+      "CTRL" => "Control_L", 
+      "ALT" => "Alt_L", 
+      "ALT_GR" => "ISO_Level3_Shift", 
+      "WIN" => "Super_L", 
+      "SUPER" => "Super_L"
     }.freeze
     
+    #The names of some keyboard symbols. The latest release of 
+    #xdotool is capable of sending keysymbols directly, i.e. 
+    #  xdotool key Adiaeresis
+    #results in Ä being sent. 
+    #This hash defines how those special characters can be 
+    #sent. Feel free to add characters that are missing! You 
+    #can use the +xev+ program to obtain their keycodes. 
     SPECIAL_CHARS = {
       "ä" => "adiaeresis", 
       "Ä" => "Adiaeresis", 
@@ -68,6 +81,15 @@ module XDo
     class << self
       
       #Types a character sequence, but without any special chars. 
+      #===Parameters
+      #[+str+] The string to type. 
+      #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  XDo::Keyboard.type("test")
+      #  XDo::Keyboard.type("täst") #=> I don't what key produces '�', skipping. 
+      #===Remarks
       #This function is a bit faster then #simulate. 
       def type(str, w_id = 0)
         out = `#{XDOTOOL} type #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}'#{str}'`
@@ -75,11 +97,81 @@ module XDo
       end
       
       #Types a character sequence. You can use the escape sequence {...} to send special 
-      #keystrokes, a full list of supported keystrokes is printed out by: 
-      #  puts (XDo::Keyboard.constants - [:SPECIAL_CHARS])
+      #keystrokes. 
+      #===Parameters
+      #[+str+] The string to simulate. 
+      #[+raw+] (false) If true, escape sequences via {...} are disabled. See _Remarks_. 
+      #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
+      #===Return value
+      #The string that was simulated. 
+      #===Example
+      #  XDo::Keyboard.simulate("test")
+      #  XDo::Keyboard.simulate("täst")
+      #  XDo::Keyboard.simulate("tex{BS}st")
+      #===Remarks
       #This method recognizes many special chars like ? and ä, even if you disable 
       #the escape syntax {..} via setting the +raw+ parameter to true (that's the only way to send the { and } chars). 
-      #It's a bit slower than the #type method. 
+      #
+      #+str+ may contain escape sequences in braces { and }. The letters between those two indicate 
+      #what special character to send - this way you can simulate non-letter keypresses like [ESC]!
+      #You may use the following escape sequences: 
+      #  Escape seq. | Keystroke         | Comment
+      #  ============+===================+=================
+      #  ALT         | [Alt_L]           |
+      #  ------------+-------------------------------------
+      #  ALT_GR      | [ISO_Level3_Shift]| Not on USA 
+      #              |                   | keyboard
+      #  ------------+-------------------------------------
+      #  BS          | [BackSpace]       |
+      #  ------------+-------------------------------------
+      #  BACKSPACE   | [BackSpace]       |
+      #  ------------+-------------------------------------
+      #  CTRL        | [Control_L]       |
+      #  ------------+-------------------------------------
+      #  DEL         | [Delete]          |
+      #  ------------+-------------------------------------
+      #  END         | [End]             |
+      #  ------------+-------------------------------------
+      #  ESC         | [Escape]          |
+      #  ------------+-------------------------------------
+      #  INS         | [Insert]          |
+      #  ------------+-------------------------------------
+      #  HOME        | [Home]            |
+      #  ------------+-------------------------------------
+      #  MENU        | [Menu]            | Usually right-
+      #              |                   | click menu
+      #  ------------+-------------------------------------
+      #  NUM0..NUM9  | [KP_0]..[KP_9]    | Numpad keys
+      #  ------------+-------------------------------------
+      #  NUM_DIV     | [KP_Divide]       | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_MUL     | [KP_Multiply]     | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_SUB     | [KP_Subtract]     | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_ADD     | [KP_Add]          | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_ENTER   | [KP_Enter]        | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_DEL     | [KP_Delete]       | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_COMMA   | [KP_Separator]    | Numpad key
+      #  ------------+-------------------------------------
+      #  NUM_INS     | [KP_Insert]       | Numpad key
+      #  ------------+-------------------------------------
+      #  PAUSE       | [Pause]           |
+      #  ------------+-------------------------------------
+      #  PGUP        | [Prior]           | Page up
+      #  ------------+-------------------------------------
+      #  PGDN        | [Next]            | Page down
+      #  ------------+-------------------------------------
+      #  PRINT       | [Print]           |
+      #  ------------+-------------------------------------
+      #  SUPER       | [Super_L]         | Windows key
+      #  ------------+-------------------------------------
+      #  TAB         | [Tab]             |
+      #  ------------+-------------------------------------
+      #  WIN         | [Super_L]         | Windows key
       def simulate(str, raw = false, w_id = 0)
         raise(XDo::XError, "Invalid number of open and close braces!") unless str.scan(/{/).size == str.scan(/}/).size
         
@@ -111,30 +203,70 @@ module XDo
         str
       end
       
-      #Simulate a single char directly via the +key+ function of +xdotool+. 
-      #+c+ is a single char like "a" or a combination like "shift+a". 
+      #Simulate a single char directly via the +key+ command of +xdotool+. 
+      #===Parameters
+      #[+c+] A single char like "a" or a combination like "shift+a". 
+      #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
+      #===Return value
+      #The +c+ you passed in. 
+      #===Example
+      #  XDo::Keyboard.char("a") #=> a
+      #  XDo::Keyboard.char("A") #=> A
+      #  XDo::Keyboard.char("ctrl+c")
       def char(c, w_id = 0)
         Open3.popen3("#{XDOTOOL} key #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}#{c}") do |stdin, stdout, stderr|
           stdin.close_write
           raise(XDo::XError, "Invalid character '#{c}'!") if stderr.read =~ /No such key name/
         end
+        c
       end
       alias key char
       
-      #Holds a key down. Please call #key_up after a call to this method. 
+      #Holds a key down. 
+      #===Parameters
+      #[+key+] The key to hold down. 
+      #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
+      #===Return value
+      #+key+. 
+      #===Example
+      #  XDo::Keyboard.key_down("a")
+      #  sleep 2
+      #  XDo::Keyboard.key_up("a")
+      #===Remarks
+      #You should release the key sometime via Keyboard.key_up. 
       def  key_down(key, w_id = 0)
         `#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
+        key
       end
       
       #Releases a key hold down by #key_down. 
+      #===Parameters
+      #[+key+] The key to release. 
+      #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
+      #===Return value
+      #+key+. 
+      #===Example
+      #  XDo::Keyboard.key_down("a")
+      #  sleep 2
+      #  XDo::Keyboard.key_up("a")
+      #===Remarks
+      #This has no effect on already released keys. 
       def key_up(key, w_id = 0)
         `#{XDOTOOL} keyup #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
+        key
       end
       
-      #Deletes a char. If +right+ is true, +del_char+ uses 
-      #the DEL key for deletion, otherwise the BackSpace key. 
+      #Deletes a char. 
+      #===Parameters
+      #[right] (false) If this is true, +del_char+ uses the DEL key for deletion, otherwise the BackSpace key. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  XDo::Keyboard.delete
+      #  XDo::Keyboard.delete(true)
       def delete(right = false)
         Keyboard.simulate(right ? "\b" : "{DEL}")
+        nil
       end
       
       #Allows you to things like this: 
@@ -148,6 +280,8 @@ module XDo
       
       private
       
+      #Tokenizes a string into an array of form
+      #  [[:plain, "nonspecial"], [:special, "a"], [:esc, "INS"], ...]
       def tokenize(str)
         tokens = []
         ss = SmallScanner.new(str)
