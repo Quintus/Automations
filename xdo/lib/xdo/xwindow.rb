@@ -411,6 +411,14 @@ module XDo
       nil
     end
     
+    def to_i
+      @id
+    end
+    
+    def to_s
+      title
+    end
+    
   end
   
 end
