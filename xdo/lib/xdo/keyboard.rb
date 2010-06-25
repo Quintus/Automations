@@ -10,11 +10,6 @@ module XDo
   #A namespace encabsulating methods to simulate keyboard input. You can 
   #send input to special windows, use the +w_id+ parameter of many methods 
   #for that purpose. 
-  #NOTE: xdotool seams to reject the <tt>--window</tt> option even if you try 
-  #to run it directly. This command fails (where 60817411 is a window id): 
-  #  xdotool key --window 60817411 a
-  #So don't be surprised if it does not work with this library. Hopefully this will be 
-  #fixed, so I leave this in. 
   module Keyboard
     
     ALIASES = {
@@ -74,8 +69,8 @@ module XDo
       
       #Types a character sequence, but without any special chars. 
       #This function is a bit faster then #simulate. 
-      def type(str, w_id = nil)
-        out = `#{XDOTOOL} type #{w_id ? "--window #{w_id} " : ""}'#{str}'`
+      def type(str, w_id = 0)
+        out = `#{XDOTOOL} type #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}'#{str}'`
         nil
       end
       
@@ -85,27 +80,27 @@ module XDo
       #This method recognizes many special chars like ? and ä, even if you disable 
       #the escape syntax {..} via setting the +raw+ parameter to true (that's the only way to send the { and } chars). 
       #It's a bit slower than the #type method. 
-      def simulate(str, raw = false, w_id = nil)
+      def simulate(str, raw = false, w_id = 0)
         raise(XDo::XError, "Invalid number of open and close braces!") unless str.scan(/{/).size == str.scan(/}/).size
         
         tokens = tokenize(str)
         
         tokens.each do |sym, s|
           case sym
-            when :plain then type(s, w_id)
+            when :plain then type(s, w_id.to_i)
             when :esc then 
               if raw
-                type("{#{s}}", w_id) #The braces should be preserved when using +raw+. 
+                type("{#{s}}", w_id.to_i) #The braces should be preserved when using +raw+. 
               else
                 if ALIASES.has_key?(s)
                   key(ALIASES[s]) 
                 else
-                  char(s.split("_").map(&:capitalize).join("_"), w_id)
+                  char(s.split("_").map(&:capitalize).join("_"), w_id.to_i)
                 end
               end
             when :special then
               if SPECIAL_CHARS.has_key?(s)
-                char(SPECIAL_CHARS[s], w_id)
+                char(SPECIAL_CHARS[s], w_id.to_i)
               else
                 raise(XDo::ParseError, "No key symbol known for '#{s}'!")
               end
@@ -118,8 +113,8 @@ module XDo
       
       #Simulate a single char directly via the +key+ function of +xdotool+. 
       #+c+ is a single char like "a" or a combination like "shift+a". 
-      def char(c, w_id = nil)
-        Open3.popen3("#{XDOTOOL} key #{w_id ? "--window #{w_id} " : ""}#{c}") do |stdin, stdout, stderr|
+      def char(c, w_id = 0)
+        Open3.popen3("#{XDOTOOL} key #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}#{c}") do |stdin, stdout, stderr|
           stdin.close_write
           raise(XDo::XError, "Invalid character '#{c}'!") if stderr.read =~ /No such key name/
         end
@@ -127,13 +122,13 @@ module XDo
       alias key char
       
       #Holds a key down. Please call #key_up after a call to this method. 
-      def  key_down(key, w_id = nil)
-        `#{XDOTOOL} keydown #{w_id ? "--window #{w_id} " : "" }#{check_for_special_key(key)}`
+      def  key_down(key, w_id = 0)
+        `#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
       end
       
       #Releases a key hold down by #key_down. 
-      def key_up(key, w_id = nil)
-        `#{XDOTOOL} keyup #{w_id ? "--window #{w_id} " : "" }#{check_for_special_key(key)}`
+      def key_up(key, w_id = 0)
+        `#{XDOTOOL} keyup #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
       end
       
       #Deletes a char. If +right+ is true, +del_char+ uses 
