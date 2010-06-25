@@ -419,6 +419,14 @@ module XDo
       title
     end
     
+    def zero?
+      @id.zero?
+    end
+    
+    def nonzero?
+      @id.nonzero?
+    end
+    
   end
   
 end
