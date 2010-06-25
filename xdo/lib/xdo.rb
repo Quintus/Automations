@@ -3,6 +3,8 @@
 #Copyright © 2009 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 
+require "open3"
+
 #The namespace of this library. 
 module XDo
   
@@ -26,6 +28,9 @@ module XDo
   
   #Class for errors in this library. 
   class XError < StandardError
+  end
+  
+  class ParseError < StandardError
   end
   
 end #module XDo
