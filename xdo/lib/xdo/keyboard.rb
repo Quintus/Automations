@@ -340,13 +340,6 @@ module XDo
         tokens
       end
       
-      #Wraps an escape sequenz in the corerresponding class and 
-      #returns the commands needed to execute it. 
-      def sequence_escape(token, w_id)
-        esc = XDo::Keyboard.const_get(token.upcase.to_sym).new(w_id)
-        return esc.actual_commands
-      end
-      
     end
     
   end
