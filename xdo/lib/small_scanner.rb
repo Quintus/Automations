@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 #Encoding: UTF-8
+#This file is part of Xdo. 
+#Copyright © 2010 Marvin Gülker
+#  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 
 #This class is similar to the StringScanner class in the stdlib, 
 #but since that one is incapable of handling strings per-character 
