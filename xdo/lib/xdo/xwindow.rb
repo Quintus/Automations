@@ -15,7 +15,7 @@ module XDo
   #you can move or resize it. Some methods are not available on every window 
   #manager: XWindow.active_window, XWindow.desktop_num, XWindow.desktop_num=, XWindow.desktop, 
   #XWindow.desktop=, XWindow.from_active, #raise, #activate, #desktop, #desktop=. 
-  #Some of them may be available, some not. On my machine (an Ubuntu Jaunty) for 
+  #Some of them may be available, some not. On my machine (an Ubuntu Lucid) for 
   #example I can use active_window, desktop_num and #activate, but not #raise or #desktop=. 
   #Those methods are tagged with the sentence "Part of the EWMH standard XY". Not all 
   #parts of the EWMH standard are provided by every window manager. 
@@ -85,13 +85,22 @@ module XDo
       #Search for a window name to get the internal ID of a window. 
       #Return value is an array containing all found IDs or an 
       #empty array if none is found. 
-      def search(name, opts = {title: true, name: true, :class => true})
+      def search(str, *opts)
+        if opts.first.kind_of?(Hash)
+          warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
+          opts = opts.first.keys
+        end
+        opts = [:name, :class, :classname] if opts.empty?
+        
+        #Allow Regular Expressions. Since I can't pass them directly to the command line, 
+        #I need to get their source. 
+        str = str.source if str.kind_of?(Regexp)
+        
         cmd = "#{XDo::XDOTOOL} search "
-        opts.each_pair{|key, value| cmd << "--#{key} " if value}
-        cmd << '"' << name << '"'
-        #Error wird nicht behandelt, weil im Fehlerfall einfach nur ein leeres Array zurückkommen soll
-        out = `#{cmd}`
-        out.lines.to_a.collect{|l| l.strip.to_i}
+        opts.each{|sym| cmd << "--#{sym} "}
+        cmd << "'" << str << "'"
+        #Don't handle errors since we want an empty array in case of an error
+        Open3.popen3(cmd){|stdin, stdout, stderr| stdin.close_write; stdout.read}.lines.to_a.collect{|l| l.strip.to_i}
       end
       
       #Returns the internal ID of the currently focused window. 
