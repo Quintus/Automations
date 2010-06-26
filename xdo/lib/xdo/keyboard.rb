@@ -92,7 +92,11 @@ module XDo
       #===Remarks
       #This function is a bit faster then #simulate. 
       def type(str, w_id = 0)
-        out = `#{XDOTOOL} type #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}'#{str}'`
+        out = Open3.popen3("#{XDOTOOL} type #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}'#{str}'") do |stdin, stdout, stderr|
+          stdin.close_write
+          str = stderr.read
+          warn(str) unless str.empty?
+        end
         nil
       end
       
@@ -104,6 +108,8 @@ module XDo
       #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
       #===Return value
       #The string that was simulated. 
+      #===Raises
+      #[ParseError] Your string was invalid. 
       #===Example
       #  XDo::Keyboard.simulate("test")
       #  XDo::Keyboard.simulate("täst")
@@ -209,6 +215,8 @@ module XDo
       #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
       #===Return value
       #The +c+ you passed in. 
+      #===Raises
+      #[XError] Invalid keyname. 
       #===Example
       #  XDo::Keyboard.char("a") #=> a
       #  XDo::Keyboard.char("A") #=> A
@@ -228,6 +236,8 @@ module XDo
       #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
       #===Return value
       #+key+. 
+      #===Raises
+      #[XError] Invalid keyname. 
       #===Example
       #  XDo::Keyboard.key_down("a")
       #  sleep 2
@@ -235,7 +245,10 @@ module XDo
       #===Remarks
       #You should release the key sometime via Keyboard.key_up. 
       def  key_down(key, w_id = 0)
-        `#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
+        Open3.popen3("#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}") do |stdin, stdout, stderr|
+          stdin.close_write
+          raise(XDo::XError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
+        end
         key
       end
       
@@ -245,6 +258,8 @@ module XDo
       #[+w_id+] (0) The ID of the window you want the input send to (or an XWindow object). 0 means the active window. 
       #===Return value
       #+key+. 
+      #===Raises
+      #[XError] Invalid keyname. 
       #===Example
       #  XDo::Keyboard.key_down("a")
       #  sleep 2
@@ -252,7 +267,10 @@ module XDo
       #===Remarks
       #This has no effect on already released keys. 
       def key_up(key, w_id = 0)
-        `#{XDOTOOL} keyup #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}`
+        Open3.popen3("#{XDOTOOL} keyup #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}") do |stdin, stdout, stderr|
+          stdin.close_write
+          raise(XDo::XError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
+        end
         key
       end
       
@@ -275,7 +293,7 @@ module XDo
       #You can't use this way to send whitespace or _ characters. 
       def method_missing(sym, *args, &block)
         super if args.size > 1 or block
-        char(sym.to_s.capitalize.gsub("_", "+"), args[0])
+        char(sym.to_s.capitalize.gsub("_", "+"), args[0].nil? ? 0 : args[0])
       end
       
       private
@@ -338,6 +356,13 @@ module XDo
         
         #Return the tokens array. 
         tokens
+      end
+      
+      #Checks wheather +key+ is a special character (i.e. contained 
+      #in the SPECIAL_CHARS hash) and returns the key symbol for it if so, 
+      #otherwise returns +key+. 
+      def check_for_special_key(key)
+        SPECIAL_CHARS.has_key?(key) ? SPECIAL_CHARS[key] : key
       end
       
     end
