@@ -49,8 +49,18 @@ module XDo
     
     class << self
       include Open3
-      #Checks if a window whose name matches +name+ exists. 
-      #Think about passing :onlyvisible in the +opt+ hash. 
+      
+      #Checks if a window exists. 
+      #===Parameters
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #===Return value
+      #true or false. 
+      #===Example
+      #  p XWindow.exists?("gedit") #=> true
+      #  p XWindow.exists?(/^gedit/) #=> false
+      #===Remarks
+      #It may be a good idea to pass :onlyvisible as a search parameter. 
       def exists?(name, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
@@ -60,7 +70,14 @@ module XDo
         !search(name, *opts).empty?
       end
       
-      #Returns true if the given window ID exists, false otherwise. 
+      #Checks wheather the given ID exists or not. 
+      #===Parameters
+      #[+id+] The ID to check for. 
+      #===Return value
+      #true or false. 
+      #===Example
+      #  p XWindow.id_exits?(29360674) #=> true
+      #  p XWindow.id_exists?(123456) #=> false
       def id_exists?(id)
         err = ""
         popen3("#{XDo::XWININFO} -id #{id}"){|stdin, stdout, stderr| err << stderr.read}
@@ -68,7 +85,21 @@ module XDo
         return true
       end
       
-      #Waits for a window name to exist and returns the ID of that window. 
+      #Waits for a window name to exist.
+      #===Parameters
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #===Return value
+      #The ID of the newly appeared window. 
+      #===Example
+      #  #Wait for a window with "gedit" somewhere in it's title:
+      #  XDo::XWindow.wait_for_window("gedit")
+      #  #Wait for a window that ends with "ends_with_this":
+      #  XDo::XWindow.wait_for_window(/ends_with_this$/)
+      #  #It's useful to combine this method with the Timeout module: 
+      #  require "timeout"
+      #  Timeout.timeout(3){XDo::XWindow.wait_for_window("gedit")}
+      #===Remarks
       #Returns immediately if the window does already exist. 
       def wait_for_window(name, *opts)
         if opts.first.kind_of?(Hash)
@@ -80,8 +111,20 @@ module XDo
         search(name, *opts).first
       end
       
-      #Waits for a window to close. If the window does not exists when calling +wait_for_close+, 
-      #the method returns immediately. 
+      #Waits for a window to close. 
+      #===Parameters
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  #Wait for a window with "gedit" somewhere in it's title
+      #  XDo::XWindow.wait_for_close("gedit")
+      #  #Waits for a window whose title ends with "ends_with_this":
+      #  XDo::XWindow.wait_for_close(/ends_with_this$/)
+      #  #It's quite useful to combine this method with the Timeout module:
+      #  require "timeout"
+      #  Timeout.timeout(3){XDo::XWindow.wait_for_close("gedit")}
       def wait_for_close(name, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
@@ -93,8 +136,25 @@ module XDo
       end
       
       #Search for a window name to get the internal ID of a window. 
-      #Return value is an array containing all found IDs or an 
-      #empty array if none is found. 
+      #===Parameters
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[<tt>*opts</tt> (<tt>[:name, class, :classname]</tt>) Search parameters. 
+      #====Possible search parameters
+      #Copied from the +xdotool+ manpage: 
+      #[class] Match against the window class. 
+      #[classname] Match against the window classname.
+      #[name] Match against the window name. This is the same string that is displayed in the window titlebar.
+      #[onlyvisible] Show only visible windows in the results. This means ones with map state IsViewable.
+      #===Return value
+      #An array containing the IDs of all found windows or an empty array 
+      #if none was found. 
+      #===Example
+      #  #Look for every window with "gedit" in it's title, class or classname
+      #  XDo::XWindow.search("gedit")
+      #  #Look for every window whose title, class or classname ends with "SciTE"
+      #  XDo::XWindow.search(/SciTE$/)
+      #  #Explicitly only search the titles of visible windows
+      #  XDo::XWindow.search("gedit", :name, :onlyvisible)
       def search(str, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
