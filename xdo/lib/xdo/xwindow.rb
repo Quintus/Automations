@@ -51,12 +51,13 @@ module XDo
       include Open3
       #Checks if a window whose name matches +name+ exists. 
       #Think about passing :onlyvisible in the +opt+ hash. 
-      def exists?(name, opts = {title: true, name: true, :class => true})
-        begin
-          !search(name, opts).empty?
-        rescue
-          false
+      def exists?(name, *opts)
+        if opts.first.kind_of?(Hash)
+          warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
+          opts = opts.first.keys
         end
+        
+        !search(name, *opts).empty?
       end
       
       #Returns true if the given window ID exists, false otherwise. 
@@ -69,16 +70,25 @@ module XDo
       
       #Waits for a window name to exist and returns the ID of that window. 
       #Returns immediately if the window does already exist. 
-      def wait_for_window(name, opts = {title: true, name: true, :class => true, :onlyvisible => true})
-        loop{break if exists?(name, opts);sleep(0.5)}
-        sleep 1 #To ensure it's really there
-        search(name, opts).first
+      def wait_for_window(name, *opts)
+        if opts.first.kind_of?(Hash)
+          warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
+          opts = opts.first.keys
+        end
+        
+        loop{break if exists?(name, *opts);sleep(0.5)}
+        search(name, *opts).first
       end
       
       #Waits for a window to close. If the window does not exists when calling +wait_for_close+, 
       #the method returns immediately. 
-      def wait_for_close(name, opts = {title: true, name: true, :class => true, :onlyvisible => true})
-        loop{break if !exists?(name, opts);sleep(0.5)}
+      def wait_for_close(name, *opts)
+        if opts.first.kind_of?(Hash)
+          warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
+          opts = opts.first.keys
+        end
+        
+        loop{break if !exists?(name, *opts);sleep(0.5)}
         nil
       end
       

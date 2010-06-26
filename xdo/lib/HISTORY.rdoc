@@ -8,6 +8,7 @@ API are marked <b>bold</b>. Bugfixes are <i>italic</i>.
 * <b>Added XWindow#zero? and XWindow#nonzero?</b>
 * All methods in the Keyboard module that accept a +w_id+ parameter now can take XWindow objects. 
 * Removed Keyboard.sequence_escape. 
+* Deprecated the use of a Hash for specifying window search parameters in favor of a rest argument. Affected methods are: XWindow.search, XWindow.exists?, XWindow.wait_for_window, XWindow.wait_for_close. 
 
 ==0.0.3
 * <i>Some XWindow instance methods (like #close!) showed wrong error messages due to the redundance of Kernel#raise with XWindow#raise. This has been fixed. </i>
