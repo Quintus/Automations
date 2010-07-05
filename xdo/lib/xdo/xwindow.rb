@@ -163,8 +163,17 @@ module XDo
         opts = [:name, :class, :classname] if opts.empty?
         
         #Allow Regular Expressions. Since I can't pass them directly to the command line, 
-        #I need to get their source. 
+        #I need to get their source. Otherwise we want an exact match, therefore the line 
+        #begin and line end anchors need to be set around the given string. 
         str = str.source if str.kind_of?(Regexp)
+        #TODO
+        #The following is the new behaviour that will be activated with the next minor version. 
+        #See DEPRECATE.rdoc. 
+        #str = if str.kind_of?(Regexp)
+          #str.source 
+        #else
+          #"^#{str.to_str}$"
+        #end
         
         cmd = "#{XDo::XDOTOOL} search "
         opts.each{|sym| cmd << "--#{sym} "}
