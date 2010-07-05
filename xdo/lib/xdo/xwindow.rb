@@ -236,8 +236,13 @@ module XDo
       
       #Creates a XWindow by calling search with the given parameters. 
       #The window is created from the first ID found. 
-      def from_name(name, opts = {title: true, name: true, :class => true})
-        ids = search(name, opts)
+      def from_name(name, *opts)
+        if opts.first.kind_of?(Hash)
+          warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
+          opts = opts.first.keys
+        end
+        
+        ids = search(name, *opts)
         raise(XDo::XError, "The window '#{name}' wasn't found!") if ids.empty?
         new(ids.first)
       end
