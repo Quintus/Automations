@@ -52,7 +52,7 @@ module XDo
       
       #Checks if a window exists. 
       #===Parameters
-      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #true or false. 
@@ -87,7 +87,7 @@ module XDo
       
       #Waits for a window name to exist.
       #===Parameters
-      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #The ID of the newly appeared window. 
@@ -113,7 +113,7 @@ module XDo
       
       #Waits for a window to close. 
       #===Parameters
-      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #nil. 
@@ -313,7 +313,23 @@ module XDo
       
       #Creates a XWindow by calling search with the given parameters. 
       #The window is created from the first ID found. 
-      def from_name(name, *opts)
+      #===Parameters
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #===Return value
+      #The created XWindow object. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  #Exact title/class/classname match
+      #  xwin = XDo::XWindow.from_search("xwindow.rb - SciTE")
+      #  #Part match via regexp
+      #  xwin = XDo::XWindow.from_search(/SciTE/)
+      #  #Part match via string - DEPRECATED. 
+      #  xwin = XDo::XWindow.from_search("SciTE")
+      #  #Only search the window classes
+      #  xwin = XDo::XWindow.from_search(/SciTE/, :class)
+      def from_search(name, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
           opts = opts.first.keys
@@ -322,6 +338,30 @@ module XDo
         ids = search(name, *opts)
         raise(XDo::XError, "The window '#{name}' wasn't found!") if ids.empty?
         new(ids.first)
+      end
+      
+      #_Deprecated_. Use XWindow.from_search or XWindow.from_title instead. 
+      def from_name(name, *opts)
+        warn("#{caller.first}: Deprecation Warning: ::from_name is deprecated. Use ::from_search if you want the old behaviour with the ability to specify all search parameters, or ::from_title if you just want to look through the window titles.")
+        from_search(name, *opts)
+      end
+      
+      #Same as XWindow.from_search, but only looks for the window's titles to match. 
+      #===Parameters
+      #[+title+] The title of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #===Return value
+      #A XWindow object made up from the first window ID found. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  #Exact string match
+      #  xwin = XWindow.from_title("xwindow.rb - SciTE")
+      #  #Part match via regexp
+      #  xwin = XWindow.from_title(/SciTE/)
+      #  #Part match via string - DEPRECATED. 
+      #  xwin = XWindow.from_title("SciTE")
+      def from_title(title)
+        from_search(title, :name)
       end
       
       #Creates a XWindow by calling focused_window with the given parameter. 
