@@ -355,36 +355,58 @@ module XDo
       #[XError] Error invoking +xdotool+. 
       #===Example
       #  #Exact string match
-      #  xwin = XWindow.from_title("xwindow.rb - SciTE")
+      #  xwin = XDo::XWindow.from_title("xwindow.rb - SciTE")
       #  #Part match via regexp
-      #  xwin = XWindow.from_title(/SciTE/)
+      #  xwin = XDo::XWindow.from_title(/SciTE/)
       #  #Part match via string - DEPRECATED. 
-      #  xwin = XWindow.from_title("SciTE")
+      #  xwin = XDo::XWindow.from_title("SciTE")
       def from_title(title)
         from_search(title, :name)
       end
       
-      #Creates a XWindow by calling focused_window with the given parameter. 
+      #Creates a XWindow by calling XWindow.focused_window with the given parameter. 
+      #===Parameters
+      #[+notice_children+] (false) If true, you may get a child window as the active window. 
+      #===Return value
+      #The newly created XWindow objects. 
+      #===Example
+      #  xwin = XDo::XWindow.from_focused
+      #===Remarks
+      #The XWindow.focused_window method is a bit dangerous, since it may 
+      #find an invisible window. Use XWindow.from_active if you don't want that. 
       def from_focused(notice_childs = false)
         new(focused_window(notice_childs))
       end
       
       #Creates a XWindow by calling active_window. 
+      #===Return value
+      #The newly created XWindow object. 
+      #===Example
+      #  xwin = XDo::XWindow.from_active
+      #===Remarks
+      #This method does not find invisible nor child windows; if you want that, 
+      #you should take a look at XWindow.from_focused. 
       def from_active
         new(active_window)
       end
       
-      #Set this to the name of your desktop window. 
+      #Set this to the name (title) of your desktop window. It's only used by XWindow.focus_desktop. 
       def desktop_name=(name)
         @desktop_name = name
       end
       
-      #Name of the desktop window. Default is "x-nautilus-desktop". 
+      #Name (title) of the desktop window. Default is "x-nautilus-desktop". It's only used by XWindow.focus_desktop. 
       def desktop_name
         @desktop_name ||= "x-nautilus-desktop"
       end
       
-      #Activate the desktop
+      #Activates the desktop window, effectively unfocusing all other windows. You may use this to 
+      #make sure nothing is focused. For this method to work you have to set XWindow.desktop_name= to 
+      #you desktop window's title. 
+      #===Return value
+      #Undefined. 
+      #===Example
+      #  XDo::XWindow.focus_desktop
       def focus_desktop
         desktop = from_name(desktop_name)
         desktop.focus
@@ -394,6 +416,15 @@ module XDo
       
       #Minimize all windows (or restore, if already) by sending [CTRL]+[ALT]+[D]. 
       #Available after requireing  "xdo/keyboard". 
+      #===Return value
+      #Undefined. 
+      #===Raises
+      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #===Example
+      #  #Everything will be minimized:
+      #  XDo::XWindow.toggle_minimize_all
+      #  #And now we'll restore everything. 
+      #  XDo::XWindow.toggle_minimize_all
       def toggle_minimize_all
         raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
         XDo::Keyboard.ctrl_alt_d
@@ -401,6 +432,12 @@ module XDo
       
       #Minimizes the active window. There's no way to restore a specific minimized window. 
       #Available after requireing "xdo/keyboard". 
+      #===Return value
+      #Undefined. 
+      #===Raises
+      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #===Example
+      #  XDo::XWindow.minimize
       def minimize
         raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
         XDo::Keyboard.key("Alt+F9")
@@ -408,6 +445,13 @@ module XDo
       
       #Maximize or normalize the active window if already maximized. 
       #Available after requireing "xdo/keyboard". 
+      #===Return value
+      #Undefined. 
+      #===Raises
+      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #===Example
+      #  XDo::XWindow.minimize
+      #  XDo::XWindow.toggle_maximize
       def toggle_maximize
         raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
         XDo::Keyboard.key("Alt+F10")
