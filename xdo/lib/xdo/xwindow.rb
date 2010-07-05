@@ -52,7 +52,7 @@ module XDo
       
       #Checks if a window exists. 
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #true or false. 
@@ -87,7 +87,7 @@ module XDo
       
       #Waits for a window name to exist.
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #The ID of the newly appeared window. 
@@ -113,7 +113,7 @@ module XDo
       
       #Waits for a window to close. 
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
       #===Return value
       #nil. 
@@ -137,7 +137,7 @@ module XDo
       
       #Search for a window name to get the internal ID of a window. 
       #===Parameters
-      #[+str+] The name of the window to look for. Either a string or a Regular Expression. 
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
       #[<tt>*opts</tt> (<tt>[:name, class, :classname]</tt>) Search parameters. 
       #====Possible search parameters
       #Copied from the +xdotool+ manpage: 
@@ -183,19 +183,35 @@ module XDo
       end
       
       #Returns the internal ID of the currently focused window. 
-      #If the +notice_childs+ parameter is true, also childwindows 
-      #are noticed. This method may find an invisible window, see 
-      #active_window for a more reliable method. 
-      def focused_window(notice_childs = false)
+      #===Parameters
+      #[+notice_children+] (false) If true, childwindows are noticed and you may get a child window instead of a toplevel window. 
+      #===Return value
+      #The internal ID of the found window. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  p XDo::XWindow.focused_window #=> 41943073
+      #  p XDo::XWindow.focused_window(true) #=> 41943074
+      #===Remarks
+      #This method may find an invisible window, see active_window for a more reliable method. 
+      def focused_window(notice_children = false)
         err = ""
         out = ""
-        popen3("#{XDo::XDOTOOL} getwindowfocus #{notice_childs ? "-f" : ""}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+        popen3("#{XDo::XDOTOOL} getwindowfocus #{notice_children ? "-f" : ""}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
         raise(XDo::XError, err) unless err.empty?
         return out.to_i
       end
       
       #Returns the internal ID of the currently focused window. 
-      #This method is more reliable than focused_window. 
+      #===Return value
+      #The ID of the found window. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  p XDo::XWindow.active_window #=> 41943073
+      #===Remarks
+      #This method is more reliable than #focused_window, but never finds an invisible window. 
+      #
       #Part of the EWMH standard ACTIVE_WINDOW. 
       def active_window
         err = ""
@@ -206,6 +222,20 @@ module XDo
       end
       
       #Set the number of working desktops. 
+      #===Parameters
+      #[+num+] The number of desktops you want to exist. 
+      #===Return value
+      #+num+. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  XDo::XWindow.desktop_num = 2
+      #===Remarks
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #
       #Part of the EWMH standard WM_DESKTOP. 
       def desktop_num=(num)
         err = ""
@@ -215,6 +245,18 @@ module XDo
       end
       
       #Get the number of working desktops. 
+      #===Return value
+      #The number of desktops. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  p XDo::XWindow.desktop_num = 1
+      #===Remarks
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #
       #Part of the EWMH standard WM_DESKTOP. 
       def desktop_num
         err = ""
@@ -225,6 +267,20 @@ module XDo
       end
       
       #Change the view to desktop +num+. 
+      #===Parameters
+      #[+num+] The 0-based index of the desktop you want to switch to. 
+      #===Return value
+      #+num+. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  XDo::XWindow.desktop = 1
+      #===Remarks
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #
       #Part of the EWMH standard CURRENT_DESKTOP. 
       def desktop=(num)
         err = ""
@@ -233,7 +289,19 @@ module XDo
         num
       end
       
-      #Output the number of the active desktop. 
+      #Returns the number of the active desktop. 
+      #===Return value
+      #The number of the currently shown desktop. 
+      #===Raises
+      #[XError] Error invoking +xdotool+. 
+      #===Example
+      #  p XDo::XWindow.desktop #=> 0
+      #===Remarks
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #
       #Part of the EWMH standard CURRENT_DESKTOP. 
       def desktop
         err = ""
