@@ -477,7 +477,7 @@ module XDo
     #Human-readable output of form
     #  <XDo::XWindow: "title" (window_id)>
     def inspect
-      %Q|<XDo::XWindow: "#{title}" (#{id})>|
+      %Q|<#{self.class}: "#{title}" (#{id})>|
     end
     
     #Set the size of a window. 
