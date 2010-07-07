@@ -459,7 +459,17 @@ module XDo
       
     end
     
-    #Creates a new XWindow object from an internal ID. See the XWindow class methods. 
+    #Creates a new XWindow object from an internal ID. 
+    #===Parameters
+    #[+id+] The internal ID to create the window from. 
+    #===Return value
+    #The newly created XWindow object. 
+    #===Example
+    #  id = XWindow.search(/edit/)[1]
+    #  xwin = XWindow.new(id)
+    #===Remarks
+    #See also many class methods of the XWindow class which allow 
+    #you to forget about the internal ID of a window. 
     def initialize(id)
       @id = id.to_i
     end
@@ -470,7 +480,22 @@ module XDo
       %Q|<XDo::XWindow: "#{title}" (#{id})>|
     end
     
-    #Set the size of a window. This has no effect on maximized winwows. 
+    #Set the size of a window. 
+    #===Parameters
+    #[+width+] The new width, usually in pixels. 
+    #[+height+] The new height, usually in pixels. 
+    #[+use_hints+] (false) If true, window sizing hints are used if they're available. This is usually done when resizing terminal windows to a specific number of rows and columns. 
+    #===Return value
+    #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  #Resize a window to 400x300px
+    #  xwin.resize(400, 300)
+    #  #Resize a terminal window to 100 rows and 100 columns
+    #  xtermwin.resize(100, 100, true)
+    #===Remarks
+    #This has no effect on maximized winwows. 
     def resize(width, height, use_hints = false)
       err = ""
       cmd = "#{XDo::XDOTOOL} windowsize #{use_hints ? "--usehints " : ""}#{@id} #{width} #{height}"
@@ -480,6 +505,16 @@ module XDo
     
     #Moves a window. +xdotool+ is not really exact with the coordinates, 
     #the window will be within a range of +-10 pixels. 
+    #===Parameters
+    #[+x+] The goal X coordinate. 
+    #[+y+] The goal Y coordinate. 
+    #===Return value
+    #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  xwin.move(100, 100)
+    #  p xwin.abs_position #=> [101, 101]
     def move(x, y)
       err = ""
       popen3("#{XDo::XDOTOOL} windowmove #{@id} #{x} #{y}"){|stdin, stdout, stderr| err << stderr.read}
@@ -487,6 +522,15 @@ module XDo
     end
     
     #Set the input focus to the window (but don't bring it to the front). 
+    #===Return value
+    #Undefined. 
+    #===Raises
+    #[XError] Error invoking +xdotool+. 
+    #===Example
+    #  xwin.focus
+    #===Remarks
+    #This method may not work on every window manager. You should use 
+    ##activate, which is supported by more window managers. 
     def focus
       err = ""
       popen3("#{XDo::XDOTOOL} windowfocus #{@id}"){|stdin, stdout, stderr| err << stderr.read}
@@ -494,11 +538,26 @@ module XDo
     end
     
     #The window loses the input focus by setting it to the desktop. 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.focus
+    #  xwin.unfocus
+    #===Remarks
+    #This method internally calls XWindow.focus_desktop, so you have to find out about your 
+    #desktop's window name and assign it to XWindow.desktop=. 
     def unfocus
       XDo::XWindow.focus_desktop
     end
     
-    #Map a window to the screen (make it visible). 
+    #Maps a window to the screen (make it visible). 
+    #===Return value
+    #Undefined. 
+    #===Raises
+    #[XError] Error invoking +xdotool+. 
+    #===Example
+    #  xwin.unmap #Windows are usually mapped
+    #  xwin.map
     def map
       err = ""
       popen3("#{XDo::XDOTOOL} windowmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
@@ -506,6 +565,10 @@ module XDo
     end
     
     #Unmap a window from the screen (make it invisible). 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.unmap
     def unmap
       err = ""
       popen3("#{XDo::XDOTOOL} windowunmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
@@ -514,6 +577,10 @@ module XDo
     
     #Bring a window to the front (but don't give it the input focus). 
     #Not implemented in all window managers. 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.raise
     def raise
       err = ""
       popen3("#{XDo::XDOTOOL} windowraise #{@id}"){|stdin, stdout, stderr| err << stderr.read}
@@ -521,6 +588,15 @@ module XDo
     end
     
     #Activate a window. That is, bring it to top and give it the input focus. 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.activate
+    #===Remarks
+    #This is the recommanded method to give a window the input focus, since 
+    #it works on more window managers than #focus and also works across 
+    #desktops. 
+    #
     #Part of the EWMH standard ACTIVE_WINDOW. 
     def activate
       err = ""
@@ -529,6 +605,18 @@ module XDo
     end
     
     #Move a window to a desktop. 
+    #===Parameters
+    #[+num+] The 0-based index of the desktop you want the window to move to. 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.desktop = 3
+    #===Remarks
+    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+    #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+    #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+    #
     #Part of the EWMH standard CURRENT_DESKTOP. 
     def desktop=(num)
       err = ""
@@ -537,6 +625,16 @@ module XDo
     end
     
     #Get the desktop the window is on. 
+    #===Return value
+    #The 0-based index of the desktop this window resides on. 
+    #===Example
+    #  p xwin.desktop #=> 0
+    #===Remarks
+    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
+    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+    #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
+    #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+    #
     #Part of the EWMH standard CURRENT_DESKTOP. 
     def desktop
       err = ""
@@ -547,6 +645,10 @@ module XDo
     end
     
     #The title of the window or nil if it doesn't have a title. 
+    #===Return value
+    #The window's title, encoded as UTF-8, or nil if the window doesn't have a title. 
+    #===Example
+    #  p xwin.title #=> "xwindow.rb SciTE"
     def title
       err = ""
       out = ""
