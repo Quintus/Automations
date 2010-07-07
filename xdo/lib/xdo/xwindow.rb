@@ -459,6 +459,54 @@ module XDo
       
     end
     
+    ##
+    #  :method: title=
+    #call-seq:
+    #  title = str
+    #  name = str
+    #
+    #Changes a window's title. 
+    #===Parameters
+    #[+str+] The new title. 
+    #===Return value
+    #+str+. 
+    #===Raises
+    #[XError] Error invoking +xdotool+. 
+    #===Example
+    #  xwin.title = "Ruby is awesome!"
+    
+    ##
+    # :method: icon_title=
+    #call-seq:
+    #  icon_title = str
+    #  icon_name = str
+    #
+    #Changes the window's icon title, i.e. the string that is displayed in 
+    #the task bar or panel where all open windows show up. 
+    #===Parameters
+    #[+str+] The string you want to set. 
+    #===Return value
+    #+str+. 
+    #===Raises
+    #[XError] Error invoking +xdotool+. 
+    #===Example
+    #  xwin.icon_title = "This is minimized."
+    
+    ##
+    #  :method: classname=
+    #call-seq:
+    #  classname = str
+    #
+    #Sets a window's classname. 
+    #===Parameters
+    #[+str+] The window's new classname. 
+    #===Return value
+    #+str+. 
+    #===Raises
+    #[XError] Error invoking +xdotool+. 
+    #===Example
+    #  xwin.classname = "MyNewClass"
+    
     #Creates a new XWindow object from an internal ID. 
     #===Parameters
     #[+id+] The internal ID to create the window from. 
@@ -772,6 +820,24 @@ module XDo
     
     def nonzero?
       @id.nonzero?
+    end
+    
+    [:"name=", :"icon_name=", :"classname="].each do |sym|
+      define_method(sym) do |str|
+        set_window(sym.to_s[0..-2].gsub("_", "-"), str.encode("UTF-8"))
+        str
+      end
+    end
+    alias title= name=
+    alias icon_title= icon_name=
+    
+    private
+    
+    #Calls +xdotool+'s set_window command with the given options. 
+    def set_window(option, value)
+      err = ""
+      Open3.popen3("#{XDOTOOL} set_window --#{option} '#{value}' #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
   end
