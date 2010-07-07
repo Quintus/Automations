@@ -1,3 +1,4 @@
-This file contains features that shall be implemented in future version. 
+=TODO list
+The following features will be added in the next minor version bump. 
 
-* Make XWindow.wait_for_window return an XWindow object. 
+* Make XWindow.wait_for_window return a XWindow object. 
