@@ -775,18 +775,20 @@ module XDo
     
     #true if the window is mapped to the screen. 
     #===Return value
-    #true or false. 
+    #nil if the window is not mapped, an integer value otherwise. 
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xwininfo+. 
     #===Example
-    #  p xwin.visible? #=> true
+    #  p xwin.visible? #=> 470
+    #  xwin.unmap
+    #  p xwin.visible? #=> nil
     def visible?
       err = ""
       out = ""
       popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
-      out = out.strip.lines.to_a
+      out = out.strip
       Kernel.raise(XDo::XError, err) unless err.empty?
-      return out[17].match(/:\s+(\w+)/)[1] == "IsViewable" ? true : false
+      return out =~ /IsViewable/
     end
     
     #Returns true if the window exists. 
