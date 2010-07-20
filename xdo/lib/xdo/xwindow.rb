@@ -706,7 +706,7 @@ module XDo
     #===Return value
     #The window's title, encoded as UTF-8, or nil if the window doesn't have a title. 
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xwininfo+. 
     #===Example
     #  p xwin.title #=> "xwindow.rb SciTE"
     def title
@@ -722,7 +722,7 @@ module XDo
     #===Return value
     #A two-element array of form <tt>[x, y]</tt>. 
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xwininfo+. 
     #===Example
     #  p xwin.abs_position #=> [0, 51]
     def abs_position
@@ -759,7 +759,7 @@ module XDo
     #===Return value
     #A two-element array of form <tt>[width, height]</tt>. 
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xwininfo+. 
     #===Example
     #  p xwin.size #=> [1280, 948]
     def size
