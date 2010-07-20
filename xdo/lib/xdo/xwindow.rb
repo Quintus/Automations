@@ -792,14 +792,27 @@ module XDo
     end
     
     #Returns true if the window exists. 
+    #===Return value
+    #true or false. 
+    #===Example
+    #  p xwin.exists? #=> true
     def exists?
       XDo::XWindow.id_exists?(@id)
     end
     
     #Closes a window by activating it and then sending [ALT] + [F4]. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[NotImplementedError] You didn't require "xdo/keyboard". 
+    #===Example
+    #  xwin.close
+    #===Remarks
     #A program could ask to save data. 
+    #
     #Use #kill! to kill the process running the window. 
-    #Available after requireing "xdo/keyboard"
+    #
+    #Available after requireing "xdo/keyboard". 
     def close
       Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       activate
@@ -813,6 +826,13 @@ module XDo
     #the middle between #close and #kill!. It first tries 
     #to close the window by calling #close and if that 
     #does not succeed (within +timeout+ seconds), it will call #kill!. 
+    #===Paramters
+    #[+timeout+] (2) The time to wait before using #kill!, in seconds. 
+    #===Return value
+    #Undefined. 
+    #===Example
+    #  xwin.close!
+    #===Remarks
     #Available after requireing "xdo/keyboard". 
     def close!(timeout = 2)
       Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard

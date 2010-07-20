@@ -4,6 +4,7 @@ from it's very beginning. Important changes in the
 API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
 
 ==0.0.4
+* <i>XWindow#exists? aways returned false. This has been fixed.</i>
 * <i>XWindow#visible? always returned false. This has been fixed.</i>
 * <b>Added XWindow#to_i and XWindow#to_s.</b>
 * <b>Added XWindow#zero? and XWindow#nonzero?.</b>
