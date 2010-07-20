@@ -404,7 +404,7 @@ module XDo
       #===Example
       #  XDo::XWindow.focus_desktop
       def focus_desktop
-        desktop = from_name(desktop_name)
+        desktop = from_title(desktop_name)
         desktop.focus
         desktop.activate
       end
