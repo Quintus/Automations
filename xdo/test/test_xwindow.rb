@@ -16,8 +16,8 @@ class WindowTest < Test::Unit::TestCase
   
   def self.startup
     fork{system(NEW_WINDOW_CMD)}
-    XDo::XWindow.wait_for_window(NEW_WINDOW_CMD)
-    @@xwin = XDo::XWindow.from_name(NEW_WINDOW_CMD)
+    XDo::XWindow.wait_for_window(Regexp.new(Regexp.escape(NEW_WINDOW_CMD)))
+    @@xwin = XDo::XWindow.from_title(Regexp.new(Regexp.escape(NEW_WINDOW_CMD)))
   end
   
   def self.shutdown
@@ -57,7 +57,7 @@ class WindowTest < Test::Unit::TestCase
   
   def test_activate_desktop
     XDo::XWindow.activate_desktop
-    assert_equal(XDo::XWindow.from_name(XDo::XWindow.desktop_name).id, XDo::XWindow.from_active.id)
+    assert_equal(XDo::XWindow.from_title(XDo::XWindow.desktop_name).id, XDo::XWindow.from_active.id)
     sleep 1
   end
   
@@ -94,10 +94,10 @@ class WindowTest < Test::Unit::TestCase
   def test_map
     @@xwin.unmap
     sleep 0.2
-    assert_equal(false, @@xwin.visible?)
+    assert_equal(nil, @@xwin.visible?)
     @@xwin.map
     sleep 0.2
-    assert_equal(true, @@xwin.visible?)
+    assert_block("Window is not visible."){@@xwin.visible?.kind_of?(Integer)}
     sleep 1
   end
   
