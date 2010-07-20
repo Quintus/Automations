@@ -615,6 +615,8 @@ module XDo
     #Unmap a window from the screen (make it invisible). 
     #===Return value
     #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  xwin.unmap
     def unmap
@@ -627,6 +629,8 @@ module XDo
     #Not implemented in all window managers. 
     #===Return value
     #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  xwin.raise
     def raise
@@ -638,6 +642,8 @@ module XDo
     #Activate a window. That is, bring it to top and give it the input focus. 
     #===Return value
     #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  xwin.activate
     #===Remarks
@@ -657,6 +663,8 @@ module XDo
     #[+num+] The 0-based index of the desktop you want the window to move to. 
     #===Return value
     #Undefined. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  xwin.desktop = 3
     #===Remarks
@@ -675,6 +683,8 @@ module XDo
     #Get the desktop the window is on. 
     #===Return value
     #The 0-based index of the desktop this window resides on. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  p xwin.desktop #=> 0
     #===Remarks
@@ -695,6 +705,8 @@ module XDo
     #The title of the window or nil if it doesn't have a title. 
     #===Return value
     #The window's title, encoded as UTF-8, or nil if the window doesn't have a title. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
     #===Example
     #  p xwin.title #=> "xwindow.rb SciTE"
     def title
@@ -707,6 +719,12 @@ module XDo
     end
     
     #The absolute position of the window on the screen. 
+    #===Return value
+    #A two-element array of form <tt>[x, y]</tt>. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  p xwin.abs_position #=> [0, 51]
     def abs_position
       out = ""
       err = ""
@@ -720,6 +738,12 @@ module XDo
     alias position abs_position
     
     #The position of the window relative to it's parent window. 
+    #===Return value
+    #A two-element array of form <tt>[x, y]</tt>. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  p xwin.rel_position => [0, 51]
     def rel_position
       out = ""
       err = ""
@@ -732,6 +756,12 @@ module XDo
     end
     
     #The size of the window. 
+    #===Return value
+    #A two-element array of form <tt>[width, height]</tt>. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  p xwin.size #=> [1280, 948]
     def size
       out = ""
       err = ""
@@ -744,6 +774,12 @@ module XDo
     end
     
     #true if the window is mapped to the screen. 
+    #===Return value
+    #true or false. 
+    #===Raises
+    #[XError] Error executing +xdotool+. 
+    #===Example
+    #  p xwin.visible? #=> true
     def visible?
       err = ""
       out = ""
