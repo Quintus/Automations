@@ -793,7 +793,7 @@ module XDo
     
     #Returns true if the window exists. 
     def exists?
-      XDo::XWindow.exists?(@id)
+      XDo::XWindow.id_exists?(@id)
     end
     
     #Closes a window by activating it and then sending [ALT] + [F4]. 
