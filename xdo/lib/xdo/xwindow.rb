@@ -20,22 +20,20 @@ module XDo
   #Those methods are tagged with the sentence "Part of the EWMH standard XY". Not all 
   #parts of the EWMH standard are provided by every window manager. 
   #
-  #Many methods accept a +name+ parameter; be aware that this name is not the whole 
-  #name of a window, but a pattern to match. So, if you pass in "edit", it will even match "gedit". 
-  #+xdotool+ handles that parameter with C style regexps. 
+  #As of version 0.0.4 the way to search for window is about to change. The old version 
+  #where you passed a hash with symbols has been deprecated (and you get warnings 
+  #about this if you use it) in favor of passing those symbols as a rest argument. See 
+  #XWindow.search for more details. 
   #
-  #The +opt+ parameter of many methods is a hash that can have the following keys: 
-  #  Key          | Effect if true
-  #  =============+====================================
-  #  :title       | Window titles are searched. 
-  #  -------------+------------------------------------
-  #  :name        | Window names are searched. 
-  #  -------------+------------------------------------
-  #  :class       | Window classes are searched. 
-  #  -------------+------------------------------------
-  #  :onlyvisible | Only visible windows are searched. 
-  #The default values for them depend on the method you want to use. See the method's 
-  #argument list to find out if a parameter is set to true or, if it isn't mentioned, to nil. 
+  #You should also be aware of the fact that XDo is about to support Regexp objects 
+  #in XWindow.search. In future versions (i.e. after the next minor release) strings 
+  #*always* mean an exact title/class/whatever match. For parts, you have to use 
+  #Regular Expressions. There is a culprit, though. +xdotool+ doesn't use Ruby's 
+  #Regular Expressions engine Oniguruma and expects C-style regexps. I don't know 
+  #about the differences - but if you're absolutely sure your window title matches 
+  #that wonderful three-line extended regexp and +xdotool+ doesn't find it, you 
+  #may email me at sutniuq@@gmx@net explaining which construct defeats +xdotool+. 
+  #I will then setup a list over time which states which constructs doesn't work. 
   #
   #Be <i>very careful</i> with the methods that are part of the two desktop EWMH standards. 
   #After I set the number of desktops and changed the current desktop, I had to reboot my 
@@ -138,7 +136,7 @@ module XDo
       #Search for a window name to get the internal ID of a window. 
       #===Parameters
       #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, class, :classname]</tt>) Search parameters. 
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. 
       #====Possible search parameters
       #Copied from the +xdotool+ manpage: 
       #[class] Match against the window class. 
