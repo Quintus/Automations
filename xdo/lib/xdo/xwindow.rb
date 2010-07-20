@@ -830,6 +830,8 @@ module XDo
     #[+timeout+] (2) The time to wait before using #kill!, in seconds. 
     #===Return value
     #Undefined. 
+    #===Raises
+    #[XError] Error executing +xkill+. 
     #===Example
     #  xwin.close!
     #===Remarks
@@ -852,6 +854,12 @@ module XDo
     #Kills the process that runs a window. The window will be 
     #terminated immediatly, if that isn't what you want, have 
     #a look at #close. 
+    #===Return value
+    #nil. 
+    #===Raises
+    #[XError] Error executing +xkill+. 
+    #===Example
+    #  xwin.kill!
     def kill!
       out = ""
       err = ""
@@ -860,18 +868,38 @@ module XDo
       nil
     end
     
+    #Returns the window's internal ID. 
+    #===Return value
+    #An integer describing the window's internal ID. 
+    #===Example
+    #  p xwin.to_i #=> 29361095
     def to_i
       @id
     end
     
+    #Returns a window's title. 
+    #===Return value
+    #The window's title. 
+    #===Example
+    #  p xwin.to_s #=> "xwindow.rb * SciTE"
     def to_s
       title
     end
     
+    #true if the internal ID is zero. 
+    #===Return value
+    #true or false. 
+    #===Example
+    #  p xwin.zero? #=> false
     def zero?
       @id.zero?
     end
     
+    #true if the internal ID is not zero. 
+    #===Return value
+    #nil or the internal ID. 
+    #===Example
+    #  p xwin.nonzero? #=> 29361095
     def nonzero?
       @id.nonzero?
     end
