@@ -845,11 +845,7 @@ module XDo
         if exists?
           #If it's not deleted after some time, force it to close. 
           kill!
-        else
-          return
         end
-      else
-        return
       end
     end
     
