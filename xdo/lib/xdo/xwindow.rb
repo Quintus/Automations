@@ -41,12 +41,10 @@ module XDo
   #but neither my library nor +xdotool+ itself could rescue my desktop settings. Btw, that's the 
   #reason why it's not in XDo's unit tests (but it should work; at least in one way...). 
   class XWindow
-    include Open3
     #The internal ID of the window. 
     attr_reader :id
     
     class << self
-      include Open3
       
       #Checks if a window exists. 
       #===Parameters
@@ -78,7 +76,7 @@ module XDo
       #  p XWindow.id_exists?(123456) #=> false
       def id_exists?(id)
         err = ""
-        popen3("#{XDo::XWININFO} -id #{id}"){|stdin, stdout, stderr| err << stderr.read}
+        Open3.popen3("#{XDo::XWININFO} -id #{id}"){|stdin, stdout, stderr| err << stderr.read}
         return false unless err.empty?
         return true
       end
@@ -195,7 +193,7 @@ module XDo
       def focused_window(notice_children = false)
         err = ""
         out = ""
-        popen3("#{XDo::XDOTOOL} getwindowfocus #{notice_children ? "-f" : ""}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} getwindowfocus #{notice_children ? "-f" : ""}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
         raise(XDo::XError, err) unless err.empty?
         return out.to_i
       end
@@ -214,7 +212,7 @@ module XDo
       def active_window
         err = ""
         out = ""
-        popen3("#{XDo::XDOTOOL} getactivewindow"){|stdin, stdout, stderr| out = stdout.read; err = stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} getactivewindow"){|stdin, stdout, stderr| out = stdout.read; err = stderr.read}
         raise(XDo::XError, err) unless err.empty?
         return Integer(out)
       end
@@ -237,7 +235,7 @@ module XDo
       #Part of the EWMH standard WM_DESKTOP. 
       def desktop_num=(num)
         err = ""
-        popen3("#{XDo::XDOTOOL} set_num_desktops #{num}"){|stdin, stdout, stderr| err << stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} set_num_desktops #{num}"){|stdin, stdout, stderr| err << stderr.read}
         raise(XDo::Error, err) unless err.empty?
         num
       end
@@ -259,7 +257,7 @@ module XDo
       def desktop_num
         err = ""
         out = ""
-        popen3("#{XDo::XDOTOOL} get_num_desktops"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} get_num_desktops"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
         raise(XDo::XError, err) unless err.empty?
         Integer(out)
       end
@@ -282,7 +280,7 @@ module XDo
       #Part of the EWMH standard CURRENT_DESKTOP. 
       def desktop=(num)
         err = ""
-        popen3("#{XDo::XDOTOOL} set_desktop #{num}"){|stdin, stdout, stderr| err << stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} set_desktop #{num}"){|stdin, stdout, stderr| err << stderr.read}
         raise(XDo::XError, err) unless err.empty?
         num
       end
@@ -304,7 +302,7 @@ module XDo
       def desktop
         err = ""
         out = ""
-        popen3("#{XDo::XDOTOOL} get_desktop"){|stdin, stdout, stderr| out = stdout.read; err = stderr.read}
+        Open3.popen3("#{XDo::XDOTOOL} get_desktop"){|stdin, stdout, stderr| out = stdout.read; err = stderr.read}
         raise(XDo::XError, err) unless err.empty?
         Integer(out)
       end
@@ -545,7 +543,7 @@ module XDo
     def resize(width, height, use_hints = false)
       err = ""
       cmd = "#{XDo::XDOTOOL} windowsize #{use_hints ? "--usehints " : ""}#{@id} #{width} #{height}"
-      popen3("#{cmd}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{cmd}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -563,7 +561,7 @@ module XDo
     #  p xwin.abs_position #=> [101, 101]
     def move(x, y)
       err = ""
-      popen3("#{XDo::XDOTOOL} windowmove #{@id} #{x} #{y}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowmove #{@id} #{x} #{y}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -579,7 +577,7 @@ module XDo
     ##activate, which is supported by more window managers. 
     def focus
       err = ""
-      popen3("#{XDo::XDOTOOL} windowfocus #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowfocus #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -606,7 +604,7 @@ module XDo
     #  xwin.map
     def map
       err = ""
-      popen3("#{XDo::XDOTOOL} windowmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -619,7 +617,7 @@ module XDo
     #  xwin.unmap
     def unmap
       err = ""
-      popen3("#{XDo::XDOTOOL} windowunmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowunmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -633,7 +631,7 @@ module XDo
     #  xwin.raise
     def raise
       err = ""
-      popen3("#{XDo::XDOTOOL} windowraise #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowraise #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -652,7 +650,7 @@ module XDo
     #Part of the EWMH standard ACTIVE_WINDOW. 
     def activate
       err = ""
-      popen3("#{XDo::XDOTOOL} windowactivate #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} windowactivate #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -674,7 +672,7 @@ module XDo
     #Part of the EWMH standard CURRENT_DESKTOP. 
     def desktop=(num)
       err = ""
-      popen3("#{XDo::XDOTOOL} set_desktop_for_window #{@id} #{num}"){|stdin, stdout, stderr| err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} set_desktop_for_window #{@id} #{num}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -695,7 +693,7 @@ module XDo
     def desktop
       err = ""
       out = ""
-      popen3("#{XDo::XDOTOOL} get_desktop_for_window #{@id}"){|stdin, stdout, stderr| out = stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XDOTOOL} get_desktop_for_window #{@id}"){|stdin, stdout, stderr| out = stdout.read; err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
       Integer(out)
     end
@@ -710,7 +708,7 @@ module XDo
     def title
       err = ""
       out = ""
-      popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
       title = out.strip.lines.to_a[0].match(/"(.*)"/)[1] rescue Kernel.raise(XDo::XError, "No window with ID #{@id} found!")
       return title #Kann auch nil sein, dann ist das Fenster namenlos. 
@@ -726,7 +724,7 @@ module XDo
     def abs_position
       out = ""
       err = ""
-      popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
       out = out.strip.lines.to_a
       x = out[2].match(/:\s+(\d+)/)[1]
@@ -745,7 +743,7 @@ module XDo
     def rel_position
       out = ""
       err = ""
-      popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
       out = out.strip.lines.to_a
       x = out[4].match(/:\s+(\d+)/)[1]
@@ -763,7 +761,7 @@ module XDo
     def size
       out = ""
       err = ""
-      popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       out = out.strip.lines.to_a
       Kernel.raise(XDo::XError, err) unless err.empty?
       width = out[6].match(/:\s+(\d+)/)[1]
@@ -783,7 +781,7 @@ module XDo
     def visible?
       err = ""
       out = ""
-      popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       out = out.strip
       Kernel.raise(XDo::XError, err) unless err.empty?
       return out =~ /IsViewable/
@@ -861,7 +859,7 @@ module XDo
     def kill!
       out = ""
       err = ""
-      popen3("#{XDo::XKILL} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      Open3.popen3("#{XDo::XKILL} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
       nil
     end
