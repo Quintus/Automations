@@ -1,0 +1,26 @@
+=History of the xdo gem
+This file shows the history of the xdo gem 
+from it's very beginning. Important changes in the 
+API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
+
+==0.0.4
+* <i>XWindow#exists? aways returned false. This has been fixed.</i>
+* <i>XWindow#visible? always returned false. This has been fixed.</i>
+* <b>Added XWindow#to_i and XWindow#to_s.</b>
+* <b>Added XWindow#zero? and XWindow#nonzero?.</b>
+* All methods in the Keyboard module that accept a +w_id+ parameter now can take XWindow objects. 
+* Removed Keyboard.sequence_escape. 
+* Several deprecations. See DEPRECATE.rdoc. 
+* <b>Added XWindow.from_title.</b>
+
+==0.0.3
+* <i>Some XWindow instance methods (like #close!) showed wrong error messages due to the redundance of Kernel#raise with XWindow#raise. This has been fixed. </i>
+* If run alone, the "test_xwindow.rb" test file failed with obscure errors. Fixed. 
+
+==0.0.2
+* Replaced fork{system("gedit")} in full_demo.rb with spawn("gedit")
+* Removed "require 'pp'" from keyboard.rb
+* <b>Added the Simulatable mixin</b>
+* <b>Corrected window id usage for the XDo::Keyboard module</b>
+* Added a test for the window id usage
+* Made the test-unit gem a development dependency
