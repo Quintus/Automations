@@ -27,19 +27,19 @@ DESCRIPTION
   s.email = "sutniuq@gmx.net"
   s.platform = Gem::Platform::RUBY
   s.required_ruby_version = ">=1.9"
-  s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "Rakefile", "lib/README.rdoc", "lib/HISTORY.rdoc"].flatten
+  s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "README.rdoc", "HISTORY.rdoc", "DEPRECATE.rdoc"].flatten
   s.executables = ["xinfo.rb"]
   s.has_rdoc = true
-  s.rdoc_options << "--title" << "XDo RDocs" <<  "--main" << "lib/README.rdoc"
+  s.rdoc_options << "--title" << "XDo RDocs" <<  "--main" << "README.rdoc"
   s.test_files = Dir["test/test_*.rb"]
   s.rubyforge_project = "Automations"
 end
 Rake::GemPackageTask.new(spec).define
 
 Rake::RDocTask.new do |rd|
-  rd.rdoc_files.include("lib/**/*.rb", "lib/README.rdoc", "lib/HISTORY.rdoc")
+  rd.rdoc_files.include("lib/**/*.rb", "**/*.rdoc")
   rd.title = "XDo RDocs"
-  rd.main = "lib/README.rdoc"
+  rd.main = "README.rdoc"
 end
 
 Rake::TestTask.new("test") do |t|
