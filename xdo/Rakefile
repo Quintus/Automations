@@ -30,7 +30,8 @@ DESCRIPTION
   s.files = ["bin/xinfo.rb", Dir["lib/**/*.rb"], Dir["test/*.rb"], Dir["samples/*.rb"], "README.rdoc", "HISTORY.rdoc", "DEPRECATE.rdoc"].flatten
   s.executables = ["xinfo.rb"]
   s.has_rdoc = true
-  s.rdoc_options << "--title" << "XDo RDocs" <<  "--main" << "README.rdoc"
+  s.extra_rdoc_files = %w[README.rdoc HISTORY.rdoc DEPRECATE.rdoc]
+  s.rdoc_options << "-t" << "XDo RDocs" <<  "-m" << "README.rdoc"
   s.test_files = Dir["test/test_*.rb"]
   s.rubyforge_project = "Automations"
 end
