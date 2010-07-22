@@ -22,7 +22,7 @@ only with Ruby 1.9.
 DESCRIPTION
   s.add_development_dependency("test-unit", ">= 2.0")
   s.requirements = ["The xdotool command-line tool.", "The xsel command-line tool.", "xwininfo (usually installed)", "eject (usually installed)", "xkill (usually installed)"]
-  s.version = "0.1.0.dev"
+  s.version = "0.0.4.dev"
   s.author = "Marvin Gülker"
   s.email = "sutniuq@gmx.net"
   s.platform = Gem::Platform::RUBY

@@ -24,7 +24,7 @@ module XDo
   EJECT = "eject"
   
   #The version of this library. 
-  VERSION = "0.0.3"
+  VERSION = "0.0.4-dev (22.7.10)"
   
   #Class for errors in this library. 
   class XError < StandardError
