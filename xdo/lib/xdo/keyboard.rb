@@ -3,7 +3,7 @@
 #Copyright © 2009, 2010 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 require_relative("../xdo")
-require_relative("../small_scanner")
+require_relative("small_scanner")
 
 module XDo
   
