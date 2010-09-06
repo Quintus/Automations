@@ -164,29 +164,80 @@ module XDo
       end
       
       #Holds a mouse button down. Don't forget to release it some time. 
-      def down(button = LEFT)
-        `#{XDOTOOL} mousedown #{button}`
+      #===Parameters
+      #[+button+] (:left) The button to hold down. 
+      #===Return value
+      #Undefined. 
+      #===Example
+      #  #Hold down the left mouse button for a second
+      #  XDo::Mouse.down
+      #  sleep 1
+      #  XDo::Mouse.up
+      #  #Hold down the right mouse button for a second
+      #  XDo::Mouse.down(:right)
+      #  sleep 1
+      #  XDo::Mouse.up(:right)
+      def down(button = :left)
+        if button.kind_of?(Numeric)
+          warn("#{caller.first}: Deprecation warning: Use symbols such as :left for the button parameter.")
+          button = BUTTON2XDOTOOL.keys[button - 1] #indices are 0-based
+        end
+        `#{XDOTOOL} mousedown #{BUTTON2XDOTOOL[button]}`
       end
       
-      #Releases a mouse button. You should call #down before using this...
-      def up(button = LEFT)
-        `#{XDOTOOL} mouseup #{button}`
+      #Releases a mouse button. Probably it's a good idea to call #down first?
+      #===Parameters
+      #[+button+] (:left) The button to release.  
+      #===Return value
+      #Undefined. 
+      #===Example
+      #  #Hold down the left mouse button for a second
+      #  XDo::Mouse.down
+      #  sleep 1
+      #  XDo::Mouse.up
+      #  #Hold down the right mouse button for a second
+      #  XDo::Mouse.down(:right)
+      #  sleep 1
+      #  XDo::Mouse.up(:right)
+      def up(button = :left)
+        if button.kind_of?(Numeric)
+          warn("#{caller.first}: Deprecation warning: Use symbols such as :left for the button parameter.")
+          button = BUTTON2XDOTOOL.keys[button - 1] #indices are 0-based
+        end
+        `#{XDOTOOL} mouseup #{BUTTON2XDOTOOL[button]}`
       end
       
-      #Executs a drag&drop operation. If you set +x1+ and +y1+ to nil, 
-      #this method will use the current cursor position as the start position. 
-      def drag(x1, y1, x2, y2, button = LEFT, speed = 2, set = false)
-        #Wenn x1 und y1 nicht übergeben werden, nehme die aktuelle Positin an
+      #Executs a drag&drop operation. 
+      #===Parameters
+      #[+x1+] Start X coordinate. Set to the current cursor X coordinate if set to nil. Pass together with +y1+. 
+      #[+y1+] Start Y coordinate. Set to the current cursor Y coordinate if set to nil. 
+      #[+x2+] Goal X coordinate. 
+      #[+y2+] Goal Y coordinate. 
+      #[+button+] (:left) The button to hold down. 
+      #The rest of the parameters is the same as for #move. 
+      #===Return value
+      #nil. 
+      #===Example
+      #  #Drag from (10|10) to (37|56)
+      #  XDo::Mouse.drag(10, 10, 37, 56)
+      #  #Drag from (10|10) to (37|56) holding the right mouse button down
+      #  XDo::Mouse.drag(10, 10, 37, 56, :right) 
+      def drag(x1, y1, x2, y2, button = :left, speed = 2, set = false)
+        if button.kind_of?(Numeric)
+          warn("#{caller.first}: Deprecation warning: Use symbols such as :left for the button parameter.")
+          button = BUTTON2XDOTOOL.keys[button - 1] #indices are 0-based
+        end
+        #If x1 and y1 aren't passed, assume the current position
         if x1.nil? and y1.nil?
           x1, y1 = position
         end
-        #Zur angegebenen Erstposition bewegen
+        #Go to the given start position
         move(x1, y1, speed, set)
-        #Taste gedrückt halten
+        #Hold button down
         down(button)
-        #Zur Zielposition bewegen
+        #Move to the goal position
         move(x2, y2, speed, set)
-        #Taste loslassen
+        #Release button
         up(button)
         nil
       end
