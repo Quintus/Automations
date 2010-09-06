@@ -22,6 +22,15 @@ module XDo
     #Mouse wheel down. 
     DOWN = 5
     
+    #Maps the button's symbols to the numbers xdotool uses. 
+    BUTTON2XDOTOOL = {
+      :left => 1, 
+      :middle => 2, 
+      :right => 3, 
+      :up => 4, 
+      :down => 5
+    }.freeze
+    
     class << self
       
       #Gets the current cursor position. 
@@ -98,17 +107,34 @@ module XDo
       end #def move
       
       #Simulates a mouse click. If you don't specify a X AND a Y position, 
-      #the click will happen at the current cursor position, +button+ may be one of 
-      #the follwoing constants: 
-      #* LEFT
-      #* RIGHT
-      #* MIDDLE
+      #the click will happen at the current cursor position. 
+      #===Parameters
+      #[+x+] (nil) The goal X position. Specify together with +y+. 
+      #[+y+] (nil) The goal Y position. 
+      #[+button+] (:left) The button to click with. One of the following symbols: <tt>:left</tt>, <tt>:right</tt>, <tt>:middle</tt>. 
       #The other arguments are the same as for #move. 
-      def click(x = nil, y = nil, button = LEFT, speed = 1, set = false)
+      #===Return value
+      #Undefined. 
+      #===Example
+      #  #Click at the current position
+      #  XDo::Mouse.click
+      #  #Click at (10|10)
+      #  XDo::Mouse.click(10, 10)
+      #  #Click at the current position with the right mouse button
+      #  XDo::Mouse.click(nil, nil, :right)
+      #  #Move fast to (10|10) and click with the right mouse button
+      #  XDo::Mouse.click(10, 10, :right, 10)
+      #  #Directly set the cursor to (10|10) and click with the middle mouse button
+      #  XDo::Mouse.click(10, 10, :middle, 1, true)
+      def click(x = nil, y = nil, button = :left, speed = 1, set = false)
+        if button.kind_of?(Numeric)
+          warn("#{caller.first}: Deprecation warning: Use symbols such as :left for the button parameter.")
+          button = BUTTON2XDOTOOL.keys[button - 1] #indices are 0-based
+        end
         if x and y
           move(x, y, speed, set)
         end
-        `#{XDOTOOL} click #{button}`
+        `#{XDOTOOL} click #{BUTTON2XDOTOOL[button]}`
       end
       
       #Scroll with the mouse wheel. +amount+ is the time of steps to scroll. 
