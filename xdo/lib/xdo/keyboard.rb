@@ -75,7 +75,8 @@ module XDo
       "}" => "braceleft", 
       "@" => "at", 
       "€" => "EuroSign", 
-      "|" => "bar"
+      "|" => "bar", 
+      "?" => "question"
     }
     
     class << self
@@ -320,7 +321,7 @@ module XDo
           end
         end
         #Now hunt for special character like ä which can't be send using xdotool's type command. 
-        regexp = Regexp.union(*SPECIAL_CHARS.keys.map{|st| Regexp.escape(st)})
+        regexp = Regexp.union(*SPECIAL_CHARS.keys.map{|st| st}) #Regexp.untion escapes automatically, no need for Regexp.escape
         tokens.map! do |ary|
           next([ary]) unless ary[0] == :plain #Extra array since we flatten(1) it afterwards
           tokens2 = []
