@@ -4,7 +4,7 @@ from it's very beginning. Important changes in the
 API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
 
 ==0.0.4
-* Mouse.click now accepts symbols as parameters.
+* All methods in the Mouse module now accept symbols for the +button+ parameter. 
 * <i>XWindow#exists? aways returned false. This has been fixed.</i>
 * <i>XWindow#visible? always returned false. This has been fixed.</i>
 * <b>Added XWindow#to_i and XWindow#to_s.</b>
