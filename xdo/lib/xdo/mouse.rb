@@ -24,36 +24,47 @@ module XDo
     
     class << self
       
-      #Gets the current cursor position, which is returned as a two-element array 
-      #of form <code>[x, y]</code>. 
+      #Gets the current cursor position. 
+      #===Return value
+      #A two-element array of form <code>[x, y]</code>. 
+      #===Example
+      #  p XDo::Mouse.position #=> [12, 326]
       def position
-        cmd = "#{XDOTOOL} getmouselocation"
-        out = `#{cmd}`
-        out.match(/x:(\d+) y:(\d+)/)
-        return [$1.to_i, $2.to_i]
+        out = `#{XDOTOOL} getmouselocation`.match(/x:(\d+) y:(\d+)/)
+        [$1.to_i, $2.to_i]
       end
       
       #Moves the mouse cursor to the given position. 
-      #If +set+ is true, this function does not move it, but set it directly 
-      #to the position. 
-      #You can manipulate the speed of the cursor movement by changing 
-      #the value of speed (which is 2 pixel per time by default), but the higher 
-      #the value is, the more inaccurate the movement is. Tough, the cursor will 
-      #be at the specfied position in any case, regeardless of how you set +speed+. 
+      #===Parameters
+      #[+x+] The goal X coordinate. 
+      #[+x+] The goal Y coordinate. 
+      #[+speed+] (2) Cursor move speed, in pixels per iteration. The higher the value, the more inaccurate the movement (but you can be sure the cursor is always at the position you specified at the end). 
+      #[+set+] (false) If true, the +speed+ parameter is ignored and the cursor is directly set to the given position. 
+      #===Return value
+      #The position you specified, as a two-dimensional array of form <tt>[x, y]</tt>. 
+      #===Raises
+      #[ArgumentError] The value of +speed+ was lower or equal to zero. 
+      #===Example
+      #  #Move to (10|10)
+      #  XDo::Mouse.move(10, 10)
+      #  #Move fast to (10|10)
+      #  XDo::Mouse.move(10, 10, 10)
+      #  #Directly set the cursor to (10|10) without any movement
+      #  XDo::Mouse.move(10, 10, 1, true)
       def move(x, y, speed = 2, set = false)
         if set
-          out = `#{XDOTOOL} mousemove #{x} #{y}`
+          `#{XDOTOOL} mousemove #{x} #{y}`
           return [x, y]
         else
           raise(ArgumentError, "speed has to be > 0 (default is 2), was #{speed}!") if speed <= 0
-          pos = position #Aktuelle Cursorposition
+          pos = position #Current cursor position
           act_x = pos[0]
           act_y = pos[1]
           aim_x = x
           aim_y = y
-          #Erschaffe die Illusion einer flüssigen Bewegung
+          #Create the illusion of a fluent movement (hey, that statement sounds better in German, really! ;-))
           loop do
-            #Position um speed verändern
+            #Change position as indiciated by +speed+
             if act_x > aim_x
               act_x -= speed
             elsif act_x < aim_x
@@ -64,24 +75,26 @@ module XDo
             elsif act_y < aim_y
               act_y += speed
             end
-            #Cursor an neue Position setzen
+            #Move to computed position
             move(act_x, act_y, speed, true)
-            #Prüfen, ob sich die aktuelle Position im durch speed definierten 
-            #Toleranzbereich um den Zielpunkt befindet
+            #Check wheather the cursor's current position is inside an 
+            #acceptable area around the goal position. The size of this 
+            #area is defined by +speed+; this check ensures we don't get 
+            #an infinite loop for unusual conditions. 
             if ((aim_x - speed)..(aim_x + speed)).include? act_x
               if ((aim_y - speed)..(aim_y + speed)).include? act_y
                 break
               end #if in Y-Toleranz
             end #if in X-Toleranz
           end #loop
-          #Falls der Cursor nicht genau auf dem Zielpunkt landet, muss
-          #eine Korrektur erfolgen
+          #Correct the cursor position to point to the exact point specified. 
+          #This is for the case the "acceptable area" condition above triggers. 
           if position != [x, y]
             move(x, y, 1, true)
           end #if position != [x, y]
           
         end #if set
-        return [x, y]
+        [x, y]
       end #def move
       
       #Simulates a mouse click. If you don't specify a X AND a Y position, 
