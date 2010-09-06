@@ -138,13 +138,28 @@ module XDo
       end
       
       #Scroll with the mouse wheel. +amount+ is the time of steps to scroll. 
-      #Note: The XServer handles wheel up and wheel down events like mouse click 
+      #===Parameters
+      #[+dir+] The direction to scroll into. Either :up or :down. 
+      #[+amount+] The number of steps to scroll. These are *not* meant to be full wheel rounds. 
+      #===Return value
+      #Undefined. 
+      #===Example
+      #  #Scroll up
+      #  XDo::Mouse.wheel(:up, 4)
+      #  #Scroll down 4 steps
+      #  XDo::Mouse.wheel(:down, 4)
+      #===Remarks
+      #The X Server handles wheel up and wheel down events like mouse click 
       #events and if you take a look in the source code of this function you will see, that 
-      #it calls #click with the value of UP or DOWN. So, if you want to be funny, write something 
-      #like 
-      #  XDo::Mouse.click(nil, nil, XDo::Mouse::UP)
+      #it calls #click passing through the +dir+ parameter. So, if you want to be funny, 
+      #write something like 
+      #  XDo::Mouse.click(nil, nil, :up)
       #. 
       def wheel(dir, amount)
+        if button.kind_of?(Numeric)
+          warn("#{caller.first}: Deprecation warning: Use symbols such as :up for the dir parameter.")
+          button = BUTTON2XDOTOOL.keys[button - 1] #indices are 0-based
+        end
         amount.times{click(nil, nil, dir)}
       end
       
