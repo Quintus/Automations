@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 #Encoding: UTF-8
+gem "test-unit", ">= 2.1" #Ensure we use the gem
 require "test/unit"
 require "tempfile"
 require "xdo/keyboard.rb"
