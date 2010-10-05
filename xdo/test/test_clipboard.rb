@@ -12,7 +12,7 @@ class ClipboardTest < Test::Unit::TestCase
     IO.popen("#{XDo::XSEL} -b -i", "w"){|io| io.write("Some clipboard \ntest text")}
     IO.popen("#{XDo::XSEL} -s -i", "w"){|io| io.write("Some secondary test text")}
     
-    clip = XDo::Clipboard.read(primary: true, secondary: true, clipboard: true)
+    clip = XDo::Clipboard.read
     assert_equal("Some primary test text", XDo::Clipboard.read_primary)
     assert_equal(XDo::Clipboard.read_primary, clip[:primary])
     assert_equal("Some clipboard \ntest text", XDo::Clipboard.read_clipboard)
@@ -30,21 +30,20 @@ class ClipboardTest < Test::Unit::TestCase
     assert_equal("Secondary!", `#{XDo::XSEL} -s`)
     assert_equal("Clipboard!\nNewline", `#{XDo::XSEL} -b`)
     
-    XDo::Clipboard.write("XYZ", primary: true, secondary: true, clipboard: true)
-    assert_equal({primary: "XYZ", secondary: "XYZ", clipboard: "XYZ"}, XDo::Clipboard.read(primary: true, secondary: true, clipboard: true))
+    XDo::Clipboard.write("XYZ", :primary, :secondary, :clipboard)
+    assert_equal({primary: "XYZ", secondary: "XYZ", clipboard: "XYZ"}, XDo::Clipboard.read)
   end
   
   def test_append
     ["primary", "secondary", "clipboard"].each{|m| XDo::Clipboard.send(:"write_#{m}", "This is... ")}
-    XDo::Clipboard.append("a Test!", primary: true, secondary: true, clipboard: true)
+    XDo::Clipboard.append("a Test!", :primary, :secondary, :clipboard)
     ["primary", "secondary", "clipboard"].each{|m| assert_equal(XDo::Clipboard.send(:"read_#{m}"), "This is... a Test!")}
   end
   
   def test_clear
-    XDo::Clipboard.write("ABC", primary: true, secondary: true, clipboard: true)
+    XDo::Clipboard.write("ABC", :primary, :secondary, :clipboard)
     ["primary", "secondary", "clipboard"].each{|m| XDo::Clipboard.send("clear_#{m}")}
     ["primary", "secondary", "clipboard"].each{|m| assert_equal("", XDo::Clipboard.send("read_#{m}"))}
   end
-  
   
 end

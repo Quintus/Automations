@@ -183,7 +183,7 @@ module XDo
         
         `#{XSEL} -c` if clips.include? :primary
         `#{XSEL} -b -c` if clips.include? :clipboard
-        `#{XSEL} -s -c` if clips.inclde? :secondary
+        `#{XSEL} -s -c` if clips.include? :secondary
         nil
       end
       
