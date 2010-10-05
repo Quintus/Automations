@@ -1,6 +1,7 @@
 =Deprecations
 The following method uses are _deprecated_ and will be removed in the next minor version bump. They show a warning if you use them unless otherwise stated. 
 
+* All Clipboard module methods take a hash in order to specify which clipboards to interact with now take the symbols directly via a rest argument. 
 * All Mouse module methods that took constant values now accept symbols. The old behaviour is deprecated now. 
 * All XWindow class methods that take a hash in order to specify which windows to search now take the symbols directly via a rest argument. 
 * All XWindow class methods that take a string as the window to search for are now accepting Regular Expressions. That means, in later version you have to pass in a regexp if you don't want to look for an entire title at once, i.e. <tt>"edit"</tt> won't find a "gedit" window, but <tt>/edit/</tt> will. <b>This doesn't show a warning. </b>
