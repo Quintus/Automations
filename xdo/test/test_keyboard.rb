@@ -20,7 +20,7 @@ class TestKeyboard < Test::Unit::TestCase
   
   def setup
     @edit_pid = spawn(EDITOR_CMD)
-    sleep 0.5
+    sleep 1
   end
   
   def teardown
