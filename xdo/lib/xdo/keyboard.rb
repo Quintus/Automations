@@ -245,7 +245,7 @@ module XDo
       #  XDo::Keyboard.key_up("a")
       #===Remarks
       #You should release the key sometime via Keyboard.key_up. 
-      def  key_down(key, w_id = 0)
+      def key_down(key, w_id = 0)
         Open3.popen3("#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}") do |stdin, stdout, stderr|
           stdin.close_write
           raise(XDo::XError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
