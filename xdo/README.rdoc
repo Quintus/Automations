@@ -24,7 +24,7 @@ After they're installed, install XDo via RubyGems:
   XDo::Keyboard.simulate("This ist\ttext.")
   #And this will move a window containing the string "gedit", 
   #unless it's maximized. 
-  win = XDo::XWindow.from_name("gedit")
+  win = XDo::XWindow.from_title(/gedit/)
   win.move(200, 200)
 ==Files
 You can require the following files in your projects: 
@@ -46,7 +46,7 @@ If you're looking for a more professional program, try the "X window information
 * I'm sure there are several things I didn't notice that can be automated somehow. If you know about, email me! Please add a description of the possibilities and a sample script. 
 * Another interesting thing are the samples. There are many Linux distrubitions out there, and even many of them rely on X. I cannot test with another than a recent Ubuntu machine, but if you want to contribute and send samples for another OS, I want to encourage you to - I surely won't reject your work. :-)
 ==License/Copyright
-  Copyright © 2009 Marvin Gülker
+  Copyright © 2009, 2010 Marvin Gülker
   This library is free software; you may redistribute it and/or modify it 
   under the terms of Ruby's license (see http://www.ruby-lang.org/en/LICENSE.txt). 
   You can contact me at sutniuq ät gmx Dot net. 
