@@ -85,5 +85,3 @@ task :finalize_version do
   puts "Old version was '#{old_version}'. "
   puts "New version is '#{new_version}'. "
 end
-
-task :gem => :finalize_version
