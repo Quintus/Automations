@@ -75,7 +75,7 @@ class TestKeyboard < Test::Unit::TestCase
   end
   
   def test_window_id
-    XDo::XWindow.focus_desktop #Ensure that the editor hasn't the input focus anymore
+    XDo::XWindow.unfocus #Ensure that the editor hasn't the input focus anymore
     sleep 1
     edit_id = XDo::XWindow.search(EDITOR_CMD).first
     xwin = XDo::XWindow.new(edit_id)
