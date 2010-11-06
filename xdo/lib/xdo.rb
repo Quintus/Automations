@@ -25,7 +25,7 @@ module XDo
   EJECT = "eject"
   
   #The version of this library. 
-  VERSION = "0.0.4-dev (6.11.10)"
+  VERSION = File.read(File.join(File.expand_path(File.dirname(__FILE__)), "..", "VERSION")).freeze
   
   #Class for errors in this library. 
   class XError < StandardError

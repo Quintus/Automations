@@ -132,9 +132,19 @@ class XInfo < Wx::App
 end
 
 if ARGV.include?("-h") or ARGV.include?("--help")
+  puts "This is xinfo.rb, from xdo #{XDo::VERSION}."
+  puts "xinfo.rb is a tool for inspecting GUI windows on X."
+  puts
+  puts "Copyright © 2010 Marvin Gülker"
+  puts "Licensed under the same terms as Ruby."
+  puts "You can find Ruby's license at http://www.ruby-lang.org/en/LICENSE.txt."
+  puts
   puts "xinfo.rb doesn't understand many command-line options."
   puts "There's -h for this message, -V for verbose output"
-  puts "and -d for debugging."
+  puts "and -d for debugging. -v shows XDo's version."
+  exit
+elsif ARGV.include?("-v") or ARGV.include?("--version")
+  puts "This is xinfo.rb, from xdo #{XDo::VERSION}."
   exit
 end
 

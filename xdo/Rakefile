@@ -50,3 +50,36 @@ end
 
 desc "Tests XDo and then builds the gem file."
 task :full_gem => [:test, :gem]
+
+desc "Update the development version number"
+task :version do
+  puts "Updating to a new development version."
+  puts "Ensure incrementing the major, minor and tiny number apropriately!"
+  
+  old_version = File.read("VERSION").rstrip
+  new_version = old_version.dup
+  if old_version =~ /\((.*?)\)/ #Starting from a development version
+    new_version.sub!($1, Time.now.strftime("%d.%m.%Y %H:%M"))
+  else #Starting from a non-development version
+    new_version << "-dev (#{Time.now.strftime("%d.%m.%Y %H:%M")})"
+  end
+  
+  File.open("VERSION", "w"){|file| file.write(new_version)}
+  
+  puts "Old version was '#{old_version}'. "
+  puts "New version is '#{new_version}'. "
+end
+
+desc "Remove the date from the version number"
+task :finalize_version do
+  puts "Updating to a new final version."
+  puts "Ensure incrementing the major, minor and tiny number apropriately!"
+  
+  old_version = File.read("VERSION").rstrip
+  new_version = old_version.sub(/-dev \(.*?\)/, "")
+  
+  File.open("VERSION", "w"){|file| file.write(new_version)}
+  
+  puts "Old version was '#{old_version}'. "
+  puts "New version is '#{new_version}'. "
+end
