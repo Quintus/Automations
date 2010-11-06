@@ -4,6 +4,7 @@ from it's very beginning. Important changes in the
 API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
 
 ==0.0.4
+* <b>Several methods now accept a +sync+ parameter wrapping +xdotool+'s <tt>--sync</tt> option. </b>
 * <b>Added XWindow.unfocus</b>
 * <b>Added XWindow.root_id</b>
 * <b>Added XWindow.from_root</b>
