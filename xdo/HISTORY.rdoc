@@ -4,6 +4,10 @@ from it's very beginning. Important changes in the
 API are marked <b>bold</b>. Bugfixes are <i>italic</i>. 
 
 ==0.0.4
+* <b>Added XWindow.unfocus</b>
+* <b>Added XWindow.root_id</b>
+* <b>Added XWindow.from_root</b>
+* Removed the internal SmallScanner class. We're now using StringScanner directly. 
 * All methods in the Mouse module now accept symbols for the +button+ parameter. 
 * <i>XWindow#exists? aways returned false. This has been fixed.</i>
 * <i>XWindow#visible? always returned false. This has been fixed.</i>

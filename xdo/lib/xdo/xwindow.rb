@@ -1,62 +1,62 @@
 #Encoding: UTF-8
-#This file is part of Xdo. 
+#This file is part of Xdo.
 #Copyright © 2009, 2010 Marvin Gülker
-#  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
+#  Initia in potestate nostra sunt, de eventu fortuna iudicat.
 require "open3"
 require_relative("../xdo")
 module XDo
   
-  #This class represents a window on the screen. Each window is uniquely identified by 
-  #an internal ID; before you can create a reference to a window (a XWindow object) you 
-  #have to obtain the internal ID of that window and pass it into XWindow.new. 
-  #Or you use the class methods of this class, notably XWindow.active_window. 
+  #This class represents a window on the screen. Each window is uniquely identified by
+  #an internal ID; before you can create a reference to a window (a XWindow object) you
+  #have to obtain the internal ID of that window and pass it into XWindow.new.
+  #Or you use the class methods of this class, notably XWindow.active_window.
   #
-  #Via the XWindow object you get you can manipulate a window in serveral ways, e.g. 
-  #you can move or resize it. Some methods are not available on every window 
-  #manager: XWindow.active_window, XWindow.desktop_num, XWindow.desktop_num=, XWindow.desktop, 
-  #XWindow.desktop=, XWindow.from_active, #raise, #activate, #desktop, #desktop=. 
-  #Some of them may be available, some not. On my machine (an Ubuntu Lucid) for 
-  #example I can use active_window, desktop_num and #activate, but not #raise or #desktop=. 
-  #Those methods are tagged with the sentence "Part of the EWMH standard XY". Not all 
-  #parts of the EWMH standard are provided by every window manager. 
+  #Via the XWindow object you get you can manipulate a window in serveral ways, e.g.
+  #you can move or resize it. Some methods are not available on every window
+  #manager: XWindow.active_window, XWindow.desktop_num, XWindow.desktop_num=, XWindow.desktop,
+  #XWindow.desktop=, XWindow.from_active, #raise, #activate, #desktop, #desktop=.
+  #Some of them may be available, some not. On my machine (an Ubuntu Lucid) for
+  #example I can use active_window, desktop_num and #activate, but not #raise or #desktop=.
+  #Those methods are tagged with the sentence "Part of the EWMH standard XY". Not all
+  #parts of the EWMH standard are provided by every window manager.
   #
-  #As of version 0.0.4 the way to search for window is about to change. The old version 
-  #where you passed a hash with symbols has been deprecated (and you get warnings 
-  #about this if you use it) in favor of passing those symbols as a rest argument. See 
-  #XWindow.search for more details. 
+  #As of version 0.0.4 the way to search for window is about to change. The old version
+  #where you passed a hash with symbols has been deprecated (and you get warnings
+  #about this if you use it) in favor of passing those symbols as a rest argument. See
+  #XWindow.search for more details.
   #
-  #You should also be aware of the fact that XDo is about to support Regexp objects 
-  #in XWindow.search. In future versions (i.e. after the next minor release) strings 
-  #*always* mean an exact title/class/whatever match. For parts, you have to use 
-  #Regular Expressions. There is a culprit, though. +xdotool+ doesn't use Ruby's 
-  #Regular Expressions engine Oniguruma and expects C-style regexps. I don't know 
-  #about the differences - but if you're absolutely sure your window title matches 
-  #that wonderful three-line extended regexp and +xdotool+ doesn't find it, you 
-  #may email me at sutniuq@@gmx@net explaining which construct defeats +xdotool+. 
-  #I will then setup a list over time which states which constructs doesn't work. 
+  #You should also be aware of the fact that XDo is about to support Regexp objects
+  #in XWindow.search. In future versions (i.e. after the next minor release) strings
+  #*always* mean an exact title/class/whatever match. For parts, you have to use
+  #Regular Expressions. There is a culprit, though. +xdotool+ doesn't use Ruby's
+  #Regular Expressions engine Oniguruma and expects C-style regexps. I don't know
+  #about the differences - but if you're absolutely sure your window title matches
+  #that wonderful three-line extended regexp and +xdotool+ doesn't find it, you
+  #may email me at sutniuq@@gmx@net explaining which construct defeats +xdotool+.
+  #I will then setup a list over time which states which constructs doesn't work.
   #
-  #Be <i>very careful</i> with the methods that are part of the two desktop EWMH standards. 
-  #After I set the number of desktops and changed the current desktop, I had to reboot my 
-  #system to get the original configuration back. I don't know if I'm not using +xdotool+ correct, 
-  #but neither my library nor +xdotool+ itself could rescue my desktop settings. Btw, that's the 
-  #reason why it's not in XDo's unit tests (but it should work; at least in one way...). 
+  #Be <i>very careful</i> with the methods that are part of the two desktop EWMH standards.
+  #After I set the number of desktops and changed the current desktop, I had to reboot my
+  #system to get the original configuration back. I don't know if I'm not using +xdotool+ correct,
+  #but neither my library nor +xdotool+ itself could rescue my desktop settings. Btw, that's the
+  #reason why it's not in XDo's unit tests (but it should work; at least in one way...).
   class XWindow
-    #The internal ID of the window. 
+    #The internal ID of the window.
     attr_reader :id
     
     class << self
       
-      #Checks if a window exists. 
+      #Checks if a window exists.
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search.
       #===Return value
-      #true or false. 
+      #true or false.
       #===Example
       #  p XWindow.exists?("gedit") #=> true
       #  p XWindow.exists?(/^gedit/) #=> false
       #===Remarks
-      #It may be a good idea to pass :onlyvisible as a search parameter. 
+      #It may be a good idea to pass :onlyvisible as a search parameter.
       def exists?(name, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
@@ -66,11 +66,11 @@ module XDo
         !search(name, *opts).empty?
       end
       
-      #Checks wheather the given ID exists or not. 
+      #Checks wheather the given ID exists or not.
       #===Parameters
-      #[+id+] The ID to check for. 
+      #[+id+] The ID to check for.
       #===Return value
-      #true or false. 
+      #true or false.
       #===Example
       #  p XWindow.id_exits?(29360674) #=> true
       #  p XWindow.id_exists?(123456) #=> false
@@ -83,20 +83,20 @@ module XDo
       
       #Waits for a window name to exist.
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search.
       #===Return value
-      #The ID of the newly appeared window. 
+      #The ID of the newly appeared window.
       #===Example
       #  #Wait for a window with "gedit" somewhere in it's title:
       #  XDo::XWindow.wait_for_window("gedit")
       #  #Wait for a window that ends with "ends_with_this":
       #  XDo::XWindow.wait_for_window(/ends_with_this$/)
-      #  #It's useful to combine this method with the Timeout module: 
+      #  #It's useful to combine this method with the Timeout module:
       #  require "timeout"
       #  Timeout.timeout(3){XDo::XWindow.wait_for_window("gedit")}
       #===Remarks
-      #Returns immediately if the window does already exist. 
+      #Returns immediately if the window does already exist.
       def wait_for_window(name, *opts)
         if opts.first.kind_of?(Hash)
           warn("#{caller.first}: Deprecation Warning: Using a hash as further arguments is deprecated. Pass the symbols directly.")
@@ -107,12 +107,12 @@ module XDo
         search(name, *opts).first
       end
       
-      #Waits for a window to close. 
+      #Waits for a window to close.
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search.
       #===Return value
-      #nil. 
+      #nil.
       #===Example
       #  #Wait for a window with "gedit" somewhere in it's title
       #  XDo::XWindow.wait_for_close("gedit")
@@ -131,19 +131,19 @@ module XDo
         nil
       end
       
-      #Search for a window name to get the internal ID of a window. 
+      #Search for a window name to get the internal ID of a window.
       #===Parameters
-      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. 
+      #[+str+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters.
       #====Possible search parameters
-      #Copied from the +xdotool+ manpage: 
-      #[class] Match against the window class. 
+      #Copied from the +xdotool+ manpage:
+      #[class] Match against the window class.
       #[classname] Match against the window classname.
       #[name] Match against the window name. This is the same string that is displayed in the window titlebar.
       #[onlyvisible] Show only visible windows in the results. This means ones with map state IsViewable.
       #===Return value
-      #An array containing the IDs of all found windows or an empty array 
-      #if none was found. 
+      #An array containing the IDs of all found windows or an empty array
+      #if none was found.
       #===Example
       #  #Look for every window with "gedit" in it's title, class or classname
       #  XDo::XWindow.search("gedit")
@@ -158,15 +158,15 @@ module XDo
         end
         opts = [:name, :class, :classname] if opts.empty?
         
-        #Allow Regular Expressions. Since I can't pass them directly to the command line, 
-        #I need to get their source. Otherwise we want an exact match, therefore the line 
-        #begin and line end anchors need to be set around the given string. 
+        #Allow Regular Expressions. Since I can't pass them directly to the command line,
+        #I need to get their source. Otherwise we want an exact match, therefore the line
+        #begin and line end anchors need to be set around the given string.
         str = str.source if str.kind_of?(Regexp)
         #TODO
-        #The following is the new behaviour that will be activated with the next minor version. 
-        #See DEPRECATE.rdoc. 
+        #The following is the new behaviour that will be activated with the next minor version.
+        #See DEPRECATE.rdoc.
         #str = if str.kind_of?(Regexp)
-          #str.source 
+          #str.source
         #else
           #"^#{str.to_str}$"
         #end
@@ -178,18 +178,18 @@ module XDo
         Open3.popen3(cmd){|stdin, stdout, stderr| stdin.close_write; stdout.read}.lines.to_a.collect{|l| l.strip.to_i}
       end
       
-      #Returns the internal ID of the currently focused window. 
+      #Returns the internal ID of the currently focused window.
       #===Parameters
-      #[+notice_children+] (false) If true, childwindows are noticed and you may get a child window instead of a toplevel window. 
+      #[+notice_children+] (false) If true, childwindows are noticed and you may get a child window instead of a toplevel window.
       #===Return value
-      #The internal ID of the found window. 
+      #The internal ID of the found window.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  p XDo::XWindow.focused_window #=> 41943073
       #  p XDo::XWindow.focused_window(true) #=> 41943074
       #===Remarks
-      #This method may find an invisible window, see active_window for a more reliable method. 
+      #This method may find an invisible window, see active_window for a more reliable method.
       def focused_window(notice_children = false)
         err = ""
         out = ""
@@ -198,17 +198,17 @@ module XDo
         return out.to_i
       end
       
-      #Returns the internal ID of the currently focused window. 
+      #Returns the internal ID of the currently focused window.
       #===Return value
-      #The ID of the found window. 
+      #The ID of the found window.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  p XDo::XWindow.active_window #=> 41943073
       #===Remarks
-      #This method is more reliable than #focused_window, but never finds an invisible window. 
+      #This method is more reliable than #focused_window, but never finds an invisible window.
       #
-      #Part of the EWMH standard ACTIVE_WINDOW. 
+      #Part of the EWMH standard ACTIVE_WINDOW.
       def active_window
         err = ""
         out = ""
@@ -217,22 +217,22 @@ module XDo
         return Integer(out)
       end
       
-      #Set the number of working desktops. 
+      #Set the number of working desktops.
       #===Parameters
-      #[+num+] The number of desktops you want to exist. 
+      #[+num+] The number of desktops you want to exist.
       #===Return value
-      #+num+. 
+      #+num+.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  XDo::XWindow.desktop_num = 2
       #===Remarks
-      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
       #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #That's the reason, why the desktop-related methods don't work with Ubuntu.
       #
-      #Part of the EWMH standard WM_DESKTOP. 
+      #Part of the EWMH standard WM_DESKTOP.
       def desktop_num=(num)
         err = ""
         Open3.popen3("#{XDo::XDOTOOL} set_num_desktops #{num}"){|stdin, stdout, stderr| err << stderr.read}
@@ -240,20 +240,20 @@ module XDo
         num
       end
       
-      #Get the number of working desktops. 
+      #Get the number of working desktops.
       #===Return value
-      #The number of desktops. 
+      #The number of desktops.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  p XDo::XWindow.desktop_num = 1
       #===Remarks
-      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
       #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #That's the reason, why the desktop-related methods don't work with Ubuntu.
       #
-      #Part of the EWMH standard WM_DESKTOP. 
+      #Part of the EWMH standard WM_DESKTOP.
       def desktop_num
         err = ""
         out = ""
@@ -262,22 +262,22 @@ module XDo
         Integer(out)
       end
       
-      #Change the view to desktop +num+. 
+      #Change the view to desktop +num+.
       #===Parameters
-      #[+num+] The 0-based index of the desktop you want to switch to. 
+      #[+num+] The 0-based index of the desktop you want to switch to.
       #===Return value
-      #+num+. 
+      #+num+.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  XDo::XWindow.desktop = 1
       #===Remarks
-      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
       #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #That's the reason, why the desktop-related methods don't work with Ubuntu.
       #
-      #Part of the EWMH standard CURRENT_DESKTOP. 
+      #Part of the EWMH standard CURRENT_DESKTOP.
       def desktop=(num)
         err = ""
         Open3.popen3("#{XDo::XDOTOOL} set_desktop #{num}"){|stdin, stdout, stderr| err << stderr.read}
@@ -285,20 +285,20 @@ module XDo
         num
       end
       
-      #Returns the number of the active desktop. 
+      #Returns the number of the active desktop.
       #===Return value
-      #The number of the currently shown desktop. 
+      #The number of the currently shown desktop.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  p XDo::XWindow.desktop #=> 0
       #===Remarks
-      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+      #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+      #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
       #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-      #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+      #That's the reason, why the desktop-related methods don't work with Ubuntu.
       #
-      #Part of the EWMH standard CURRENT_DESKTOP. 
+      #Part of the EWMH standard CURRENT_DESKTOP.
       def desktop
         err = ""
         out = ""
@@ -307,21 +307,21 @@ module XDo
         Integer(out)
       end
       
-      #Creates a XWindow by calling search with the given parameters. 
-      #The window is created from the first ID found. 
+      #Creates a XWindow by calling search with the given parameters.
+      #The window is created from the first ID found.
       #===Parameters
-      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
-      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search. 
+      #[+name+] The name of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
+      #[<tt>*opts</tt> (<tt>[:name, :class, :classname]</tt>) Search parameters. See XWindow.search.
       #===Return value
-      #The created XWindow object. 
+      #The created XWindow object.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  #Exact title/class/classname match
       #  xwin = XDo::XWindow.from_search("xwindow.rb - SciTE")
       #  #Part match via regexp
       #  xwin = XDo::XWindow.from_search(/SciTE/)
-      #  #Part match via string - DEPRECATED. 
+      #  #Part match via string - DEPRECATED.
       #  xwin = XDo::XWindow.from_search("SciTE")
       #  #Only search the window classes
       #  xwin = XDo::XWindow.from_search(/SciTE/, :class)
@@ -336,102 +336,144 @@ module XDo
         new(ids.first)
       end
       
-      #_Deprecated_. Use XWindow.from_search or XWindow.from_title instead. 
+      #_Deprecated_. Use XWindow.from_search or XWindow.from_title instead.
       def from_name(name, *opts)
         warn("#{caller.first}: Deprecation Warning: ::from_name is deprecated. Use ::from_search if you want the old behaviour with the ability to specify all search parameters, or ::from_title if you just want to look through the window titles.")
         from_search(name, *opts)
       end
       
-      #Same as XWindow.from_search, but only looks for the window's titles to match. 
+      #Same as XWindow.from_search, but only looks for the window's titles to match.
       #===Parameters
-      #[+title+] The title of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though. 
+      #[+title+] The title of the window to look for. Either a string or a Regular Expression; however, there's no guaranty that +xdotool+ gets the regexp right. Simple ones should work, though.
       #===Return value
-      #A XWindow object made up from the first window ID found. 
+      #A XWindow object made up from the first window ID found.
       #===Raises
-      #[XError] Error invoking +xdotool+. 
+      #[XError] Error invoking +xdotool+.
       #===Example
       #  #Exact string match
       #  xwin = XDo::XWindow.from_title("xwindow.rb - SciTE")
       #  #Part match via regexp
       #  xwin = XDo::XWindow.from_title(/SciTE/)
-      #  #Part match via string - DEPRECATED. 
+      #  #Part match via string - DEPRECATED.
       #  xwin = XDo::XWindow.from_title("SciTE")
       def from_title(title)
         from_search(title, :name)
       end
       
-      #Creates a XWindow by calling XWindow.focused_window with the given parameter. 
+      #Creates a XWindow by calling XWindow.focused_window with the given parameter.
       #===Parameters
-      #[+notice_children+] (false) If true, you may get a child window as the active window. 
+      #[+notice_children+] (false) If true, you may get a child window as the active window.
       #===Return value
-      #The newly created XWindow objects. 
+      #The newly created XWindow objects.
       #===Example
       #  xwin = XDo::XWindow.from_focused
       #===Remarks
-      #The XWindow.focused_window method is a bit dangerous, since it may 
-      #find an invisible window. Use XWindow.from_active if you don't want that. 
+      #The XWindow.focused_window method is a bit dangerous, since it may
+      #find an invisible window. Use XWindow.from_active if you don't want that.
       def from_focused(notice_childs = false)
         new(focused_window(notice_childs))
       end
       
-      #Creates a XWindow by calling active_window. 
+      #Creates a XWindow by calling active_window.
       #===Return value
-      #The newly created XWindow object. 
+      #The newly created XWindow object.
       #===Example
       #  xwin = XDo::XWindow.from_active
       #===Remarks
-      #This method does not find invisible nor child windows; if you want that, 
-      #you should take a look at XWindow.from_focused. 
+      #This method does not find invisible nor child windows; if you want that,
+      #you should take a look at XWindow.from_focused.
       def from_active
         new(active_window)
       end
       
-      #Set this to the name (title) of your desktop window. It's only used by XWindow.focus_desktop. 
-      def desktop_name=(name)
-        @desktop_name = name
-      end
-      
-      #Name (title) of the desktop window. Default is "x-nautilus-desktop". It's only used by XWindow.focus_desktop. 
-      def desktop_name
-        @desktop_name ||= "x-nautilus-desktop"
-      end
-      
-      #Activates the desktop window, effectively unfocusing all other windows. You may use this to 
-      #make sure nothing is focused. For this method to work you have to set XWindow.desktop_name= to 
-      #you desktop window's title. 
+      #Returns the ID of the root window.
       #===Return value
-      #Undefined. 
+      #The ID of the root window.
       #===Example
-      #  XDo::XWindow.focus_desktop
+      #  p XDo::XWindow.root_id #=> 346
+      def root_id
+        out = ""
+        err = ""
+        Open3.popen3("#{XDo::XWININFO} -root"){|stdin, stdout, stderr| out << stdout.read.strip; err << stderr.read.strip}
+        Kernel.raise(XDo::XError, err) unless err.empty?
+        Integer(out.lines.to_a[0].match(/Window id:(.*?)\(/)[1].strip)
+      end
+      
+      #Creates a XWindow refering to the root window.
+      #===Return value
+      #The newly created XWindow object.
+      #===Example
+      #  rwin = XDo::XWindow.from_root
+      def from_root
+        new(root_id)
+      end
+      
+      #Creates a invalid XWindow.
+      #===Return value
+      #The newly created XWindow object.
+      #===Example
+      #  nwin = XDo::XWindow.from_null
+      #===Remarks
+      #The handle the returned XWindow object uses is zero and
+      #therefore invalid. You can't call #move, #resize or other
+      #methods on it, but it may be useful for unsetting focus.
+      #See also the XWindow.unfocus method.
+      def from_null
+        new(0) #Zero never is a valid window ID. Even the root window has another ID.
+      end
+      
+      #Unsets the input focus by setting it to the invalid
+      #NULL window.
+      #===Return value
+      #nil.
+      #===Example
+      #  win = XDo::XWindow.from_active
+      #  win.focus
+      #  XDo::XWindow.unfocus
+      def unfocus
+        from_null.focus
+      end
+      
+      #Deprecated.
+      def desktop_name=(name)
+        warn("#{caller.first}: Deprecation warning: XWindow.desktop_name= doesn't do anything anymore.")
+      end
+      
+      #Deprecated.
+      def desktop_name
+        warn("#{caller.first}: Deprecation warning: XWindow.desktop_name doesn't do anything anymore.")
+        "x-nautilus-desktop"
+      end
+      
+      #Deprecated. Just calls XWindow.unfocus internally.
       def focus_desktop
-        desktop = from_title(desktop_name)
-        desktop.focus
-        desktop.activate
+        warn("#{caller.first}: Deprecation warning: XWindow.focus_desktop is deprecated. Use XWindow.unfocus instead.")
+        unfocus
       end
       alias activate_desktop focus_desktop
       
-      #Minimize all windows (or restore, if already) by sending [CTRL]+[ALT]+[D]. 
-      #Available after requireing  "xdo/keyboard". 
+      #Minimize all windows (or restore, if already) by sending [CTRL]+[ALT]+[D].
+      #Available after requireing  "xdo/keyboard".
       #===Return value
-      #Undefined. 
+      #Undefined.
       #===Raises
-      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #[NotImplementedError] You didn't require 'xdo/keyboard'.
       #===Example
       #  #Everything will be minimized:
       #  XDo::XWindow.toggle_minimize_all
-      #  #And now we'll restore everything. 
+      #  #And now we'll restore everything.
       #  XDo::XWindow.toggle_minimize_all
       def toggle_minimize_all
         raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
         XDo::Keyboard.ctrl_alt_d
       end
       
-      #Minimizes the active window. There's no way to restore a specific minimized window. 
-      #Available after requireing "xdo/keyboard". 
+      #Minimizes the active window. There's no way to restore a specific minimized window.
+      #Available after requireing "xdo/keyboard".
       #===Return value
-      #Undefined. 
+      #Undefined.
       #===Raises
-      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #[NotImplementedError] You didn't require 'xdo/keyboard'.
       #===Example
       #  XDo::XWindow.minimize
       def minimize
@@ -439,12 +481,12 @@ module XDo
         XDo::Keyboard.key("Alt+F9")
       end
       
-      #Maximize or normalize the active window if already maximized. 
-      #Available after requireing "xdo/keyboard". 
+      #Maximize or normalize the active window if already maximized.
+      #Available after requireing "xdo/keyboard".
       #===Return value
-      #Undefined. 
+      #Undefined.
       #===Raises
-      #[NotImplementedError] You didn't require 'xdo/keyboard'. 
+      #[NotImplementedError] You didn't require 'xdo/keyboard'.
       #===Example
       #  XDo::XWindow.minimize
       #  XDo::XWindow.toggle_maximize
@@ -461,13 +503,13 @@ module XDo
     #  title = str
     #  name = str
     #
-    #Changes a window's title. 
+    #Changes a window's title.
     #===Parameters
-    #[+str+] The new title. 
+    #[+str+] The new title.
     #===Return value
-    #+str+. 
+    #+str+.
     #===Raises
-    #[XError] Error invoking +xdotool+. 
+    #[XError] Error invoking +xdotool+.
     #===Example
     #  xwin.title = "Ruby is awesome!"
     
@@ -477,14 +519,14 @@ module XDo
     #  icon_title = str
     #  icon_name = str
     #
-    #Changes the window's icon title, i.e. the string that is displayed in 
-    #the task bar or panel where all open windows show up. 
+    #Changes the window's icon title, i.e. the string that is displayed in
+    #the task bar or panel where all open windows show up.
     #===Parameters
-    #[+str+] The string you want to set. 
+    #[+str+] The string you want to set.
     #===Return value
-    #+str+. 
+    #+str+.
     #===Raises
-    #[XError] Error invoking +xdotool+. 
+    #[XError] Error invoking +xdotool+.
     #===Example
     #  xwin.icon_title = "This is minimized."
     
@@ -493,27 +535,27 @@ module XDo
     #call-seq:
     #  classname = str
     #
-    #Sets a window's classname. 
+    #Sets a window's classname.
     #===Parameters
-    #[+str+] The window's new classname. 
+    #[+str+] The window's new classname.
     #===Return value
-    #+str+. 
+    #+str+.
     #===Raises
-    #[XError] Error invoking +xdotool+. 
+    #[XError] Error invoking +xdotool+.
     #===Example
     #  xwin.classname = "MyNewClass"
     
-    #Creates a new XWindow object from an internal ID. 
+    #Creates a new XWindow object from an internal ID.
     #===Parameters
-    #[+id+] The internal ID to create the window from. 
+    #[+id+] The internal ID to create the window from.
     #===Return value
-    #The newly created XWindow object. 
+    #The newly created XWindow object.
     #===Example
     #  id = XWindow.search(/edit/)[1]
     #  xwin = XWindow.new(id)
     #===Remarks
-    #See also many class methods of the XWindow class which allow 
-    #you to forget about the internal ID of a window. 
+    #See also many class methods of the XWindow class which allow
+    #you to forget about the internal ID of a window.
     def initialize(id)
       @id = id.to_i
     end
@@ -524,22 +566,22 @@ module XDo
       %Q|<#{self.class}: "#{title}" (#{id})>|
     end
     
-    #Set the size of a window. 
+    #Set the size of a window.
     #===Parameters
-    #[+width+] The new width, usually in pixels. 
-    #[+height+] The new height, usually in pixels. 
-    #[+use_hints+] (false) If true, window sizing hints are used if they're available. This is usually done when resizing terminal windows to a specific number of rows and columns. 
+    #[+width+] The new width, usually in pixels.
+    #[+height+] The new height, usually in pixels.
+    #[+use_hints+] (false) If true, window sizing hints are used if they're available. This is usually done when resizing terminal windows to a specific number of rows and columns.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  #Resize a window to 400x300px
     #  xwin.resize(400, 300)
     #  #Resize a terminal window to 100 rows and 100 columns
     #  xtermwin.resize(100, 100, true)
     #===Remarks
-    #This has no effect on maximized winwows. 
+    #This has no effect on maximized winwows.
     def resize(width, height, use_hints = false)
       err = ""
       cmd = "#{XDo::XDOTOOL} windowsize #{use_hints ? "--usehints " : ""}#{@id} #{width} #{height}"
@@ -547,15 +589,15 @@ module XDo
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Moves a window. +xdotool+ is not really exact with the coordinates, 
-    #the window will be within a range of +-10 pixels. 
+    #Moves a window. +xdotool+ is not really exact with the coordinates,
+    #the window will be within a range of +-10 pixels.
     #===Parameters
-    #[+x+] The goal X coordinate. 
-    #[+y+] The goal Y coordinate. 
+    #[+x+] The goal X coordinate.
+    #[+y+] The goal Y coordinate.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.move(100, 100)
     #  p xwin.abs_position #=> [101, 101]
@@ -565,40 +607,37 @@ module XDo
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Set the input focus to the window (but don't bring it to the front). 
+    #Set the input focus to the window (but don't bring it to the front).
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error invoking +xdotool+. 
+    #[XError] Error invoking +xdotool+.
     #===Example
     #  xwin.focus
     #===Remarks
-    #This method may not work on every window manager. You should use 
-    ##activate, which is supported by more window managers. 
+    #This method may not work on every window manager. You should use
+    ##activate, which is supported by more window managers.
     def focus
       err = ""
       Open3.popen3("#{XDo::XDOTOOL} windowfocus #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #The window loses the input focus by setting it to the desktop. 
+    #The window loses the input focus by setting it to an invalid window.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Example
     #  xwin.focus
     #  xwin.unfocus
-    #===Remarks
-    #This method internally calls XWindow.focus_desktop, so you have to find out about your 
-    #desktop's window name and assign it to XWindow.desktop=. 
     def unfocus
-      XDo::XWindow.focus_desktop
+      XDo::XWindow.unfocus
     end
     
-    #Maps a window to the screen (make it visible). 
+    #Maps a window to the screen (make it visible).
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error invoking +xdotool+. 
+    #[XError] Error invoking +xdotool+.
     #===Example
     #  xwin.unmap #Windows are usually mapped
     #  xwin.map
@@ -608,11 +647,11 @@ module XDo
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Unmap a window from the screen (make it invisible). 
+    #Unmap a window from the screen (make it invisible).
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.unmap
     def unmap
@@ -621,12 +660,12 @@ module XDo
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Bring a window to the front (but don't give it the input focus). 
-    #Not implemented in all window managers. 
+    #Bring a window to the front (but don't give it the input focus).
+    #Not implemented in all window managers.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.raise
     def raise
@@ -635,61 +674,61 @@ module XDo
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Activate a window. That is, bring it to top and give it the input focus. 
+    #Activate a window. That is, bring it to top and give it the input focus.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.activate
     #===Remarks
-    #This is the recommanded method to give a window the input focus, since 
-    #it works on more window managers than #focus and also works across 
-    #desktops. 
+    #This is the recommanded method to give a window the input focus, since
+    #it works on more window managers than #focus and also works across
+    #desktops.
     #
-    #Part of the EWMH standard ACTIVE_WINDOW. 
+    #Part of the EWMH standard ACTIVE_WINDOW.
     def activate
       err = ""
       Open3.popen3("#{XDo::XDOTOOL} windowactivate #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Move a window to a desktop. 
+    #Move a window to a desktop.
     #===Parameters
-    #[+num+] The 0-based index of the desktop you want the window to move to. 
+    #[+num+] The 0-based index of the desktop you want the window to move to.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.desktop = 3
     #===Remarks
-    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
     #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-    #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+    #That's the reason, why the desktop-related methods don't work with Ubuntu.
     #
-    #Part of the EWMH standard CURRENT_DESKTOP. 
+    #Part of the EWMH standard CURRENT_DESKTOP.
     def desktop=(num)
       err = ""
       Open3.popen3("#{XDo::XDOTOOL} set_desktop_for_window #{@id} #{num}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
-    #Get the desktop the window is on. 
+    #Get the desktop the window is on.
     #===Return value
-    #The 0-based index of the desktop this window resides on. 
+    #The 0-based index of the desktop this window resides on.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  p xwin.desktop #=> 0
     #===Remarks
-    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only 
-    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4). 
+    #Although Ubuntu systems seem to have several desktops, that isn't completely true. An usual Ubuntu system only
+    #has a single working desktop, on which Ubuntu sets up an arbitrary number of other "desktop views" (usually 4).
     #That's kind of cheating, but I have not yet find out why it is like that. Maybe it's due to the nice cube rotating effect?
-    #That's the reason, why the desktop-related methods don't work with Ubuntu. 
+    #That's the reason, why the desktop-related methods don't work with Ubuntu.
     #
-    #Part of the EWMH standard CURRENT_DESKTOP. 
+    #Part of the EWMH standard CURRENT_DESKTOP.
     def desktop
       err = ""
       out = ""
@@ -698,27 +737,33 @@ module XDo
       Integer(out)
     end
     
-    #The title of the window or nil if it doesn't have a title. 
+    #The title of the window or nil if it doesn't have a title.
     #===Return value
-    #The window's title, encoded as UTF-8, or nil if the window doesn't have a title. 
+    #The window's title, encoded as UTF-8, or nil if the window doesn't have a title.
     #===Raises
-    #[XError] Error executing +xwininfo+. 
+    #[XError] Error executing +xwininfo+.
     #===Example
     #  p xwin.title #=> "xwindow.rb SciTE"
     def title
       err = ""
       out = ""
-      Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      if @id == XWindow.root_id #This is the root window
+        return "(the root window)"
+      elsif @id.zero?
+        return "(NULL window)"
+      else
+        Open3.popen3("#{XDo::XWININFO} -id #{@id}"){|stdin, stdout, stderr| out << stdout.read; err << stderr.read}
+      end
       Kernel.raise(XDo::XError, err) unless err.empty?
       title = out.strip.lines.to_a[0].match(/"(.*)"/)[1] rescue Kernel.raise(XDo::XError, "No window with ID #{@id} found!")
-      return title #Kann auch nil sein, dann ist das Fenster namenlos. 
+      return title #Kann auch nil sein, dann ist das Fenster namenlos.
     end
     
-    #The absolute position of the window on the screen. 
+    #The absolute position of the window on the screen.
     #===Return value
-    #A two-element array of form <tt>[x, y]</tt>. 
+    #A two-element array of form <tt>[x, y]</tt>.
     #===Raises
-    #[XError] Error executing +xwininfo+. 
+    #[XError] Error executing +xwininfo+.
     #===Example
     #  p xwin.abs_position #=> [0, 51]
     def abs_position
@@ -733,11 +778,11 @@ module XDo
     end
     alias position abs_position
     
-    #The position of the window relative to it's parent window. 
+    #The position of the window relative to it's parent window.
     #===Return value
-    #A two-element array of form <tt>[x, y]</tt>. 
+    #A two-element array of form <tt>[x, y]</tt>.
     #===Raises
-    #[XError] Error executing +xdotool+. 
+    #[XError] Error executing +xdotool+.
     #===Example
     #  p xwin.rel_position => [0, 51]
     def rel_position
@@ -751,11 +796,11 @@ module XDo
       [x.to_i, y.to_i]
     end
     
-    #The size of the window. 
+    #The size of the window.
     #===Return value
-    #A two-element array of form <tt>[width, height]</tt>. 
+    #A two-element array of form <tt>[width, height]</tt>.
     #===Raises
-    #[XError] Error executing +xwininfo+. 
+    #[XError] Error executing +xwininfo+.
     #===Example
     #  p xwin.size #=> [1280, 948]
     def size
@@ -769,11 +814,11 @@ module XDo
       [width.to_i, height.to_i]
     end
     
-    #true if the window is mapped to the screen. 
+    #true if the window is mapped to the screen.
     #===Return value
-    #nil if the window is not mapped, an integer value otherwise. 
+    #nil if the window is not mapped, an integer value otherwise.
     #===Raises
-    #[XError] Error executing +xwininfo+. 
+    #[XError] Error executing +xwininfo+.
     #===Example
     #  p xwin.visible? #=> 470
     #  xwin.unmap
@@ -787,28 +832,28 @@ module XDo
       return out =~ /IsViewable/
     end
     
-    #Returns true if the window exists. 
+    #Returns true if the window exists.
     #===Return value
-    #true or false. 
+    #true or false.
     #===Example
     #  p xwin.exists? #=> true
     def exists?
       XDo::XWindow.id_exists?(@id)
     end
     
-    #Closes a window by activating it and then sending [ALT] + [F4]. 
+    #Closes a window by activating it and then sending [ALT] + [F4].
     #===Return value
-    #nil. 
+    #nil.
     #===Raises
-    #[NotImplementedError] You didn't require "xdo/keyboard". 
+    #[NotImplementedError] You didn't require "xdo/keyboard".
     #===Example
     #  xwin.close
     #===Remarks
-    #A program could ask to save data. 
+    #A program could ask to save data.
     #
-    #Use #kill! to kill the process running the window. 
+    #Use #kill! to kill the process running the window.
     #
-    #Available after requireing "xdo/keyboard". 
+    #Available after requireing "xdo/keyboard".
     def close
       Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       activate
@@ -818,20 +863,20 @@ module XDo
       nil
     end
     
-    #More aggressive variant of #close. Think of +close!+ as 
-    #the middle between #close and #kill!. It first tries 
-    #to close the window by calling #close and if that 
-    #does not succeed (within +timeout+ seconds), it will call #kill!. 
+    #More aggressive variant of #close. Think of +close!+ as
+    #the middle between #close and #kill!. It first tries
+    #to close the window by calling #close and if that
+    #does not succeed (within +timeout+ seconds), it will call #kill!.
     #===Paramters
-    #[+timeout+] (2) The time to wait before using #kill!, in seconds. 
+    #[+timeout+] (2) The time to wait before using #kill!, in seconds.
     #===Return value
-    #Undefined. 
+    #Undefined.
     #===Raises
-    #[XError] Error executing +xkill+. 
+    #[XError] Error executing +xkill+.
     #===Example
     #  xwin.close!
     #===Remarks
-    #Available after requireing "xdo/keyboard". 
+    #Available after requireing "xdo/keyboard".
     def close!(timeout = 2)
       Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       #Try to close normally
@@ -841,19 +886,19 @@ module XDo
         #If not, wait some seconds and then check again
         sleep timeout
         if exists?
-          #If it's not deleted after some time, force it to close. 
+          #If it's not deleted after some time, force it to close.
           kill!
         end
       end
     end
     
-    #Kills the process that runs a window. The window will be 
-    #terminated immediatly, if that isn't what you want, have 
-    #a look at #close. 
+    #Kills the process that runs a window. The window will be
+    #terminated immediatly, if that isn't what you want, have
+    #a look at #close.
     #===Return value
-    #nil. 
+    #nil.
     #===Raises
-    #[XError] Error executing +xkill+. 
+    #[XError] Error executing +xkill+.
     #===Example
     #  xwin.kill!
     def kill!
@@ -864,36 +909,36 @@ module XDo
       nil
     end
     
-    #Returns the window's internal ID. 
+    #Returns the window's internal ID.
     #===Return value
-    #An integer describing the window's internal ID. 
+    #An integer describing the window's internal ID.
     #===Example
     #  p xwin.to_i #=> 29361095
     def to_i
       @id
     end
     
-    #Returns a window's title. 
+    #Returns a window's title.
     #===Return value
-    #The window's title. 
+    #The window's title.
     #===Example
     #  p xwin.to_s #=> "xwindow.rb * SciTE"
     def to_s
       title
     end
     
-    #true if the internal ID is zero. 
+    #true if the internal ID is zero.
     #===Return value
-    #true or false. 
+    #true or false.
     #===Example
     #  p xwin.zero? #=> false
     def zero?
       @id.zero?
     end
     
-    #true if the internal ID is not zero. 
+    #true if the internal ID is not zero.
     #===Return value
-    #nil or the internal ID. 
+    #nil or the internal ID.
     #===Example
     #  p xwin.nonzero? #=> 29361095
     def nonzero?
@@ -911,7 +956,7 @@ module XDo
     
     private
     
-    #Calls +xdotool+'s set_window command with the given options. 
+    #Calls +xdotool+'s set_window command with the given options.
     def set_window(option, value)
       err = ""
       Open3.popen3("#{XDOTOOL} set_window --#{option} '#{value}' #{@id}"){|stdin, stdout, stderr| err << stderr.read}
