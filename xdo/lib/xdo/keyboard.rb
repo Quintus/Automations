@@ -309,20 +309,20 @@ module XDo
           pos = ss.pos
           if ss.scan_until(/{/)
             #Get the string between the last and the recent match. We have to subtract 2 here, 
-            #since a SmallScanner position is always ahead of the stirng character by 1 (since 0 in 
+            #since a StringScanner position is always ahead of the string character by 1 (since 0 in 
             #a SmallScanner means "before the first character") and the matched brace shouldn't be 
             #included. 
             tokens << [:plain, ss.string[Range.new(pos, ss.pos - 2)]] unless ss.pos == 1 #This means, the escape sequence is at the beginning of the string - no :plain text before. 
             pos = ss.pos
             ss.scan_until(/}/)
             tokens << [:esc, ss.string[Range.new(pos, ss.pos - 2)]] #See above for comment on -2
-          else #We're behind the last escape sequence now - there must be some characters left, otherwise this would be triggered. 
+          else #We're behind the last escape sequence now - there must be some characters left, otherwise this wouldn't be triggered. 
             tokens << [:plain, ss.rest]
             ss.terminate
           end
         end
         #Now hunt for special character like ä which can't be send using xdotool's type command. 
-        regexp = Regexp.union(*SPECIAL_CHARS.keys.map{|st| st}) #Regexp.untion escapes automatically, no need for Regexp.escape
+        regexp = Regexp.union(*SPECIAL_CHARS.keys.map{|st| st}) #Regexp.union escapes automatically, no need for Regexp.escape
         tokens.map! do |ary|
           #But first, we have to remedy from that insane forced encoding for StringScanner. 
           #Force every string's encoding back to the original encoding. 
