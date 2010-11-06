@@ -432,17 +432,6 @@ module XDo
       #  win = XDo::XWindow.from_active
       #  win.focus
       #  XDo::XWindow.unfocus
-      #===Remarks
-      #There's a mayor culprit with this method. Once called, every following 
-      #XWindow.from_activate and XWindow#activate calls fail until another 
-      #window has been focused. That is because XWindow#acticate tries to determine 
-      #what the active window is, and fails when trying to get the NULL window 
-      #set by this method. As a workaround, instead of #activate call subsequently 
-      ##raise and #focus, i.e. 
-      #  win.unfocus #Now the NULL window the focus; any #acticate is going to fail. 
-      #  #Set the input focus by combining #raise and #focus: 
-      #  win.raise
-      #  win.focus
       def unfocus(sync = true)
         from_null.focus(sync)
       end
@@ -653,18 +642,7 @@ module XDo
     #Undefined.
     #===Example
     #  xwin.focus
-    #  xwin.unfocus
-    #===Remarks
-    #There's a mayor culprit with this method. Once called, every following 
-    #XWindow.from_activate and XWindow#activate calls fail until another 
-    #window has been focused. That is because XWindow#acticate tries to determine 
-    #what the active window is, and fails when trying to get the NULL window 
-    #set by this method. As a workaround, instead of #activate call subsequently 
-    ##raise and #focus, i.e. 
-    #  win.unfocus #Now the NULL window the focus; any #acticate is going to fail. 
-    #  #Set the input focus by combining #raise and #focus: 
-    #  win.raise
-    #  win.focus
+    #  xwin.unfocus    
     def unfocus(sync = true)
       XDo::XWindow.unfocus(sync)
     end
@@ -732,16 +710,26 @@ module XDo
     #it works on more window managers than #focus and also works across
     #desktops.
     #
-    #After a call to #unfocus or XWindow.unfocus this method doesn't work. See 
-    #the documentation of XWindow.unfocus on why. 
-    #
     #Part of the EWMH standard ACTIVE_WINDOW.
     def activate(sync = true)
-      err = ""
-      opts = []
-      opts << "--sync" if sync
-      Open3.popen3("#{XDo::XDOTOOL} windowactivate #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
-      Kernel.raise(XDo::XError, err) unless err.empty?
+      tried_focus = false
+      begin
+        err = ""
+        opts = []
+        opts << "--sync" if sync
+        Open3.popen3("#{XDo::XDOTOOL} windowactivate #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+        Kernel.raise(XDo::XError, err) unless err.empty?
+      rescue XDo::XError
+        #If no window is active, xdotool's windowactivate fails, 
+        #because it tries to determine which is the currently active window. 
+        unless tried_focus
+          tried_focus = true
+          focus
+          retry
+        else
+          raise
+        end
+      end
     end
     
     #Move a window to a desktop.
