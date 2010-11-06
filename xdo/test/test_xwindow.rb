@@ -64,7 +64,6 @@ class WindowTest < Test::Unit::TestCase
   end
   
   def test_active
-    XDo::XWindow.from_root.focus #Ensure the input focus is elsewhere
     @@xwin.activate
     assert_equal(@@xwin.id, XDo::XWindow.from_active.id)
   end
