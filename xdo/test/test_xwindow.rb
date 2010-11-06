@@ -9,6 +9,7 @@ class WindowTest < Test::Unit::TestCase
   
   attr_accessor :xwindow
   
+  #The command used to create new windows. 
   #The program MUST NOT start maximized. xdotool has no possibility of 
   #acting on maximized windows. 
   NEW_WINDOW_CMD = "gedit"
@@ -22,6 +23,7 @@ class WindowTest < Test::Unit::TestCase
   end
   
   def self.shutdown
+    @@xwin.focus
     @@xwin.close!
   end
   
@@ -58,24 +60,19 @@ class WindowTest < Test::Unit::TestCase
   
   def test_unfocus
     XDo::XWindow.unfocus
-    assert_raise(XDo::XError){XDo::XWindow.from_active} #Nothing's active anymore
-    sleep 1
+    assert_raise(XDo::XError){XDo::XWindow.from_active} #Nothing's active anymore    
   end
   
   def test_active
-    @@xwin.unfocus
-    sleep 1
+    XDo::XWindow.from_root.focus #Ensure the input focus is elsewhere
     @@xwin.activate
     assert_equal(@@xwin.id, XDo::XWindow.from_active.id)
-    sleep 1
   end
   
   def test_focused
     @@xwin.unfocus
-    sleep 1
     @@xwin.focus
     assert_equal(@@xwin.id, XDo::XWindow.from_focused.id)
-    sleep 1
   end
   
   def test_move
@@ -83,23 +80,18 @@ class WindowTest < Test::Unit::TestCase
     assert_in_delta(50, 60, @@xwin.abs_position[0])
     assert_in_delta(50, 50, @@xwin.abs_position[1])
     assert_equal(@@xwin.abs_position, @@xwin.rel_position)
-    sleep 1
   end
   
   def test_resize
     @@xwin.resize(500, 500)
     assert_equal([500, 500], @@xwin.size)
-    sleep 1
   end
 
   def test_map
     @@xwin.unmap
-    sleep 0.2
     assert_equal(nil, @@xwin.visible?)
     @@xwin.map
-    sleep 0.2
-    assert_block("Window is not visible."){@@xwin.visible?.kind_of?(Integer)}
-    sleep 1
+    assert_block("Window is not visible."){@@xwin.visible?.kind_of?(Integer)}    
   end
   
 end

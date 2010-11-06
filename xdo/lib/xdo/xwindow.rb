@@ -33,7 +33,7 @@ module XDo
   #about the differences - but if you're absolutely sure your window title matches
   #that wonderful three-line extended regexp and +xdotool+ doesn't find it, you
   #may email me at sutniuq@@gmx@net explaining which construct defeats +xdotool+.
-  #I will then setup a list over time which states which constructs doesn't work.
+  #I will then setup a list over time which states which constructs don't work.
   #
   #Be <i>very careful</i> with the methods that are part of the two desktop EWMH standards.
   #After I set the number of desktops and changed the current desktop, I had to reboot my
@@ -424,14 +424,27 @@ module XDo
       
       #Unsets the input focus by setting it to the invalid
       #NULL window.
+      #===Parameters
+      #[+sync+] (true) If true, this method blocks until the input focus has been unset. 
       #===Return value
       #nil.
       #===Example
       #  win = XDo::XWindow.from_active
       #  win.focus
       #  XDo::XWindow.unfocus
-      def unfocus
-        from_null.focus
+      #===Remarks
+      #There's a mayor culprit with this method. Once called, every following 
+      #XWindow.from_activate and XWindow#activate calls fail until another 
+      #window has been focused. That is because XWindow#acticate tries to determine 
+      #what the active window is, and fails when trying to get the NULL window 
+      #set by this method. As a workaround, instead of #activate call subsequently 
+      ##raise and #focus, i.e. 
+      #  win.unfocus #Now the NULL window the focus; any #acticate is going to fail. 
+      #  #Set the input focus by combining #raise and #focus: 
+      #  win.raise
+      #  win.focus
+      def unfocus(sync = true)
+        from_null.focus(sync)
       end
       
       #Deprecated.
@@ -571,6 +584,7 @@ module XDo
     #[+width+] The new width, usually in pixels.
     #[+height+] The new height, usually in pixels.
     #[+use_hints+] (false) If true, window sizing hints are used if they're available. This is usually done when resizing terminal windows to a specific number of rows and columns.
+    #[+sync+] (true) If true, this method blocks until the window has finished resizing. 
     #===Return value
     #Undefined.
     #===Raises
@@ -582,18 +596,21 @@ module XDo
     #  xtermwin.resize(100, 100, true)
     #===Remarks
     #This has no effect on maximized winwows.
-    def resize(width, height, use_hints = false)
+    def resize(width, height, use_hints = false, sync = true)
       err = ""
-      cmd = "#{XDo::XDOTOOL} windowsize #{use_hints ? "--usehints " : ""}#{@id} #{width} #{height}"
-      Open3.popen3("#{cmd}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--usehints" if use_hints
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowsize #{opts.join(" ")} #{@id} #{width} #{height}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
     #Moves a window. +xdotool+ is not really exact with the coordinates,
-    #the window will be within a range of +-10 pixels.
+    #special windows like Ubuntu's panels make it placing wrong. 
     #===Parameters
     #[+x+] The goal X coordinate.
     #[+y+] The goal Y coordinate.
+    #[+sync+] (true) If true, this method blocks until the window has finished moving. 
     #===Return value
     #Undefined.
     #===Raises
@@ -601,13 +618,17 @@ module XDo
     #===Example
     #  xwin.move(100, 100)
     #  p xwin.abs_position #=> [101, 101]
-    def move(x, y)
+    def move(x, y, sync = true)
       err = ""
-      Open3.popen3("#{XDo::XDOTOOL} windowmove #{@id} #{x} #{y}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowmove #{opts.join(" ")} #{@id} #{x} #{y}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
     #Set the input focus to the window (but don't bring it to the front).
+    #===Parameters
+    #[+sync+] (true) If true, this method blocks until the window got the input focus. 
     #===Return value
     #Undefined.
     #===Raises
@@ -617,23 +638,40 @@ module XDo
     #===Remarks
     #This method may not work on every window manager. You should use
     ##activate, which is supported by more window managers.
-    def focus
+    def focus(sync = true)
       err = ""
-      Open3.popen3("#{XDo::XDOTOOL} windowfocus #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowfocus #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
     #The window loses the input focus by setting it to an invalid window.
+    #Parameters
+    #[+sync+] (true) If true, this method blocks until the focus has been set to nothing. 
     #===Return value
     #Undefined.
     #===Example
     #  xwin.focus
     #  xwin.unfocus
-    def unfocus
-      XDo::XWindow.unfocus
+    #===Remarks
+    #There's a mayor culprit with this method. Once called, every following 
+    #XWindow.from_activate and XWindow#activate calls fail until another 
+    #window has been focused. That is because XWindow#acticate tries to determine 
+    #what the active window is, and fails when trying to get the NULL window 
+    #set by this method. As a workaround, instead of #activate call subsequently 
+    ##raise and #focus, i.e. 
+    #  win.unfocus #Now the NULL window the focus; any #acticate is going to fail. 
+    #  #Set the input focus by combining #raise and #focus: 
+    #  win.raise
+    #  win.focus
+    def unfocus(sync = true)
+      XDo::XWindow.unfocus(sync)
     end
     
-    #Maps a window to the screen (make it visible).
+    #Maps a window to the screen (makes it visible).
+    #===Parameters
+    #[+sync+] (true) If true, this method blocks until the window has been mapped. 
     #===Return value
     #Undefined.
     #===Raises
@@ -641,22 +679,28 @@ module XDo
     #===Example
     #  xwin.unmap #Windows are usually mapped
     #  xwin.map
-    def map
+    def map(sync = true)
       err = ""
-      Open3.popen3("#{XDo::XDOTOOL} windowmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowmap #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
     #Unmap a window from the screen (make it invisible).
+    #===Parameters
+    #[+sync+] (true) If true, this method blocks until the window has been unmapped. 
     #===Return value
     #Undefined.
     #===Raises
     #[XError] Error executing +xdotool+.
     #===Example
     #  xwin.unmap
-    def unmap
+    def unmap(sync = true)
       err = ""
-      Open3.popen3("#{XDo::XDOTOOL} windowunmap #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowunmap #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -675,6 +719,8 @@ module XDo
     end
     
     #Activate a window. That is, bring it to top and give it the input focus.
+    #===Parameters
+    #[+sync+] (true) If true, this method blocks until the window has been activated. 
     #===Return value
     #Undefined.
     #===Raises
@@ -686,10 +732,15 @@ module XDo
     #it works on more window managers than #focus and also works across
     #desktops.
     #
+    #After a call to #unfocus or XWindow.unfocus this method doesn't work. See 
+    #the documentation of XWindow.unfocus on why. 
+    #
     #Part of the EWMH standard ACTIVE_WINDOW.
-    def activate
+    def activate(sync = true)
       err = ""
-      Open3.popen3("#{XDo::XDOTOOL} windowactivate #{@id}"){|stdin, stdout, stderr| err << stderr.read}
+      opts = []
+      opts << "--sync" if sync
+      Open3.popen3("#{XDo::XDOTOOL} windowactivate #{opts.join(" ")} #{@id}"){|stdin, stdout, stderr| err << stderr.read}
       Kernel.raise(XDo::XError, err) unless err.empty?
     end
     
@@ -857,7 +908,6 @@ module XDo
     def close
       Kernel.raise(NotImplementedError, "You have to require 'xdo/keyboard' before you can use #{__method__}!") unless defined? XDo::Keyboard
       activate
-      sleep 0.5
       XDo::Keyboard.char("Alt+F4")
       sleep 0.5
       nil
