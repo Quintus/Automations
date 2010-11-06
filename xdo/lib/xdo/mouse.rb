@@ -49,6 +49,7 @@ module XDo
       #[+x+] The goal Y coordinate. 
       #[+speed+] (2) Cursor move speed, in pixels per iteration. The higher the value, the more inaccurate the movement (but you can be sure the cursor is always at the position you specified at the end). 
       #[+set+] (false) If true, the +speed+ parameter is ignored and the cursor is directly set to the given position. 
+      #[+sync+] (true) If true, this method blocks until the cursor has reached the given position. 
       #===Return value
       #The position you specified, as a two-dimensional array of form <tt>[x, y]</tt>. 
       #===Raises
@@ -60,9 +61,11 @@ module XDo
       #  XDo::Mouse.move(10, 10, 10)
       #  #Directly set the cursor to (10|10) without any movement
       #  XDo::Mouse.move(10, 10, 1, true)
-      def move(x, y, speed = 2, set = false)
+      def move(x, y, speed = 2, set = false, sync = true)
         if set
-          `#{XDOTOOL} mousemove #{x} #{y}`
+          opts = []
+          opts << "--sync" if sync
+          `#{XDOTOOL} mousemove #{opts.join(" ")} #{x} #{y}`
           return [x, y]
         else
           raise(ArgumentError, "speed has to be > 0 (default is 2), was #{speed}!") if speed <= 0
