@@ -3,7 +3,6 @@
 #Copyright © 2009, 2010 Marvin Gülker
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 require_relative("../xdo")
-require_relative("small_scanner")
 
 module XDo
   
@@ -303,7 +302,9 @@ module XDo
       #  [[:plain, "nonspecial"], [:special, "a"], [:esc, "INS"], ...]
       def tokenize(str)
         tokens = []
-        ss = SmallScanner.new(str)
+        #We need a binary version of our string as StringScanner isn't able to work 
+        #with encodings. 
+        ss = StringScanner.new(str.dup.force_encoding("BINARY")) #String#force_encoding always returns self
         until ss.eos?
           pos = ss.pos
           if ss.scan_until(/{/)
@@ -323,13 +324,20 @@ module XDo
         #Now hunt for special character like ä which can't be send using xdotool's type command. 
         regexp = Regexp.union(*SPECIAL_CHARS.keys.map{|st| st}) #Regexp.untion escapes automatically, no need for Regexp.escape
         tokens.map! do |ary|
+          #But first, we have to remedy from that insane forced encoding for StringScanner. 
+          #Force every string's encoding back to the original encoding. 
+          ary[1].force_encoding(str.encoding)
           next([ary]) unless ary[0] == :plain #Extra array since we flatten(1) it afterwards
           tokens2 = []
-          ss = SmallScanner.new(ary[1])
+          ss = StringScanner.new(ary[1])
           until ss.eos?
             pos = ss.pos
             if ss.scan_until(regexp)
-              tokens2 << [:plain, ss.string[Range.new(pos, ss.pos - 2)]] unless ss.pos == 1
+              #Same as for the first StringScanner encoding problem goes here, but since I now have to use a UTF-8 regexp 
+              #I have to put the string into the StringScanner as UTF-8, but because the StringScanner returns positions for 
+              #a BINARY-encoded string I have to get the string, grep the position from the BINARY version and then reforce 
+              #it to the correct encoding. 
+              tokens2 << [:plain, ss.string.dup.force_encoding("BINARY")[Range.new(pos, ss.pos - 2)].force_encoding(str.encoding)] unless ss.pos == 1
               tokens2 << [:special, ss.matched]
               pos = ss.pos
             else

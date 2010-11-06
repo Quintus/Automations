@@ -4,6 +4,7 @@
 #  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
 
 require "open3"
+require "strscan"
 
 #The namespace of this library. 
 module XDo
