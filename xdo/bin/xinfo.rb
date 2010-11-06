@@ -78,20 +78,18 @@ class XInfoFrame < Wx::Frame
     Timer.every(UPDATE_TIME) do
       begin
         @updater.update
-        @title.text = @updater.act_win.title
-        @id.text = @updater.act_win.id.inspect
-        @abs_xy.text = @updater.act_win.abs_position.join(", ")
-        @rel_xy.text = @updater.act_win.rel_position.join(", ")
+        @title.value = @updater.act_win.title
+        @id.value = @updater.act_win.id.inspect
+        @abs_xy.value = @updater.act_win.abs_position.join(", ")
+        @rel_xy.value = @updater.act_win.rel_position.join(", ")
         ary = @updater.act_win.size
-        @width.text = ary[0].inspect
-        @height.text = ary[1].inspect
-      rescue NoMethodError #This means the active window is being closed. 
-        THE_APP.log.warn "Window closed. Skipping NoMethodError. "        
+        @width.value = ary[0].inspect
+        @height.value = ary[1].inspect        
       end
       
       curpos = @updater.cursorpos
-      @x.text = curpos[0].inspect
-      @y.text = curpos[1].inspect
+      @x.value = curpos[0].inspect
+      @y.value = curpos[1].inspect
     end
   end
   
@@ -117,8 +115,9 @@ class XInfo < Wx::App
     super
   rescue => e
     @log.fatal(e.class.name)
+    @log.fatal(e.message)
     e.backtrace.each{|trace| @log.fatal(trace)}
-    message = "A #{e.class} occured. Backtrace: \n\n#{e.backtrace.join("\n")}"    
+    message = "A #{e.class} occured: #{e.message} \n\nBacktrace: \n\n#{e.backtrace.join("\n")}"    
     message << "\n\nIf you want to contact me about the error, send an email to sutniuq ät gmx Dot net."    
     msgbox = MessageDialog.new(@mainwindow, message, $!.class.name, OK | ICON_ERROR)
     msgbox.show_modal
