@@ -56,9 +56,9 @@ class WindowTest < Test::Unit::TestCase
     assert_equal(true, XDo::XWindow.exists?(@@xwin.title))
   end
   
-  def test_activate_desktop
-    XDo::XWindow.activate_desktop
-    assert_equal(XDo::XWindow.from_title(XDo::XWindow.desktop_name).id, XDo::XWindow.from_active.id)
+  def test_unfocus
+    XDo::XWindow.unfocus
+    assert_raise(XDo::XError){XDo::XWindow.from_active} #Nothing's active anymore
     sleep 1
   end
   
