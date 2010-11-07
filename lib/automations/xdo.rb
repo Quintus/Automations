@@ -6,32 +6,36 @@
 require "open3"
 require "strscan"
 
-#The namespace of this library. 
-module XDo
+module Automations
   
-  #The command to start xdotool. 
-  XDOTOOL = "xdotool"
+  #The namespace of this library. 
+  module XDo
+    
+    #The command to start xdotool. 
+    XDOTOOL = "xdotool"
+    
+    #The command to start xsel. 
+    XSEL = "xsel"
+    
+    #The command to start xwininfo. 
+    XWININFO = "xwininfo"
+    
+    #The command to start xkill. 
+    XKILL = "xkill"
+    
+    #The command to start eject. 
+    EJECT = "eject"
+    
+    #The version of this library. 
+    VERSION = File.read(File.join(File.expand_path(File.dirname(__FILE__)), "..", "VERSION")).freeze
+    
+    #Class for errors in this library. 
+    class XError < StandardError
+    end
+    
+    class ParseError < StandardError
+    end
+    
+  end #module XDo
   
-  #The command to start xsel. 
-  XSEL = "xsel"
-  
-  #The command to start xwininfo. 
-  XWININFO = "xwininfo"
-  
-  #The command to start xkill. 
-  XKILL = "xkill"
-  
-  #The command to start eject. 
-  EJECT = "eject"
-  
-  #The version of this library. 
-  VERSION = File.read(File.join(File.expand_path(File.dirname(__FILE__)), "..", "VERSION")).freeze
-  
-  #Class for errors in this library. 
-  class XError < StandardError
-  end
-  
-  class ParseError < StandardError
-  end
-  
-end #module XDo
+end
