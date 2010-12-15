@@ -6,36 +6,34 @@ require_relative("../xdo")
 
 module Automations
   
-  module XDo
+  #Automate your mouse! You can simulate every click you can do with 
+  #your fingers - it's kind of funny, but don't forget to create USEFUL 
+  #applications, not ones annoying your users (e. g. you could make 
+  #his/her mouse unusable). 
+  module Mouse
     
-    #Automate your mouse! You can simulate every click you can do with 
-    #your fingers - it's kind of funny, but don't forget to create USEFUL 
-    #applications, not ones annoying your users (e. g. you could make 
-    #his/her mouse unusable). 
-    module Mouse
+    #Left mouse button. 
+    LEFT = 1
+    #Middle mouse button (as if you click your mouse wheel). 
+    MIDDLE = 2
+    #Right mouse button. 
+    RIGHT = 3
+    #Mouse wheel up. 
+    UP = 4
+    #Mouse wheel down. 
+    DOWN = 5
+    
+    #Maps the button's symbols to the numbers xdotool uses. 
+    BUTTON2XDOTOOL = {
+      :left => 1, 
+      :middle => 2, 
+      :right => 3, 
+      :up => 4, 
+      :down => 5
+      }.freeze
       
-      #Left mouse button. 
-      LEFT = 1
-      #Middle mouse button (as if you click your mouse wheel). 
-      MIDDLE = 2
-      #Right mouse button. 
-      RIGHT = 3
-      #Mouse wheel up. 
-      UP = 4
-      #Mouse wheel down. 
-      DOWN = 5
-      
-      #Maps the button's symbols to the numbers xdotool uses. 
-      BUTTON2XDOTOOL = {
-        :left => 1, 
-        :middle => 2, 
-        :right => 3, 
-        :up => 4, 
-        :down => 5
-        }.freeze
-        
       class << self
-        
+      
         #Gets the current cursor position. 
         #===Return value
         #A two-element array of form <code>[x, y]</code>. 
@@ -45,7 +43,7 @@ module Automations
           out = `#{XDOTOOL} getmouselocation`.match(/x:(\d+) y:(\d+)/)
           [$1.to_i, $2.to_i]
         end
-        
+      
         #Moves the mouse cursor to the given position. 
         #===Parameters
         #[+x+] The goal X coordinate. 
@@ -107,11 +105,11 @@ module Automations
             if position != [x, y]
               move(x, y, 1, true)
             end #if position != [x, y]
-            
+          
           end #if set
           [x, y]
         end #def move
-        
+      
         #Simulates a mouse click. If you don't specify a X AND a Y position, 
         #the click will happen at the current cursor position. 
         #===Parameters
@@ -142,7 +140,7 @@ module Automations
           end
           `#{XDOTOOL} click #{BUTTON2XDOTOOL[button]}`
         end
-        
+      
         #Scroll with the mouse wheel. +amount+ is the time of steps to scroll. 
         #===Parameters
         #[+dir+] The direction to scroll into. Either :up or :down. 
@@ -168,7 +166,7 @@ module Automations
           end
           amount.times{click(nil, nil, dir)}
         end
-        
+      
         #Holds a mouse button down. Don't forget to release it some time. 
         #===Parameters
         #[+button+] (:left) The button to hold down. 
@@ -190,7 +188,7 @@ module Automations
           end
           `#{XDOTOOL} mousedown #{BUTTON2XDOTOOL[button]}`
         end
-        
+      
         #Releases a mouse button. Probably it's a good idea to call #down first?
         #===Parameters
         #[+button+] (:left) The button to release.  
@@ -212,7 +210,7 @@ module Automations
           end
           `#{XDOTOOL} mouseup #{BUTTON2XDOTOOL[button]}`
         end
-        
+      
         #Executs a drag&drop operation. 
         #===Parameters
         #[+x1+] Start X coordinate. Set to the current cursor X coordinate if set to nil. Pass together with +y1+. 
@@ -247,10 +245,9 @@ module Automations
           up(button)
           nil
         end
-        
-      end #class << self
       
-    end #module Mouse
+      end #class << self
+          
   end
   
 end
