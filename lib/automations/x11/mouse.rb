@@ -1,42 +1,41 @@
 #Encoding: UTF-8
-#This file is part of Xdo. 
+#This file is part of Xdo.
 #Copyright © 2009 Marvin Gülker
-#  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
-require_relative("../xdo")
+#  Initia in potestate nostra sunt, de eventu fortuna iudicat.
 
 module Automations
   
-  #Automate your mouse! You can simulate every click you can do with 
-  #your fingers - it's kind of funny, but don't forget to create USEFUL 
-  #applications, not ones annoying your users (e. g. you could make 
-  #his/her mouse unusable). 
+  #Automate your mouse! You can simulate every click you can do with
+  #your fingers - it's kind of funny, but don't forget to create USEFUL
+  #applications, not ones annoying your users (e. g. you could make
+  #his/her mouse unusable).
   module Mouse
     
-    #Left mouse button. 
+    #Left mouse button.
     LEFT = 1
-    #Middle mouse button (as if you click your mouse wheel). 
+    #Middle mouse button (as if you click your mouse wheel).
     MIDDLE = 2
-    #Right mouse button. 
+    #Right mouse button.
     RIGHT = 3
-    #Mouse wheel up. 
+    #Mouse wheel up.
     UP = 4
-    #Mouse wheel down. 
+    #Mouse wheel down.
     DOWN = 5
     
-    #Maps the button's symbols to the numbers xdotool uses. 
+    #Maps the button's symbols to the numbers xdotool uses.
     BUTTON2XDOTOOL = {
-      :left => 1, 
-      :middle => 2, 
-      :right => 3, 
-      :up => 4, 
+      :left => 1,
+      :middle => 2,
+      :right => 3,
+      :up => 4,
       :down => 5
       }.freeze
       
       class << self
       
-        #Gets the current cursor position. 
+        #Gets the current cursor position.
         #===Return value
-        #A two-element array of form <code>[x, y]</code>. 
+        #A two-element array of form <code>[x, y]</code>.
         #===Example
         #  p XDo::Mouse.position #=> [12, 326]
         def position
@@ -44,17 +43,17 @@ module Automations
           [$1.to_i, $2.to_i]
         end
       
-        #Moves the mouse cursor to the given position. 
+        #Moves the mouse cursor to the given position.
         #===Parameters
-        #[+x+] The goal X coordinate. 
-        #[+x+] The goal Y coordinate. 
-        #[+speed+] (2) Cursor move speed, in pixels per iteration. The higher the value, the more inaccurate the movement (but you can be sure the cursor is always at the position you specified at the end). 
-        #[+set+] (false) If true, the +speed+ parameter is ignored and the cursor is directly set to the given position. 
-        #[+sync+] (true) If true, this method blocks until the cursor has reached the given position. 
+        #[+x+] The goal X coordinate.
+        #[+x+] The goal Y coordinate.
+        #[+speed+] (2) Cursor move speed, in pixels per iteration. The higher the value, the more inaccurate the movement (but you can be sure the cursor is always at the position you specified at the end).
+        #[+set+] (false) If true, the +speed+ parameter is ignored and the cursor is directly set to the given position.
+        #[+sync+] (true) If true, this method blocks until the cursor has reached the given position.
         #===Return value
-        #The position you specified, as a two-dimensional array of form <tt>[x, y]</tt>. 
+        #The position you specified, as a two-dimensional array of form <tt>[x, y]</tt>.
         #===Raises
-        #[ArgumentError] The value of +speed+ was lower or equal to zero. 
+        #[ArgumentError] The value of +speed+ was lower or equal to zero.
         #===Example
         #  #Move to (10|10)
         #  XDo::Mouse.move(10, 10)
@@ -90,18 +89,18 @@ module Automations
               end
               #Move to computed position
               move(act_x, act_y, speed, true)
-              #Check wheather the cursor's current position is inside an 
-              #acceptable area around the goal position. The size of this 
-              #area is defined by +speed+; this check ensures we don't get 
-              #an infinite loop for unusual conditions. 
+              #Check wheather the cursor's current position is inside an
+              #acceptable area around the goal position. The size of this
+              #area is defined by +speed+; this check ensures we don't get
+              #an infinite loop for unusual conditions.
               if ((aim_x - speed)..(aim_x + speed)).include? act_x
                 if ((aim_y - speed)..(aim_y + speed)).include? act_y
                   break
                 end #if in Y-Toleranz
               end #if in X-Toleranz
             end #loop
-            #Correct the cursor position to point to the exact point specified. 
-            #This is for the case the "acceptable area" condition above triggers. 
+            #Correct the cursor position to point to the exact point specified.
+            #This is for the case the "acceptable area" condition above triggers.
             if position != [x, y]
               move(x, y, 1, true)
             end #if position != [x, y]
@@ -110,15 +109,15 @@ module Automations
           [x, y]
         end #def move
       
-        #Simulates a mouse click. If you don't specify a X AND a Y position, 
-        #the click will happen at the current cursor position. 
+        #Simulates a mouse click. If you don't specify a X AND a Y position,
+        #the click will happen at the current cursor position.
         #===Parameters
-        #[+x+] (nil) The goal X position. Specify together with +y+. 
-        #[+y+] (nil) The goal Y position. 
-        #[+button+] (:left) The button to click with. One of the following symbols: <tt>:left</tt>, <tt>:right</tt>, <tt>:middle</tt>. 
-        #The other arguments are the same as for #move. 
+        #[+x+] (nil) The goal X position. Specify together with +y+.
+        #[+y+] (nil) The goal Y position.
+        #[+button+] (:left) The button to click with. One of the following symbols: <tt>:left</tt>, <tt>:right</tt>, <tt>:middle</tt>.
+        #The other arguments are the same as for #move.
         #===Return value
-        #Undefined. 
+        #Undefined.
         #===Example
         #  #Click at the current position
         #  XDo::Mouse.click
@@ -141,24 +140,24 @@ module Automations
           `#{XDOTOOL} click #{BUTTON2XDOTOOL[button]}`
         end
       
-        #Scroll with the mouse wheel. +amount+ is the time of steps to scroll. 
+        #Scroll with the mouse wheel. +amount+ is the time of steps to scroll.
         #===Parameters
-        #[+dir+] The direction to scroll into. Either :up or :down. 
-        #[+amount+] The number of steps to scroll. These are *not* meant to be full wheel rounds. 
+        #[+dir+] The direction to scroll into. Either :up or :down.
+        #[+amount+] The number of steps to scroll. These are *not* meant to be full wheel rounds.
         #===Return value
-        #Undefined. 
+        #Undefined.
         #===Example
         #  #Scroll up
         #  XDo::Mouse.wheel(:up, 4)
         #  #Scroll down 4 steps
         #  XDo::Mouse.wheel(:down, 4)
         #===Remarks
-        #The X Server handles wheel up and wheel down events like mouse click 
-        #events and if you take a look in the source code of this function you will see, that 
-        #it calls #click passing through the +dir+ parameter. So, if you want to be funny, 
-        #write something like 
+        #The X Server handles wheel up and wheel down events like mouse click
+        #events and if you take a look in the source code of this function you will see, that
+        #it calls #click passing through the +dir+ parameter. So, if you want to be funny,
+        #write something like
         #  XDo::Mouse.click(nil, nil, :up)
-        #. 
+        #.
         def wheel(dir, amount)
           if button.kind_of?(Numeric)
             warn("#{caller.first}: Deprecation warning: Use symbols such as :up for the dir parameter.")
@@ -167,11 +166,11 @@ module Automations
           amount.times{click(nil, nil, dir)}
         end
       
-        #Holds a mouse button down. Don't forget to release it some time. 
+        #Holds a mouse button down. Don't forget to release it some time.
         #===Parameters
-        #[+button+] (:left) The button to hold down. 
+        #[+button+] (:left) The button to hold down.
         #===Return value
-        #Undefined. 
+        #Undefined.
         #===Example
         #  #Hold down the left mouse button for a second
         #  XDo::Mouse.down
@@ -191,9 +190,9 @@ module Automations
       
         #Releases a mouse button. Probably it's a good idea to call #down first?
         #===Parameters
-        #[+button+] (:left) The button to release.  
+        #[+button+] (:left) The button to release.
         #===Return value
-        #Undefined. 
+        #Undefined.
         #===Example
         #  #Hold down the left mouse button for a second
         #  XDo::Mouse.down
@@ -211,21 +210,21 @@ module Automations
           `#{XDOTOOL} mouseup #{BUTTON2XDOTOOL[button]}`
         end
       
-        #Executs a drag&drop operation. 
+        #Executs a drag&drop operation.
         #===Parameters
-        #[+x1+] Start X coordinate. Set to the current cursor X coordinate if set to nil. Pass together with +y1+. 
-        #[+y1+] Start Y coordinate. Set to the current cursor Y coordinate if set to nil. 
-        #[+x2+] Goal X coordinate. 
-        #[+y2+] Goal Y coordinate. 
-        #[+button+] (:left) The button to hold down. 
-        #The rest of the parameters is the same as for #move. 
+        #[+x1+] Start X coordinate. Set to the current cursor X coordinate if set to nil. Pass together with +y1+.
+        #[+y1+] Start Y coordinate. Set to the current cursor Y coordinate if set to nil.
+        #[+x2+] Goal X coordinate.
+        #[+y2+] Goal Y coordinate.
+        #[+button+] (:left) The button to hold down.
+        #The rest of the parameters is the same as for #move.
         #===Return value
-        #nil. 
+        #nil.
         #===Example
         #  #Drag from (10|10) to (37|56)
         #  XDo::Mouse.drag(10, 10, 37, 56)
         #  #Drag from (10|10) to (37|56) holding the right mouse button down
-        #  XDo::Mouse.drag(10, 10, 37, 56, :right) 
+        #  XDo::Mouse.drag(10, 10, 37, 56, :right)
         def drag(x1, y1, x2, y2, button = :left, speed = 2, set = false)
           if button.kind_of?(Numeric)
             warn("#{caller.first}: Deprecation warning: Use symbols such as :left for the button parameter.")
