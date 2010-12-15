@@ -1,31 +1,31 @@
 #!/usr/bin/env ruby
 #Encoding: UTF-8
-#This file is part of Automations. 
+#This file is part of Automations.
 #Copyright © 2010 Marvin Gülker
-#  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
+#  Initia in potestate nostra sunt, de eventu fortuna iudicat.
 
-#Things specific to the X11 part, but needed by the 
-#whole part. 
+#Things specific to the X11 part, but needed by the
+#whole part.
 module Automations
   
   module X11
    
-    #The command to start xdotool. 
+    #The command to start xdotool.
     XDOTOOL = "xdotool"
     
-    #The command to start xsel. 
+    #The command to start xsel.
     XSEL = "xsel"
     
-    #The command to start xwininfo. 
+    #The command to start xwininfo.
     XWININFO = "xwininfo"
     
-    #The command to start xkill. 
+    #The command to start xkill.
     XKILL = "xkill"
     
-    #The command to start eject. 
+    #The command to start eject.
     EJECT = "eject"
     
-    #Class for errors in the X11 library. 
+    #Class for errors in the X11 library.
     class XError < StandardError
     end
     
@@ -36,5 +36,5 @@ module Automations
   
 end
 
-require_relative "./linux/keyboard"
-require_relative "./linux/mouse"
+require_relative "./x11/keyboard"
+require_relative "./x11/mouse"
