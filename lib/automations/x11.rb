@@ -36,9 +36,5 @@ module Automations
   
 end
 
-require_relative "./linux/clipboard"
-require_relative "./linux/drive"
 require_relative "./linux/keyboard"
 require_relative "./linux/mouse"
-require_relative "./linux/simulatable"
-require_relative "./linux/xwindow"
