@@ -22,9 +22,6 @@ module Automations
     #The command to start xkill.
     XKILL = "xkill"
     
-    #The command to start eject.
-    EJECT = "eject"
-    
     #Class for errors in the X11 library.
     class XError < StandardError
     end
