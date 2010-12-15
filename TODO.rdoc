@@ -1,6 +1,7 @@
 =TODO list
-The following features will be added in the next minor version bump. 
+The following features will be added in the next minor version bump.
 
-* Make XWindow.wait_for_window return a XWindow object. 
-* Make XWindow#move return the new position of the window. 
-* Make all modifying methods of XWindow using +xdotool+'s new --sync option. 
+* Make Drive a class
+* Make XWindow.wait_for_window return a XWindow object.
+* Make XWindow#move return the new position of the window.
+* Make all modifying methods of XWindow using +xdotool+'s new --sync option.
