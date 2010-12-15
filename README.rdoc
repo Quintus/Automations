@@ -1,42 +1,43 @@
 --
-This file is part of Automations. 
+This file is part of Automations.
 Copyright © 2009, 2010 Marvin Gülker, Steven Heidel
-  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
+  Initia in potestate nostra sunt, de eventu fortuna iudicat.
 ++
 =Automations
 
-*Automations* is a Ruby library to fake user input to Linux systems using X11 
-and Microsoft® Windows® systems. Features include Mouse and Keyboard automation as well as 
-the ability to manipulate windows as objects. 
+*Automations* is a Ruby library to fake user input to Linux systems using X11
+and Microsoft® Windows® systems. Features include Mouse and Keyboard automation as well as
+the ability to manipulate windows as objects.
 
 ==Prerequesites
 
 ==X11
 
-* The X server, of course. 
+* The X server, of course.
 * xdotool[http://www.semicomplete.com/projects/xdotool]
 
 ==Microsoft® Windows®
 
-* AutoIt3[http://www.autoitscript.com]. Copy the <b>AutoItX3.dll</b> file to your Ruby's <b>bin/</b> directory or to the directory you're working in. 
+* AutoIt3[http://www.autoitscript.com]. Copy the <b>AutoItX3.dll</b> file to your Ruby's <b>bin/</b> directory or to the directory you're working in.
 
 ==Usage
 
 ===General
 
-The following code gives you access to a cross-platform universal API 
-that is able to do the most important things. For the platform-specific 
-features, see below. 
+The following code gives you access to a cross-platform universal API
+that is able to do the most important things. For the platform-specific
+features, see below.
 
   require "automations"
   Automations::Mouse.move(100, 100)
   
 ===For specific features
 
-There are some features that aren't available on all platforms Automations 
-supports. Although Automations is aimed at cross-compatibility, you 
-can make use of them if you require the wanted feature in the form 
+There are some features that aren't available on all platforms Automations
+supports. Although Automations is aimed at cross-compatibility, you
+can make use of them if you require the wanted feature in the form
 
+  require "automations"
   require "automations/<platform>/feature"
   #Do something with your feature...
   
@@ -45,17 +46,17 @@ for example
   require "automations/x11/drive"
   Automations::X11::Drive.eject
   
-to require the <tt>Automations::X11::Drive</tt> module. It's unnecessary to 
-say that an application using specific features like the above one isn't 
-portable to another platform easily. 
+to require the <tt>Automations::X11::Drive</tt> module. It's unnecessary to
+say that an application using specific features like the above one isn't
+portable to another platform easily.
 
 ==Note
 
-This README is a draft. Don't count on what it says. 
+This README is a draft. Don't count on what it says.
 
 ==License/Copyright
   Copyright © 2009, 2010 Marvin Gülker, Seven Heidel
-  This library is free software; you may redistribute it and/or modify it 
-  under the terms of Ruby's license (see http://www.ruby-lang.org/en/LICENSE.txt). 
-  You can contact me at sutniuq ät gmx Dot net. 
-  Initia in potestate nostra sunt, de eventu fortuna iudicat. 
+  This library is free software; you may redistribute it and/or modify it
+  under the terms of Ruby's license (see http://www.ruby-lang.org/en/LICENSE.txt).
+  You can contact me at sutniuq ät gmx Dot net.
+  Initia in potestate nostra sunt, de eventu fortuna iudicat.
