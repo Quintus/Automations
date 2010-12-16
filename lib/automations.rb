@@ -30,7 +30,7 @@ end
 #if the target platform isn't supported.
 case RUBY_PLATFORM
 when /linux/ then require_relative "automations/x11"
-when /mswin|mingw|cygwin/ then require_relative "automations/windows"
+when /mswin|mingw|cygwin/ then require_relative "automations/au3"
 else
   raise(NotImplementedError, "We're sorry, but the platform #{RUBY_PLATFORM} isn't supported by Automations yet.")
 end
