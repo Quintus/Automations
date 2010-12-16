@@ -12,9 +12,23 @@ module Automations
   #Things specific to the Au3 part of Automations. 
   module Au3
     
+    #Converts +str+ to a MS API-compliant wide string. 
+    def self.wide_str(str)
+      "#{str}\0".force_encoding("UTF-16LE")
+    end
+    
+    #Converts +str+ from an MS API-compliant wide string back to 
+    #a normal Ruby UTF-8-encoded string. 
+    def self.unwide_str(str)
+      str.encode("UTF-8").strip
+    end
+    
   end
   
 end
 
-require_relative("./au3/keyboard")
+require_relative("./au3/structs")
+require_relative("./au3/functions")
+
+#require_relative("./au3/keyboard")
 require_relative("./au3/mouse")
