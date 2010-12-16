@@ -22,13 +22,6 @@ module Automations
     #The command to start xkill.
     XKILL = "xkill"
     
-    #Class for errors in the X11 library.
-    class XError < StandardError
-    end
-    
-    class ParseError < StandardError
-    end
-    
   end
   
 end

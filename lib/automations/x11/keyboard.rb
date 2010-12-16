@@ -199,10 +199,10 @@ module Automations
               if SPECIAL_CHARS.has_key?(s)
                 char(SPECIAL_CHARS[s], w_id.to_i)
               else
-                raise(XDo::ParseError, "No key symbol known for '#{s}'!")
+                raise(ParseError, "No key symbol known for '#{s}'!")
               end
             else #Write a bug report if you get here. That really shouldn't happen.
-              raise(XDo::ParseError, "Invalid token named #{sym.inspect}! This is an internal error - please write a bug report at http://github.com/Quintus/Automations/issues or email me at sutniuq@@gmx@net.")
+              raise(ParseError, "Invalid token named #{sym.inspect}! This is an internal error - please write a bug report at http://github.com/Quintus/Automations/issues or email me at sutniuq@@gmx@net.")
             end
           end
           str
@@ -223,7 +223,7 @@ module Automations
         def char(c, w_id = 0)
         Open3.popen3("#{XDOTOOL} key #{w_id.nonzero? ? "--window #{w_id.to_i} " : ""}#{c}") do |stdin, stdout, stderr|
         stdin.close_write
-        raise(XDo::XError, "Invalid character '#{c}'!") if stderr.read =~ /No such key name/
+        raise(ArgumentError, "Invalid character '#{c}'!") if stderr.read =~ /No such key name/
       end
       c
     end
@@ -246,7 +246,7 @@ module Automations
     def key_down(key, w_id = 0)
         Open3.popen3("#{XDOTOOL} keydown #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}") do |stdin, stdout, stderr|
         stdin.close_write
-        raise(XDo::XError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
+        raise(ArgumentError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
       end
       key
     end
@@ -268,7 +268,7 @@ module Automations
     def key_up(key, w_id = 0)
         Open3.popen3("#{XDOTOOL} keyup #{w_id.nonzero? ? "--window #{w_id.to_i} " : "" }#{check_for_special_key(key)}") do |stdin, stdout, stderr|
         stdin.close_write
-        raise(XDo::XError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
+        raise(ArgumentError, "Invalid character '#{key}'!") if stderr.read =~ /No such key name/
       end
       key
     end
@@ -355,7 +355,7 @@ module Automations
         tokens.delete_if do |sym, st|
           if st.empty?
             if sym == :esc
-              raise(XDo::ParseError, "Empty escape sequence found!")
+              raise(ParseError, "Empty escape sequence found!")
             else
               true
             end
