@@ -53,7 +53,7 @@ module Automations::Win::Misc
         res | (C.const_get(:"MB_#{sym.upcase}") || raise(ArgumentError, "Unknown style #{sym}!"))
       end
       
-      res = F.message_box(parent, wide_str(text), wide_str(caption), style)
+      res = F.scall(:message_box, parent, wide_str(text), wide_str(caption), style)
       case res
       when C::IDABORT    then :abort
       when C::IDCANCEL   then :cancel
