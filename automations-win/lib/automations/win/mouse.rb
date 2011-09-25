@@ -27,12 +27,12 @@ module Automations::Win::Mouse
     alias pos position
 
     #call-seq:
-    #  position=(x, y)
-    #  pos=(x, y)
+    #  position=(ary)
+    #  pos=(ary)
     #
     #Set the cursor to the specified position.
     #==Parameters
-    #[*ary] The new coordinates as an array of form <tt>[x, y]</tt>.
+    #[ary] The new coordinates as an array of form <tt>[x, y]</tt>.
     #==Example
     #  Mouse.position = [100, 234]
     def position=(ary)
@@ -57,7 +57,7 @@ module Automations::Win::Mouse
     #==Remarks
     #This method isn't absolutely exact, you will notice a slight offset
     #around 2 pixels. If you need absolutely exact coordinates, use
-    #the #position= method, but keep in mind that #move uses the
+    #the ::position= method, but keep in mind that ::move uses the
     #more modern <tt>SendInput()</tt> interface.
     def move(target_x, target_y, relative = false)
       input        = Structs::Input.new

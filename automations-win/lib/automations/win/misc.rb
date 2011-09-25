@@ -82,7 +82,7 @@ module Automations::Win::Misc
     #==Remarks
     #A comprehensive description of the possible system metrics can be
     #found in MSDN's documentation of the <tt>GetSystemMetrics()</tt>
-    #function: http://msdn.microsoft.com/en-us/library/ms724385%28v=VS.85%29.aspx.
+    #function: http://msdn.microsoft.com/en-us/library/ms724385%28v=VS.85%29.aspx .
     #
     #Note that this method doesn't raise SystemCallErrors, because the
     #0 usually indicating function failure can actually be a valid

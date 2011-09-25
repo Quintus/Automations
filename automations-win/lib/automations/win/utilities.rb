@@ -16,7 +16,7 @@ module Automations::Win::Utilities
     "#{str}\0".encode("UTF-16LE")
   end
 
-  #Undoes the effect of ::wide_str, i.e. encodes a string to
+  #Undoes the effect of #wide_str, i.e. encodes a string to
   #UTF-8 and then strips off trailing NUL bytes.
   #==Parameter
   #[str] The string to transform.
