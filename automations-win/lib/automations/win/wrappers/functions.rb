@@ -78,5 +78,10 @@ module Automations::Win::Wrappers::Functions
   attach_function :get_last_error, :GetLastError, [], :int
   attach_function :format_message, :FormatMessageW, [:int, :buffer_in, :int, :int, :buffer_out, :int, :pointer], :int #The last pointer is actually varargs...
   attach_function :message_box, :MessageBoxW, [:pointer, :buffer_in, :buffer_in, :uint], :int
+  attach_function :get_system_metrics, :GetSystemMetrics, [:int], :int
 
+  attach_function :get_cursor_pos, :GetCursorPos, [:pointer], :bool
+  attach_function :set_cursor_pos, :SetCursorPos, [:int, :int], :bool
+  attach_function :send_input, :SendInput, [:uint, :pointer, :int], :uint
+  
 end

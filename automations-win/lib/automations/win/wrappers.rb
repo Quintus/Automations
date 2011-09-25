@@ -11,4 +11,5 @@ module Automations::Win::Wrappers
 end
 
 require_relative "wrappers/constants"
+require_relative "wrappers/structs"
 require_relative "wrappers/functions"

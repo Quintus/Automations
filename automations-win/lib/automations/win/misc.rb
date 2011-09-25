@@ -7,10 +7,9 @@ require_relative "../win"
 module Automations::Win::Misc
   extend Automations::Win::Utilities
   
-  C = Automations::Win::Wrappers::Constants
-  F = Automations::Win::Wrappers::Functions
-
   class << self
+    include Automations::Win::Utilities
+    include Automations::Win::Wrappers
     
     #Shows a message box to the user.
     #==Parameters
@@ -50,23 +49,50 @@ module Automations::Win::Misc
     #  end
     def msgbox(caption, text, parent = nil, *styles)
       style = styles.inject(0) do |res, sym| 
-        res | (C.const_get(:"MB_#{sym.upcase}") || raise(ArgumentError, "Unknown style #{sym}!"))
+        res | (Constants.const_get(:"MB_#{sym.upcase}") || raise(ArgumentError, "Unknown style #{sym}!"))
       end
       
-      res = F.scall(:message_box, parent, wide_str(text), wide_str(caption), style)
+      res = Functions.scall(:message_box, parent, wide_str(text), wide_str(caption), style)
       case res
-      when C::IDABORT    then :abort
-      when C::IDCANCEL   then :cancel
-      when C::IDCONTINUE then :continue
-      when C::IDIGNORE   then :ignore
-      when C::IDNO       then :no
-      when C::IDOK       then :ok
-      when C::IDRETRY    then :retry
-      when C::IDTRYAGAIN then :tryagain
-      when C::IDYES      then :yes
+      when Constants::IDABORT    then :abort
+      when Constants::IDCANCEL   then :cancel
+      when Constants::IDCONTINUE then :continue
+      when Constants::IDIGNORE   then :ignore
+      when Constants::IDNO       then :no
+      when Constants::IDOK       then :ok
+      when Constants::IDRETRY    then :retry
+      when Constants::IDTRYAGAIN then :tryagain
+      when Constants::IDYES      then :yes
       else
         res
       end
+    end
+
+    #Reads a specific system attribute.
+    #==Parameter
+    #[sym] The symbol of the parameter to read. Possible symbols can be
+    #      derived from the Automations::Win::Wrappers::Constants::SM_* 
+    #      constants.
+    #==Return value
+    #The specified metric.
+    #==Example
+    #  # Get the screen width. The constant you find is SM_CXSCREEN,
+    #  # therefore the symbol you have to use is :cxsreen.
+    #  Misc.system_metric(:cxscreen) #=> 1024
+    #==Remarks
+    #A comprehensive description of the possible system metrics can be
+    #found in MSDN's documentation of the <tt>GetSystemMetrics()</tt>
+    #function: http://msdn.microsoft.com/en-us/library/ms724385%28v=VS.85%29.aspx.
+    #
+    #Note that this method doesn't raise SystemCallErrors, because the
+    #0 usually indicating function failure can actually be a valid
+    #metric value.
+    def system_metric(sym)
+      const = :"SM_#{sym.upcase}"
+      raise(ArgumentError, "Unknown metric #{sym}!") unless Constants.const_defined?(const)
+      
+      val = Constants.const_get(const)
+      Functions.get_system_metrics(Constants.const_get(const))
     end
 
   end
